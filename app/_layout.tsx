@@ -38,7 +38,12 @@ function InitialLayout() {
     );
   }
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        // This prevents directory group names from showing as headers
+        headerTitle: '',
+      }}>
       <Stack.Screen name="(protected)/home" options={{ headerShown: false }} />
       <Stack.Screen name="signin" options={{ headerShown: false }} />
       <Stack.Screen name="signup" options={{ headerShown: false }} />
