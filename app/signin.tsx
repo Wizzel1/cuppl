@@ -59,6 +59,20 @@ export default function Page() {
           <Text>Sign up</Text>
         </Link>
       </View>
+      <Button
+        title="Account1"
+        onPress={() => {
+          setEmailAddress('test+clerk_test@test.com');
+          setPassword('test+clerk_test');
+        }}
+      />
+      <Button
+        title="Account2"
+        onPress={() => {
+          setEmailAddress('test2+clerk_test@test.com');
+          setPassword('test2+clerk_test');
+        }}
+      />
     </View>
   );
 }
