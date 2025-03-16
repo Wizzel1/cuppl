@@ -2,7 +2,7 @@ import { useAccount, useCoState } from 'jazz-react-native';
 import { useEffect, useState } from 'react';
 import { Button, Text, View } from 'react-native';
 
-import { Couple, shareCouple } from '~/src/schema';
+import { Couple, shareCouple } from '~/src/schema.jazz';
 export default function Profile() {
   const { me, logOut } = useAccount();
   const [inviteLink, setInviteLink] = useState<string | null>(null);

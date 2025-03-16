@@ -73,6 +73,20 @@ export default function Page() {
           setPassword('test2+clerk_test');
         }}
       />
+      <Button
+        title="Account3"
+        onPress={() => {
+          setEmailAddress('test3+clerk_test@test.com');
+          setPassword('test3+clerk_test');
+        }}
+      />
+      <Button
+        title="Account4"
+        onPress={() => {
+          setEmailAddress('test4+clerk_test@test.com');
+          setPassword('test4+clerk_test');
+        }}
+      />
     </View>
   );
 }
