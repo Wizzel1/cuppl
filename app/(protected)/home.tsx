@@ -88,7 +88,7 @@ export default function Index() {
           width: '100%',
           justifyContent: 'center',
           alignItems: 'baseline',
-          marginTop: -50,
+          marginTop: -44,
         }}>
         <Pressable
           onPress={() => {
