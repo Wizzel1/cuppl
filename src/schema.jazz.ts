@@ -500,52 +500,6 @@ export const createPartnerProfile = (
 };
 
 /**
- * Gets the current user's partner profile from a couple.
- *
- * @param couple The couple instance
- * @param currentAccountId The current user's account ID
- * @returns The partner profile for the current user, or null if not found
- */
-export const getMyPartnerProfile = (
-  couple: Couple,
-  currentAccountId: string
-): PartnerProfile | null => {
-  const partnerA = couple.partnerA;
-  const partnerB = couple.partnerB;
-
-  if (partnerA && partnerA.accountId === currentAccountId) {
-    return partnerA;
-  }
-  if (partnerB && partnerB.accountId === currentAccountId) {
-    return partnerB;
-  }
-  return null;
-};
-
-/**
- * Gets the partner's profile (the other person in the couple).
- *
- * @param couple The couple instance
- * @param currentAccountId The current user's account ID
- * @returns The other partner's profile, or null if not found
- */
-export const getPartnerProfile = (
-  couple: Couple,
-  currentAccountId: string
-): PartnerProfile | null => {
-  const partnerA = couple.partnerA;
-  const partnerB = couple.partnerB;
-
-  if (partnerA && partnerA.accountId === currentAccountId) {
-    return partnerB || null;
-  }
-  if (partnerB && partnerB.accountId === currentAccountId) {
-    return partnerA;
-  }
-  return null;
-};
-
-/**
  * Custom hook that returns the couple that the current user is in.
  *
  * This hook simplifies access to the couple data and handles the loading state.
@@ -567,12 +521,22 @@ export const usePartnerProfiles = () => {
   const [partnerProfile, setPartnerProfile] = useState<PartnerProfile | null>(null);
 
   useEffect(() => {
-    if (!couple) return;
-    const myProfile = getMyPartnerProfile(couple, me?.id);
-    const partnerProfile = getPartnerProfile(couple, me?.id);
-    setMyProfile(myProfile);
-    setPartnerProfile(partnerProfile);
-  }, [couple]);
+    if (!couple || !me?.id) return;
+
+    const partnerA = couple.partnerA;
+    const partnerB = couple.partnerB;
+
+    if (partnerA && partnerA.accountId === me.id) {
+      setMyProfile(partnerA);
+      setPartnerProfile(partnerB || null);
+    } else if (partnerB && partnerB.accountId === me.id) {
+      setMyProfile(partnerB);
+      setPartnerProfile(partnerA || null);
+    } else {
+      setMyProfile(null);
+      setPartnerProfile(null);
+    }
+  }, [couple, me?.id]);
 
   return { myProfile, partnerProfile };
 };
