@@ -544,3 +544,35 @@ export const getPartnerProfile = (
   }
   return null;
 };
+
+/**
+ * Custom hook that returns the couple that the current user is in.
+ *
+ * This hook simplifies access to the couple data and handles the loading state.
+ * It automatically retrieves the couple from the user's account root.
+ *
+ * @returns The couple instance or undefined if not loaded yet
+ */
+export const useCouple = () => {
+  const { me } = useAccount();
+  const couple = useCoState(Couple, me?.root?.couple?.id);
+
+  return couple;
+};
+
+export const usePartnerProfiles = () => {
+  const { me } = useAccount();
+  const couple = useCoState(Couple, me?.root?.couple?.id);
+  const [myProfile, setMyProfile] = useState<PartnerProfile | null>(null);
+  const [partnerProfile, setPartnerProfile] = useState<PartnerProfile | null>(null);
+
+  useEffect(() => {
+    if (!couple) return;
+    const myProfile = getMyPartnerProfile(couple, me?.id);
+    const partnerProfile = getPartnerProfile(couple, me?.id);
+    setMyProfile(myProfile);
+    setPartnerProfile(partnerProfile);
+  }, [couple]);
+
+  return { myProfile, partnerProfile };
+};
