@@ -44,17 +44,16 @@ export class TodoList extends CoMap {
   emoji = co.optional.string;
   backgroundColor = co.optional.string;
   items = co.ref(TodoItems);
-  isPrivate = co.boolean;
+  isHidden = co.boolean;
   createdBy = co.string;
   owner = co.literal('me', 'partner', 'us');
   deleted = co.boolean;
 }
 
-export class DefaultTodoList extends CoMap {
-  todos = co.ref(TodoItems);
-}
-
 export class TodoLists extends CoList.Of(co.ref(TodoList)) {}
+export class DefaultTodoList extends CoMap {
+  items = co.ref(TodoItems);
+}
 
 export class Couple extends CoMap {
   anniversary = co.optional.Date;
@@ -62,8 +61,8 @@ export class Couple extends CoMap {
   partnerA = co.ref(PartnerProfile);
   partnerB = co.optional.ref(PartnerProfile);
   // Default todo lists
-  myTodos = co.ref(DefaultTodoList);
-  partnerTodos = co.ref(DefaultTodoList);
+  partnerATodos = co.ref(DefaultTodoList);
+  partnerBTodos = co.ref(DefaultTodoList);
   ourTodos = co.ref(TodoList);
   // Additional todo lists
   todoLists = co.ref(TodoLists);
@@ -272,42 +271,53 @@ export class CoupleAccount extends Account {
     // Create a private group for couple data
     const privateGroup = Group.create({ owner: this });
 
-    // Create empty todo lists
-    const myTodoLists = TodoListList.create([], privateGroup);
-    const partnerTodoLists = TodoListList.create([], privateGroup);
-    const ourTodoLists = TodoListList.create([], privateGroup);
-
     // Create a sample personal todo list
-    const myTodoList = TodoList.create(
+    const myTodoList = this.createTodoList({
+      title: 'My To-Dos',
+      isHidden: false,
+      owner: 'me',
+      emoji: '📝',
+      backgroundColor: '#000000',
+    });
+    myTodoList!.items!.push(
+      TodoItem.create(
+        {
+          title: 'Welcome to your todo list!',
+          completed: false,
+          dueDate: null,
+          notes: null,
+          deleted: false,
+          createdBy: this.id,
+        },
+        privateGroup
+      )
+    );
+
+    const partnerATodos = DefaultTodoList.create(
       {
-        title: 'My To-Dos',
-        emoji: '📝',
-        createdBy: this.id,
-        items: TodoItemList.create(
-          [
-            TodoItem.create(
-              {
-                title: 'Welcome to your todo list!',
-                completed: false,
-                dueDate: null,
-                notes: null,
-                deleted: false,
-                createdBy: this.id,
-              },
-              privateGroup
-            ),
-          ],
-          privateGroup
-        ),
-        isPrivate: true,
-        deleted: false,
+        items: TodoItems.create([], privateGroup),
       },
       privateGroup
     );
 
-    // Add the sample list to personal lists
-    myTodoLists.push(myTodoList);
+    const partnerBTodos = DefaultTodoList.create(
+      {
+        items: TodoItems.create([], privateGroup),
+      },
+      privateGroup
+    );
 
+    const ourTodos = TodoList.create(
+      {
+        title: 'Our To-Dos',
+        owner: 'us',
+        isHidden: false,
+        items: TodoItems.create([], privateGroup),
+        createdBy: this.id,
+        deleted: false,
+      },
+      privateGroup
+    );
     // Create a temporary partner profile first - we'll replace it with the proper one after
     const tempPartnerProfile = PartnerProfile.create(
       {
@@ -327,23 +337,24 @@ export class CoupleAccount extends Account {
         anniversary: new Date(),
         partnerA: tempPartnerProfile, // Use temporary profile initially
         partnerB: null, // Second partner is null until someone joins
-        myTodoLists,
-        partnerTodoLists,
-        ourTodoLists,
+        ourTodos,
+        partnerATodos,
+        partnerBTodos,
+        todoLists: TodoLists.create([], privateGroup),
         deleted: false,
       },
       privateGroup
     );
 
     // Now create the proper partner profile using the createPartnerProfile helper
-    const partnerProfile = createPartnerProfile(
+    const myProfile = createPartnerProfile(
       initialCouple,
       this.profile?.name || 'New Partner',
       this.id
     );
 
     // Replace the temporary profile with the proper one
-    initialCouple.partnerA = partnerProfile;
+    initialCouple.partnerA = myProfile;
 
     // Initialize the account root with version tracking and the couple
     this.root = CoupleAccountRoot.create(
@@ -382,7 +393,13 @@ export class CoupleAccount extends Account {
     return invitedCouple;
   }
 
-  createTodoList(title: string, isPrivate: boolean = true): TodoList | null {
+  createTodoList(args: {
+    title: string;
+    isHidden: boolean;
+    owner: 'me' | 'partner' | 'us';
+    emoji: string;
+    backgroundColor: string;
+  }): TodoList | null {
     if (!this.root?.couple) throw new Error('No couple found');
 
     const couple = this.root.couple;
@@ -391,34 +408,33 @@ export class CoupleAccount extends Account {
 
     const newList = TodoList.create(
       {
-        title,
-        emoji: '📝',
+        title: args.title,
+        emoji: args.emoji,
+        backgroundColor: args.backgroundColor,
         createdBy: this.id,
-        items: TodoItemList.create([], { owner: coupleGroup }),
-        isPrivate,
+        items: TodoItems.create([], { owner: coupleGroup }),
+        isHidden: args.isHidden,
+        owner: args.owner,
         deleted: false,
       },
       { owner: coupleGroup }
     );
 
-    if (isPrivate) {
-      const myProfile = getMyPartnerProfile(couple, this.id);
-      if (myProfile === couple.partnerA && couple.myTodoLists) {
-        couple.myTodoLists.push(newList);
-      }
-      if (myProfile === couple.partnerB && couple.partnerTodoLists) {
-        couple.partnerTodoLists.push(newList);
-      }
-      return null;
-    }
-    if (couple.ourTodoLists) {
-      couple.ourTodoLists.push(newList);
+    if (couple.todoLists) {
+      couple.todoLists.push(newList);
+    } else {
+      throw new Error('No todo lists found');
     }
 
     return newList;
   }
 
-  addTodoItem(list: TodoList, title: string, dueDate?: Date, notes?: string): TodoItem | null {
+  addTodoItem(
+    list: TodoList | DefaultTodoList,
+    title: string,
+    dueDate?: Date,
+    notes?: string
+  ): TodoItem | null {
     if (!list.items) return null;
 
     const owner = list._owner;
@@ -443,30 +459,6 @@ export class CoupleAccount extends Account {
   toggleTodoItem(item: TodoItem): boolean {
     item.completed = !item.completed;
     return item.completed;
-  }
-
-  getTodoLists(listType: 'my' | 'partner' | 'our'): TodoListList | null {
-    if (!this.root?.couple) return null;
-
-    const couple = this.root.couple;
-
-    if (listType === 'my') {
-      const myProfile = getMyPartnerProfile(couple, this.id);
-      if (myProfile === couple.partnerA) {
-        return couple.myTodoLists;
-      }
-      if (myProfile === couple.partnerB) {
-        return couple.partnerTodoLists;
-      }
-    }
-    if (listType === 'partner') {
-      const myProfile = getMyPartnerProfile(couple, this.id);
-      if (myProfile === couple.partnerA) return couple.partnerTodoLists;
-      if (myProfile === couple.partnerB) return couple.myTodoLists;
-    }
-    if (listType === 'our') return couple.ourTodoLists;
-
-    return null;
   }
 }
 
@@ -493,10 +485,7 @@ export const createPartnerProfile = (
   accountId: ID<Account>,
   options?: { nickname?: string; birthday?: Date; avatar?: ImageDefinition }
 ): PartnerProfile => {
-  // Get the group that owns the couple
   const coupleGroup = couple._owner.castAs(Group);
-
-  // Create a new profile owned by the couple's group
   return PartnerProfile.create(
     {
       name,
