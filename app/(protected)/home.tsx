@@ -1,16 +1,17 @@
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
+import { ProgressiveImg } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { useState } from 'react';
 import { Dimensions, Image, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
 import EmojiPicker, { type EmojiType } from 'rn-emoji-keyboard';
 
 import PartnerAvatar from '~/components/PartnerAvatar';
-import { Couple, PartnerProfile } from '~/src/schema.jazz';
+import { PartnerProfile, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function Index() {
-  const { me } = useAccount();
-  const couple = useCoState(Couple, me.coupleId);
+  const couple = useCouple();
+  const { myProfile, partnerProfile } = usePartnerProfiles();
+
   const [isOpen, setIsOpen] = useState(false);
   const [partnerTapped, setPartnerTapped] = useState<PartnerProfile | null>(null);
 
@@ -92,23 +93,23 @@ export default function Index() {
         }}>
         <Pressable
           onPress={() => {
-            setPartnerTapped(couple?.partnerA ?? null);
+            setPartnerTapped(myProfile ?? null);
             setIsOpen(true);
           }}>
-          <Text style={styles.moodText}>{couple?.partnerA?.mood}</Text>
+          <Text style={styles.moodText}>{myProfile?.mood}</Text>
         </Pressable>
         <View style={{ flexDirection: 'row', marginHorizontal: -10 }}>
-          <PartnerAvatar partner={couple?.partnerA} />
+          <PartnerAvatar partner={myProfile} />
           <View style={{ marginLeft: -10 }}>
-            <PartnerAvatar partner={couple?.partnerB} />
+            <PartnerAvatar partner={partnerProfile} />
           </View>
         </View>
         <Pressable
           onPress={() => {
-            setPartnerTapped(couple?.partnerB ?? null);
+            setPartnerTapped(partnerProfile ?? null);
             setIsOpen(true);
           }}>
-          <Text style={styles.moodText}>{couple?.partnerB?.mood}</Text>
+          <Text style={styles.moodText}>{partnerProfile?.mood}</Text>
         </Pressable>
       </View>
     </View>
