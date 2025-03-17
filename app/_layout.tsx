@@ -1,8 +1,9 @@
 import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack, usePathname, useRouter, useSegments } from 'expo-router';
-import { useAccount } from 'jazz-react-native';
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { JazzAndAuth } from '~/providers/JazzAndAuth';
 import { tokenCache } from '~/utils/tokenCache';
@@ -17,7 +18,6 @@ function InitialLayout() {
   const { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
   const pathname = usePathname();
-  const { logOut } = useAccount();
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -25,7 +25,6 @@ function InitialLayout() {
     if (isSignedIn && !inAuthGroup) {
       router.replace('/(protected)/home');
     } else if (!isSignedIn && pathname !== '/signin') {
-      // logOut();
       router.replace('/signin');
     }
   }, [isSignedIn]);
@@ -52,14 +51,23 @@ function InitialLayout() {
 }
 
 export default function RootLayout() {
-  console.log('RootLayout');
   return (
-    <ClerkProvider publishableKey={publishableKey!} tokenCache={tokenCache}>
-      <ClerkLoaded>
-        <JazzAndAuth>
-          <InitialLayout />
-        </JazzAndAuth>
-      </ClerkLoaded>
-    </ClerkProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <BottomSheetModalProvider>
+        <ClerkProvider publishableKey={publishableKey!} tokenCache={tokenCache}>
+          <ClerkLoaded>
+            <JazzAndAuth>
+              <InitialLayout />
+            </JazzAndAuth>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -7,8 +7,8 @@ import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import { withLayoutContext } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-const { Navigator } = createMaterialTopTabNavigator<MaterialTopTabNavigationEventMap>();
 
+const { Navigator } = createMaterialTopTabNavigator<MaterialTopTabNavigationEventMap>();
 export const MaterialTopTabs = withLayoutContext<
   MaterialTopTabNavigationOptions,
   typeof Navigator,
@@ -20,6 +20,7 @@ export default function ListsLayout() {
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <MaterialTopTabs
+        style={{ marginTop: 24 }}
         screenOptions={{
           tabBarStyle: styles.containerStyle,
           tabBarIndicatorStyle: styles.indicator,
