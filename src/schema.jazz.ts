@@ -41,12 +41,11 @@ export class TodoItemList extends CoList.Of(co.ref(TodoItem)) {}
 
 export class TodoList extends CoMap {
   title = co.string;
-  icon = co.optional.string;
+  emoji = co.optional.string;
   backgroundColor = co.optional.string;
   items = co.ref(TodoItemList);
   isPrivate = co.boolean;
   createdBy = co.string;
-  category = co.optional.string;
   deleted = co.boolean;
 }
 
@@ -274,7 +273,7 @@ export class CoupleAccount extends Account {
     const myTodoList = TodoList.create(
       {
         title: 'My To-Dos',
-        icon: '📝',
+        emoji: '📝',
         createdBy: this.id,
         items: TodoItemList.create(
           [
@@ -293,7 +292,6 @@ export class CoupleAccount extends Account {
           privateGroup
         ),
         isPrivate: true,
-        category: null,
         deleted: false,
       },
       privateGroup
@@ -376,21 +374,20 @@ export class CoupleAccount extends Account {
     return invitedCouple;
   }
 
-  createTodoList(title: string, isPrivate: boolean = true, category?: string): TodoList | null {
-    if (!this.root?.couple) return null;
+  createTodoList(title: string, isPrivate: boolean = true): TodoList | null {
+    if (!this.root?.couple) throw new Error('No couple found');
 
     const couple = this.root.couple;
     const coupleGroup = couple._owner;
-    if (!coupleGroup) return null;
+    if (!coupleGroup) throw new Error('No couple group found');
 
     const newList = TodoList.create(
       {
         title,
-        icon: '📝',
+        emoji: '📝',
         createdBy: this.id,
         items: TodoItemList.create([], { owner: coupleGroup }),
         isPrivate,
-        category: category || null,
         deleted: false,
       },
       { owner: coupleGroup }
@@ -408,8 +405,6 @@ export class CoupleAccount extends Account {
     }
     if (couple.ourTodoLists) {
       couple.ourTodoLists.push(newList);
-    } else {
-      return null;
     }
 
     return newList;
