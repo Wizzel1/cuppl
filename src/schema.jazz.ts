@@ -46,7 +46,12 @@ export class TodoList extends CoMap {
   items = co.ref(TodoItems);
   isPrivate = co.boolean;
   createdBy = co.string;
+  owner = co.literal('me', 'partner', 'us');
   deleted = co.boolean;
+}
+
+export class DefaultTodoList extends CoMap {
+  todos = co.ref(TodoItems);
 }
 
 export class TodoLists extends CoList.Of(co.ref(TodoList)) {}
@@ -57,8 +62,8 @@ export class Couple extends CoMap {
   partnerA = co.ref(PartnerProfile);
   partnerB = co.optional.ref(PartnerProfile);
   // Default todo lists
-  myTodos = co.ref(TodoItems);
-  partnerTodos = co.ref(TodoItems);
+  myTodos = co.ref(DefaultTodoList);
+  partnerTodos = co.ref(DefaultTodoList);
   ourTodos = co.ref(TodoList);
   // Additional todo lists
   todoLists = co.ref(TodoLists);
