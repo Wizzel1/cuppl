@@ -517,26 +517,25 @@ export const useCouple = () => {
 export const usePartnerProfiles = () => {
   const { me } = useAccount();
   const couple = useCoState(Couple, me?.root?.couple?.id);
-  const [myProfile, setMyProfile] = useState<PartnerProfile | null>(null);
-  const [partnerProfile, setPartnerProfile] = useState<PartnerProfile | null>(null);
 
-  useEffect(() => {
-    if (!couple || !me?.id) return;
+  // Use useMemo instead of useState + useEffect for derived state
+  // This avoids unnecessary re-renders and state updates
+  const profiles = useMemo(() => {
+    if (!couple || !me?.id) {
+      return { myProfile: null, partnerProfile: null };
+    }
 
     const partnerA = couple.partnerA;
     const partnerB = couple.partnerB;
 
     if (partnerA && partnerA.accountId === me.id) {
-      setMyProfile(partnerA);
-      setPartnerProfile(partnerB || null);
+      return { myProfile: partnerA, partnerProfile: partnerB || null };
     } else if (partnerB && partnerB.accountId === me.id) {
-      setMyProfile(partnerB);
-      setPartnerProfile(partnerA || null);
-    } else {
-      setMyProfile(null);
-      setPartnerProfile(null);
+      return { myProfile: partnerB, partnerProfile: partnerA || null };
     }
+
+    return { myProfile: null, partnerProfile: null };
   }, [couple, me?.id]);
 
-  return { myProfile, partnerProfile };
+  return profiles;
 };
