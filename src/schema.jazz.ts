@@ -1,3 +1,4 @@
+import { useAccount, useCoState } from 'jazz-react-native';
 import {
   Account,
   co,
@@ -9,7 +10,7 @@ import {
   ImageDefinition,
   Profile,
 } from 'jazz-tools';
-
+import { useMemo } from 'react';
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;
@@ -34,7 +35,7 @@ export class TodoItem extends CoMap {
   notes = co.optional.string;
   deleted = co.boolean;
   photo = co.optional.ref(ImageDefinition);
-  createdBy = co.string;
+  creatorAccID = co.string;
 }
 
 export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}
@@ -45,7 +46,7 @@ export class TodoList extends CoMap {
   backgroundColor = co.optional.string;
   items = co.ref(TodoItems);
   isHidden = co.boolean;
-  createdBy = co.string;
+  creatorAccID = co.string;
   owner = co.literal('me', 'partner', 'us');
   deleted = co.boolean;
 }
@@ -279,6 +280,7 @@ export class CoupleAccount extends Account {
       emoji: '📝',
       backgroundColor: '#000000',
     });
+    if (!myTodoList) return;
     myTodoList!.items!.push(
       TodoItem.create(
         {
@@ -287,7 +289,7 @@ export class CoupleAccount extends Account {
           dueDate: null,
           notes: null,
           deleted: false,
-          createdBy: this.id,
+          creatorAccID: this.id,
         },
         privateGroup
       )
@@ -313,7 +315,7 @@ export class CoupleAccount extends Account {
         owner: 'us',
         isHidden: false,
         items: TodoItems.create([], privateGroup),
-        createdBy: this.id,
+        creatorAccID: this.id,
         deleted: false,
       },
       privateGroup
@@ -400,7 +402,8 @@ export class CoupleAccount extends Account {
     emoji: string;
     backgroundColor: string;
   }): TodoList | null {
-    if (!this.root?.couple) throw new Error('No couple found');
+    console.log('createTodoList', args);
+    if (!this.root?.couple) return null;
 
     const couple = this.root.couple;
     const coupleGroup = couple._owner;
@@ -411,7 +414,7 @@ export class CoupleAccount extends Account {
         title: args.title,
         emoji: args.emoji,
         backgroundColor: args.backgroundColor,
-        createdBy: this.id,
+        creatorAccID: this.id,
         items: TodoItems.create([], { owner: coupleGroup }),
         isHidden: args.isHidden,
         owner: args.owner,
@@ -447,7 +450,7 @@ export class CoupleAccount extends Account {
         dueDate: dueDate || null,
         notes: notes || null,
         deleted: false,
-        createdBy: this.id,
+        creatorAccID: this.id,
       },
       { owner }
     );
