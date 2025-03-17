@@ -1,6 +1,7 @@
 import {
   Account,
   co,
+  CoList,
   CoMap,
   createInviteLink,
   Group,
@@ -9,16 +10,6 @@ import {
   Profile,
 } from 'jazz-tools';
 
-/**
- * Represents partner profile information that can be edited by both members of a couple.
- *
- * Properties:
- *  - name: The partner's name.
- *  - nickname: Optional nickname for the partner.
- *  - birthday: Optional birthday date.
- *  - avatar: Optional profile avatar image.
- *  - accountId: ID of the account this profile belongs to (for identification).
- */
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;
@@ -36,39 +27,48 @@ export class PartnerProfile extends CoMap {
   }
 }
 
-/**
- * Represents a couple in the app, serving as the foundation for all activities.
- *
- * Properties:
- *  - anniversary: Optional anniversary date of the couple.
- *  - backgroundPhoto: Optional photo displayed on the homescreen.
- *  - partnerA: Reference to the first partner's profile.
- *  - partnerB: Optional reference to the second partner's profile.
- *  - deleted: Soft delete flag.
- */
+export class TodoItem extends CoMap {
+  title = co.string;
+  completed = co.boolean;
+  dueDate = co.optional.Date;
+  notes = co.optional.string;
+  deleted = co.boolean;
+  photo = co.optional.ref(ImageDefinition);
+  createdBy = co.string;
+}
+
+export class TodoItemList extends CoList.Of(co.ref(TodoItem)) {}
+
+export class TodoList extends CoMap {
+  title = co.string;
+  icon = co.optional.string;
+  backgroundColor = co.optional.string;
+  items = co.ref(TodoItemList);
+  isPrivate = co.boolean;
+  createdBy = co.string;
+  category = co.optional.string;
+  deleted = co.boolean;
+}
+
+export class TodoListList extends CoList.Of(co.ref(TodoList)) {}
+
 export class Couple extends CoMap {
   anniversary = co.optional.Date;
   backgroundPhoto = co.optional.ref(ImageDefinition);
-  partnerA = co.ref(PartnerProfile); // First partner (the one who created the couple)
-  partnerB = co.optional.ref(PartnerProfile); // Second partner (may be null if not joined yet)
+  partnerA = co.ref(PartnerProfile);
+  partnerB = co.optional.ref(PartnerProfile);
+  myTodoLists = co.ref(TodoListList);
+  partnerTodoLists = co.ref(TodoListList);
+  ourTodoLists = co.ref(TodoListList);
   deleted = co.boolean;
 
-  // Methods to manage the relationship
   getPartners() {
-    // Returns the members of the group that owns this Couple
     return this._owner
       .castAs(Group)
       .members.filter((member) => member.role === 'admin' || member.role === 'writer');
   }
 }
 
-/**
- * The top-level account root for the Couple app.
- *
- * Properties:
- *  - couple: A reference to the user's couple.
- *  - version: Optional version number for migrations.
- */
 export class CoupleAccountRoot extends CoMap {
   couple = co.ref(Couple);
   version = co.optional.number;
@@ -195,8 +195,6 @@ export class CoupleAccount extends Account {
       const secondMemberAccount = groupMembers.find(
         (member) => member.account?.id && member.account.id !== couple.partnerA?.accountId
       );
-      //mbEM
-      //Wg2C
 
       if (secondMemberAccount?.account?.id) {
         // Create a partner profile for the second account
@@ -267,6 +265,43 @@ export class CoupleAccount extends Account {
     // Create a private group for couple data
     const privateGroup = Group.create({ owner: this });
 
+    // Create empty todo lists
+    const myTodoLists = TodoListList.create([], privateGroup);
+    const partnerTodoLists = TodoListList.create([], privateGroup);
+    const ourTodoLists = TodoListList.create([], privateGroup);
+
+    // Create a sample personal todo list
+    const myTodoList = TodoList.create(
+      {
+        title: 'My To-Dos',
+        icon: '📝',
+        createdBy: this.id,
+        items: TodoItemList.create(
+          [
+            TodoItem.create(
+              {
+                title: 'Welcome to your todo list!',
+                completed: false,
+                dueDate: null,
+                notes: null,
+                deleted: false,
+                createdBy: this.id,
+              },
+              privateGroup
+            ),
+          ],
+          privateGroup
+        ),
+        isPrivate: true,
+        category: null,
+        deleted: false,
+      },
+      privateGroup
+    );
+
+    // Add the sample list to personal lists
+    myTodoLists.push(myTodoList);
+
     // Create a temporary partner profile first - we'll replace it with the proper one after
     const tempPartnerProfile = PartnerProfile.create(
       {
@@ -286,6 +321,9 @@ export class CoupleAccount extends Account {
         anniversary: new Date(),
         partnerA: tempPartnerProfile, // Use temporary profile initially
         partnerB: null, // Second partner is null until someone joins
+        myTodoLists,
+        partnerTodoLists,
+        ourTodoLists,
         deleted: false,
       },
       privateGroup
@@ -311,62 +349,124 @@ export class CoupleAccount extends Account {
     );
   }
 
-  /**
-   * Updates the account to join an existing couple after accepting an invite.
-   * @param coupleId The ID of the couple being joined
-   */
   async acceptCoupleInvite(coupleId: string) {
-    // 1. Load the invited couple
     const invitedCouple = await Couple.load(coupleId as ID<Couple>, []);
+    if (!invitedCouple) throw new Error('Could not load the couple you were invited to');
+    if (invitedCouple.partnerB) throw new Error('This couple already has two partners');
 
-    if (!invitedCouple) {
-      throw new Error('Could not load the couple you were invited to');
-    }
-
-    if (invitedCouple.partnerB) {
-      throw new Error('This couple already has two partners');
-    }
-
-    // 2. Store the original couple ID for cleanup later if needed
-    const originalCoupleId = this.coupleId;
-
-    // 3. Create a partner profile for this user using the helper function
-    const partnerProfile = createPartnerProfile(
+    const myProfile = createPartnerProfile(
       invitedCouple,
       this.profile?.name || 'New Partner',
       this.id
     );
 
-    // Set this profile as partnerB
-    invitedCouple.partnerB = partnerProfile;
+    invitedCouple.partnerB = myProfile;
+    if (this.root) this.root.couple = invitedCouple;
 
-    // 4. Update the root to point to the new couple
-    if (this.root) {
-      this.root.couple = invitedCouple;
-    }
-
-    // 5. Optionally mark the original couple as deleted if we want to clean up
+    const originalCoupleId = this.coupleId;
     if (originalCoupleId) {
       try {
         const originalCouple = await Couple.load(originalCoupleId, { owner: this });
-        if (originalCouple) {
-          originalCouple.deleted = true;
-        }
+        if (originalCouple) originalCouple.deleted = true;
       } catch (error) {
-        // Just log this error, don't block the main flow
         console.error('Could not mark original couple as deleted', error);
       }
     }
 
     return invitedCouple;
   }
+
+  createTodoList(title: string, isPrivate: boolean = true, category?: string): TodoList | null {
+    if (!this.root?.couple) return null;
+
+    const couple = this.root.couple;
+    const coupleGroup = couple._owner;
+    if (!coupleGroup) return null;
+
+    const newList = TodoList.create(
+      {
+        title,
+        icon: '📝',
+        createdBy: this.id,
+        items: TodoItemList.create([], { owner: coupleGroup }),
+        isPrivate,
+        category: category || null,
+        deleted: false,
+      },
+      { owner: coupleGroup }
+    );
+
+    if (isPrivate) {
+      const myProfile = getMyPartnerProfile(couple, this.id);
+      if (myProfile === couple.partnerA && couple.myTodoLists) {
+        couple.myTodoLists.push(newList);
+      }
+      if (myProfile === couple.partnerB && couple.partnerTodoLists) {
+        couple.partnerTodoLists.push(newList);
+      }
+      return null;
+    }
+    if (couple.ourTodoLists) {
+      couple.ourTodoLists.push(newList);
+    } else {
+      return null;
+    }
+
+    return newList;
+  }
+
+  addTodoItem(list: TodoList, title: string, dueDate?: Date, notes?: string): TodoItem | null {
+    if (!list.items) return null;
+
+    const owner = list._owner;
+    if (!owner) return null;
+
+    const newItem = TodoItem.create(
+      {
+        title,
+        completed: false,
+        dueDate: dueDate || null,
+        notes: notes || null,
+        deleted: false,
+        createdBy: this.id,
+      },
+      { owner }
+    );
+
+    list.items.push(newItem);
+    return newItem;
+  }
+
+  toggleTodoItem(item: TodoItem): boolean {
+    item.completed = !item.completed;
+    return item.completed;
+  }
+
+  getTodoLists(listType: 'my' | 'partner' | 'our'): TodoListList | null {
+    if (!this.root?.couple) return null;
+
+    const couple = this.root.couple;
+
+    if (listType === 'my') {
+      const myProfile = getMyPartnerProfile(couple, this.id);
+      if (myProfile === couple.partnerA) {
+        return couple.myTodoLists;
+      }
+      if (myProfile === couple.partnerB) {
+        return couple.partnerTodoLists;
+      }
+    }
+    if (listType === 'partner') {
+      const myProfile = getMyPartnerProfile(couple, this.id);
+      if (myProfile === couple.partnerA) return couple.partnerTodoLists;
+      if (myProfile === couple.partnerB) return couple.myTodoLists;
+    }
+    if (listType === 'our') return couple.ourTodoLists;
+
+    return null;
+  }
 }
 
-/**
- * Creates a sharable invite link for a couple.
- * Returns a string that can be used by another user to join this couple.
- * Returns null if the couple is not properly owned.
- */
 export const shareCouple = (couple: Couple): string | null => {
   if (couple._owner) {
     return createInviteLink(couple, 'admin', 'invite');
