@@ -37,28 +37,31 @@ export class TodoItem extends CoMap {
   createdBy = co.string;
 }
 
-export class TodoItemList extends CoList.Of(co.ref(TodoItem)) {}
+export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}
 
 export class TodoList extends CoMap {
   title = co.string;
   emoji = co.optional.string;
   backgroundColor = co.optional.string;
-  items = co.ref(TodoItemList);
+  items = co.ref(TodoItems);
   isPrivate = co.boolean;
   createdBy = co.string;
   deleted = co.boolean;
 }
 
-export class TodoListList extends CoList.Of(co.ref(TodoList)) {}
+export class TodoLists extends CoList.Of(co.ref(TodoList)) {}
 
 export class Couple extends CoMap {
   anniversary = co.optional.Date;
   backgroundPhoto = co.optional.ref(ImageDefinition);
   partnerA = co.ref(PartnerProfile);
   partnerB = co.optional.ref(PartnerProfile);
-  myTodoLists = co.ref(TodoListList);
-  partnerTodoLists = co.ref(TodoListList);
-  ourTodoLists = co.ref(TodoListList);
+  // Default todo lists
+  myTodos = co.ref(TodoItems);
+  partnerTodos = co.ref(TodoItems);
+  ourTodos = co.ref(TodoList);
+  // Additional todo lists
+  todoLists = co.ref(TodoLists);
   deleted = co.boolean;
 
   getPartners() {
