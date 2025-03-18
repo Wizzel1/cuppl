@@ -47,7 +47,7 @@ export class TodoList extends CoMap {
   items = co.ref(TodoItems);
   isHidden = co.boolean;
   creatorAccID = co.string;
-  owner = co.literal('me', 'partner', 'us');
+  assignedTo = co.literal('me', 'partner', 'us');
   deleted = co.boolean;
 }
 
@@ -312,7 +312,7 @@ export class CoupleAccount extends Account {
     const ourTodos = TodoList.create(
       {
         title: 'Our To-Dos',
-        owner: 'us',
+        assignedTo: 'us',
         isHidden: false,
         items: TodoItems.create([], privateGroup),
         creatorAccID: this.id,
@@ -417,7 +417,7 @@ export class CoupleAccount extends Account {
         creatorAccID: this.id,
         items: TodoItems.create([], { owner: coupleGroup }),
         isHidden: args.isHidden,
-        owner: args.owner,
+        assignedTo: args.owner,
         deleted: false,
       },
       { owner: coupleGroup }
