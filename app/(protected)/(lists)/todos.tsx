@@ -11,7 +11,6 @@ import EmojiPicker from 'rn-emoji-keyboard';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListItem';
 import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
-
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -41,6 +40,7 @@ export default function Todos() {
     const partnerListsArray: TodoList[] = [];
     const sharedListsArray: TodoList[] = [];
     console.log(couple.todoLists.length);
+
     for (const list of couple.todoLists) {
       if (!list) return;
       switch (list.assignedTo) {
@@ -92,7 +92,16 @@ export default function Todos() {
           { title: 'Shared Lists', data: sharedLists },
         ]}
         renderSectionHeader={({ section }) => (
-          <Text style={{ fontSize: 16, fontWeight: '500', color: '#18181B' }}>{section.title}</Text>
+          <Text
+            style={{
+              paddingHorizontal: 24,
+              paddingTop: 24,
+              fontSize: 18,
+              color: '#18181B',
+              fontWeight: '600',
+            }}>
+            {section.title}
+          </Text>
         )}
         renderItem={({ item }) => (
           <TodoListItem
@@ -101,7 +110,7 @@ export default function Todos() {
             todosCount={2}
             completedCount={2}
             onPress={() => {}}
-            backgroundColor={item?.backgroundColor}
+            backgroundColor="red"
             emoji={item?.emoji}
           />
         )}
@@ -120,25 +129,31 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const couple = useCouple();
   const { myProfile } = usePartnerProfiles();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [emoji, setEmoji] = useState('');
+  const [emoji, setEmoji] = useState('🖊');
   const [isHidden, setIsHidden] = useState(false);
   const [title, setTitle] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const handleSubmit = () => {
     if (!couple?.todoLists) return;
 
-    const newList = TodoList.create({
-      title,
-      items: TodoItems.create([]),
-      emoji,
-      isHidden,
-      backgroundColor,
-      creatorAccID: myProfile!.accountId,
-      assignedTo: 'us',
-      deleted: false,
-    });
+    const newList = TodoList.create(
+      {
+        title: title.trim(),
+        items: TodoItems.create([]),
+        emoji,
+        isHidden,
+        backgroundColor,
+        creatorAccID: myProfile!.accountId,
+        assignedTo: 'us',
+        deleted: false,
+      },
+      { owner: couple._owner }
+    );
     couple.todoLists.push(newList);
-
+    setTitle('');
+    setEmoji('');
+    setIsHidden(false);
+    setBackgroundColor('#FFFFFF');
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
     }
