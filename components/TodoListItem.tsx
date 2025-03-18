@@ -28,7 +28,6 @@ export default function TodoListItem({
           marginVertical: 12,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 12,
         }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
           {backgroundColor && emoji ? (
@@ -59,14 +58,28 @@ export default function TodoListItem({
             </ProgressiveImg>
           )}
 
-          <View>
-            <Text style={{ fontSize: 16, fontWeight: '500', color: '#18181B' }}>{title}</Text>
+          <View style={{ flex: 1 }}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{
+                fontSize: 16,
+                fontWeight: '500',
+                color: '#18181B',
+              }}>
+              {title}
+            </Text>
             <Text style={{ fontSize: 14, color: '#71717B' }}>
-              {completedCount}/{todosCount}
+              {completedCount} / {todosCount}
             </Text>
           </View>
         </View>
-        <Ionicons name="chevron-forward-outline" size={24} color="black" />
+        <Ionicons
+          name="chevron-forward-outline"
+          size={24}
+          color="black"
+          style={{ paddingLeft: 18 }}
+        />
       </View>
     </TouchableOpacity>
   );
