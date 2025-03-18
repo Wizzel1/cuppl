@@ -2,15 +2,15 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
-  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { SectionList, StyleSheet, Text, View } from 'react-native';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, SectionList, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import EmojiPicker from 'rn-emoji-keyboard';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListItem';
-import { TodoItems, TodoList, TodoLists, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
@@ -40,6 +40,7 @@ export default function Todos() {
     const myListsArray: TodoList[] = [];
     const partnerListsArray: TodoList[] = [];
     const sharedListsArray: TodoList[] = [];
+    console.log(couple.todoLists.length);
     for (const list of couple.todoLists) {
       if (!list) return;
       switch (list.assignedTo) {
@@ -59,52 +60,6 @@ export default function Todos() {
     setPartnerLists(partnerListsArray);
     setSharedLists(sharedListsArray);
   }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
-
-  const snapPoints = useMemo(() => ['40%', '60%'], []);
-
-  const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
-    return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
-  }, []);
-
-  const addList = () => {
-    if (!couple) return;
-    couple!.todoLists = TodoLists.create([]);
-
-    if (couple?.todoLists) {
-      const accountId = myProfile!.accountId;
-      const partnerAccountId = partnerProfile!.accountId;
-      const newList = [
-        TodoList.create({
-          title: `New List`,
-          items: TodoItems.create([]),
-          isHidden: false,
-          creatorAccID: accountId,
-          assignedTo: 'us',
-          backgroundColor: '#FFFFFF',
-          deleted: false,
-        }),
-        TodoList.create({
-          title: `New List2`,
-          items: TodoItems.create([]),
-          isHidden: false,
-          creatorAccID: accountId,
-          assignedTo: 'me',
-          backgroundColor: '#FFFFFF',
-          deleted: false,
-        }),
-        TodoList.create({
-          title: `New List3`,
-          items: TodoItems.create([]),
-          isHidden: false,
-          creatorAccID: partnerAccountId,
-          assignedTo: 'partner',
-          backgroundColor: '#FFFFFF',
-          deleted: false,
-        }),
-      ];
-      couple.todoLists = TodoLists.create(newList, { owner: couple._owner });
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -151,31 +106,133 @@ export default function Todos() {
           />
         )}
       />
-
+      <TodoListBottomSheet ref={bottomSheetModalRef} />
       <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
-      <BottomSheetModal
-        ref={bottomSheetModalRef}
-        backdropComponent={backdropComponent}
-        snapPoints={snapPoints}
-        enablePanDownToClose>
-        <BottomSheetView style={styles.contentContainer}>
-          <Text>Text</Text>
-          <BottomSheetTextInput placeholder="Add a todo" />
-        </BottomSheetView>
-      </BottomSheetModal>
     </View>
   );
 }
 
+const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
+  const snapPoints = useMemo(() => ['40%'], []);
+  const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
+    return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
+  }, []);
+  const couple = useCouple();
+  const { myProfile } = usePartnerProfiles();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [emoji, setEmoji] = useState('');
+  const [isHidden, setIsHidden] = useState(false);
+  const [title, setTitle] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+  const handleSubmit = () => {
+    if (!couple?.todoLists) return;
+
+    const newList = TodoList.create({
+      title,
+      items: TodoItems.create([]),
+      emoji,
+      isHidden,
+      backgroundColor,
+      creatorAccID: myProfile!.accountId,
+      assignedTo: 'us',
+      deleted: false,
+    });
+    couple.todoLists.push(newList);
+
+    if (ref && 'current' in ref) {
+      ref.current?.dismiss();
+    }
+  };
+
+  return (
+    <BottomSheetModal
+      ref={ref}
+      backdropComponent={backdropComponent}
+      snapPoints={snapPoints}
+      enablePanDownToClose>
+      <BottomSheetView style={styles.sheetContainer}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            justifyContent: 'space-between',
+          }}>
+          <TextInput
+            placeholder="New Todo List"
+            style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
+            value={title}
+            onChangeText={setTitle}
+            onSubmitEditing={handleSubmit}
+          />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <EmojiPicker
+              onEmojiSelected={(emoji) => setEmoji(emoji.emoji)}
+              open={pickerOpen}
+              onClose={() => setPickerOpen(false)}
+            />
+            <Pressable onPress={() => setPickerOpen(true)}>
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: '#E4E4E7',
+                  justifyContent: 'center',
+                }}>
+                <Text style={{ fontSize: 20, textAlign: 'center' }}>{emoji}</Text>
+              </View>
+            </Pressable>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: '#E4E4E7',
+                justifyContent: 'center',
+                backgroundColor: '#F4F4F5',
+              }}
+            />
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 16,
+          }}>
+          <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 8,
+              backgroundColor: '#D4D4D8',
+              borderRadius: 20,
+            }}>
+            <Switch
+              trackColor={{ true: 'transparent', false: 'transparent' }}
+              thumbColor="white"
+              value={isHidden}
+              onValueChange={setIsHidden}
+            />
+          </View>
+        </View>
+      </BottomSheetView>
+    </BottomSheetModal>
+  );
+});
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
   },
-  contentContainer: {
+  sheetContainer: {
     flex: 1,
-    padding: 36,
+    padding: 24,
     zIndex: 1000,
-    alignItems: 'center',
   },
 });
