@@ -30,12 +30,14 @@ export class PartnerProfile extends CoMap {
 
 export class TodoItem extends CoMap {
   title = co.string;
+  description = co.optional.string;
   completed = co.boolean;
   dueDate = co.optional.Date;
   notes = co.optional.string;
   deleted = co.boolean;
   photo = co.optional.ref(ImageDefinition);
   creatorAccID = co.string;
+  assignedTo = co.literal('me', 'partner', 'us');
 }
 
 export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}
@@ -290,6 +292,7 @@ export class CoupleAccount extends Account {
           notes: null,
           deleted: false,
           creatorAccID: this.id,
+          assignedTo: 'me',
         },
         privateGroup
       )
@@ -431,38 +434,6 @@ export class CoupleAccount extends Account {
 
     return newList;
   }
-
-  addTodoItem(
-    list: TodoList | DefaultTodoList,
-    title: string,
-    dueDate?: Date,
-    notes?: string
-  ): TodoItem | null {
-    if (!list.items) return null;
-
-    const owner = list._owner;
-    if (!owner) return null;
-
-    const newItem = TodoItem.create(
-      {
-        title,
-        completed: false,
-        dueDate: dueDate || null,
-        notes: notes || null,
-        deleted: false,
-        creatorAccID: this.id,
-      },
-      { owner }
-    );
-
-    list.items.push(newItem);
-    return newItem;
-  }
-
-  toggleTodoItem(item: TodoItem): boolean {
-    item.completed = !item.completed;
-    return item.completed;
-  }
 }
 
 export const shareCouple = (couple: Couple): string | null => {
@@ -536,7 +507,7 @@ export const usePartnerProfiles = () => {
     }
 
     return { myProfile: null, partnerProfile: null };
-  }, [couple, me?.id]);
+  }, [couple?.partnerA?.id, couple?.partnerB?.id, me?.id]);
 
   return profiles;
 };
