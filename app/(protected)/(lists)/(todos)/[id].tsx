@@ -1,19 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetModal,
-  BottomSheetView,
-} from '@gorhom/bottom-sheet';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, SectionList, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import TodoListBottomSheet from '~/components/TodoListBottomSheet';
+import { TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function ListDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -130,182 +125,10 @@ export default function ListDetailScreen() {
   );
 }
 
-const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
-  const snapPoints = useMemo(() => ['80%'], []);
-  const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
-    return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
-  }, []);
-  const couple = useCouple();
-  const { myProfile } = usePartnerProfiles();
-  const [emoji, setEmoji] = useState('🖊');
-  const [isHidden, setIsHidden] = useState(false);
-  const [title, setTitle] = useState('');
-  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-  const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-
-  const handleSubmit = () => {
-    if (!couple?.todoLists) return;
-
-    const newList = TodoList.create(
-      {
-        title: title.trim(),
-        items: TodoItems.create([]),
-        emoji,
-        isHidden,
-        backgroundColor,
-        creatorAccID: myProfile!.accountId,
-        assignedTo: 'us',
-        deleted: false,
-      },
-      { owner: couple._owner }
-    );
-    couple.todoLists.push(newList);
-    setTitle('');
-    setEmoji('');
-    setIsHidden(false);
-    setBackgroundColor('#FFFFFF');
-    setHasDueDate(false);
-    if (ref && 'current' in ref) {
-      ref.current?.dismiss();
-    }
-  };
-
-  return (
-    <BottomSheetModal
-      ref={ref}
-      backdropComponent={backdropComponent}
-      snapPoints={snapPoints}
-      enablePanDownToClose>
-      <BottomSheetView style={styles.sheetContainer}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            justifyContent: 'space-between',
-          }}>
-          <TextInput
-            placeholder="New Todo List"
-            style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
-            value={title}
-            onChangeText={setTitle}
-            onSubmitEditing={handleSubmit}
-          />
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: 16,
-          }}>
-          <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              backgroundColor: '#D4D4D8',
-              borderRadius: 20,
-            }}>
-            <Switch
-              trackColor={{ true: 'transparent', false: 'transparent' }}
-              thumbColor="white"
-              value={isHidden}
-              onValueChange={setIsHidden}
-            />
-          </View>
-        </View>
-
-        <View
-          style={{
-            marginTop: 16,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 8,
-            }}>
-            <Text style={{ fontSize: 16, color: '#27272A' }}>Due Date</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                backgroundColor: '#D4D4D8',
-                borderRadius: 20,
-              }}>
-              <Switch
-                trackColor={{ true: 'transparent', false: 'transparent' }}
-                thumbColor="white"
-                value={hasDueDate}
-                onValueChange={setHasDueDate}
-              />
-            </View>
-          </View>
-
-          {hasDueDate && (
-            <View style={styles.dateTimeContainer}>
-              <Pressable style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
-                <Text style={styles.dateButtonText}>
-                  {dueDate.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </Text>
-              </Pressable>
-              <Pressable style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
-                <Text style={styles.dateButtonText}>
-                  {dueDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                </Text>
-              </Pressable>
-
-              {showDatePicker && (
-                <DateTimePicker
-                  value={dueDate}
-                  mode="date"
-                  display="inline"
-                  onChange={(event, date) => {
-                    setShowDatePicker(false);
-                    if (date) setDueDate(date);
-                  }}
-                />
-              )}
-
-              {showTimePicker && (
-                <DateTimePicker
-                  value={dueDate}
-                  mode="time"
-                  display="default"
-                  onChange={(event, date) => {
-                    setShowTimePicker(false);
-                    if (date) setDueDate(date);
-                  }}
-                />
-              )}
-            </View>
-          )}
-        </View>
-      </BottomSheetView>
-    </BottomSheetModal>
-  );
-});
-
 const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 18,
     fontWeight: '600',
-  },
-  sheetContainer: {
-    flex: 1,
-    padding: 24,
-    zIndex: 1000,
   },
   progressContainer: {
     paddingHorizontal: 24,
@@ -328,31 +151,5 @@ const styles = StyleSheet.create({
     color: '#71717B',
     marginTop: 8,
     textAlign: 'right',
-  },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
-  dateButton: {
-    flex: 1,
-    backgroundColor: '#F4F4F5',
-    padding: 12,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  timeButton: {
-    flex: 1,
-    backgroundColor: '#F4F4F5',
-    padding: 12,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dateButtonText: {
-    fontSize: 14,
-    color: '#27272A',
-    textAlign: 'center',
   },
 });
