@@ -44,7 +44,7 @@ export default function HandleInviteScreen() {
         setStatus('success');
         // Wait a moment to show success message before redirecting
         setTimeout(() => {
-          router.replace('/(protected)/home');
+          router.replace('/(protected)');
         }, 2000);
       } catch (error) {
         handleError(error, 'Error accepting invite');

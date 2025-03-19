@@ -11,7 +11,14 @@ import EmojiPicker from 'rn-emoji-keyboard';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListItem';
-import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import {
+  DefaultTodoList,
+  TodoItems,
+  TodoList,
+  useCouple,
+  usePartnerProfiles,
+} from '~/src/schema.jazz';
+
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -34,7 +41,6 @@ export default function Todos() {
   useEffect(() => {
     if (!couple?.todoLists) return;
     if (!myProfile?.accountId || !partnerProfile?.accountId) return;
-
     const myAccountId = myProfile.accountId;
     const partnerAccountId = partnerProfile.accountId;
 
@@ -63,29 +69,37 @@ export default function Todos() {
     setSharedLists(sharedListsArray);
   }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
 
+  const onItemPress = (list: TodoList | DefaultTodoList) => {
+    router.push(`/(protected)/(lists)/(todos)/${list.id}`);
+  };
+
   return (
     <View style={styles.container}>
-      <TodoListItem
-        avatar={myProfile?.avatar}
-        title="My To-Dos"
-        todosCount={10}
-        completedCount={5}
-        onPress={() => {}}
-      />
-      <TodoListItem
-        avatar={partnerProfile?.avatar}
-        title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
-        todosCount={10}
-        completedCount={5}
-        onPress={() => {}}
-      />
+      {myProfile?.avatar && (
+        <TodoListItem
+          avatar={myProfile.avatar}
+          title="My To-Dos"
+          todosCount={10}
+          completedCount={5}
+          onPress={() => onItemPress(myLists[0])}
+        />
+      )}
+      {partnerProfile?.avatar && (
+        <TodoListItem
+          avatar={partnerProfile.avatar}
+          title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
+          todosCount={10}
+          completedCount={5}
+          onPress={() => onItemPress(partnerLists[0])}
+        />
+      )}
       <TodoListItem
         backgroundColor="#ADD8E6"
         emoji="😮‍💨"
         title="Shared To-Dos"
         todosCount={10}
         completedCount={5}
-        onPress={() => {}}
+        onPress={() => onItemPress(sharedLists[0])}
       />
       <SectionList
         sections={[
@@ -111,9 +125,7 @@ export default function Todos() {
             title={item?.title ?? ''}
             todosCount={2}
             completedCount={2}
-            onPress={() => {
-              router.push(`/(protected)/(lists)/(todos)/${item?.id}`);
-            }}
+            onPress={() => onItemPress(item)}
             backgroundColor="red"
             emoji={item?.emoji}
           />

@@ -521,8 +521,6 @@ export const usePartnerProfiles = () => {
   const { me } = useAccount();
   const couple = useCoState(Couple, me?.root?.couple?.id);
 
-  // Use useMemo instead of useState + useEffect for derived state
-  // This avoids unnecessary re-renders and state updates
   const profiles = useMemo(() => {
     if (!couple || !me?.id) {
       return { myProfile: null, partnerProfile: null };

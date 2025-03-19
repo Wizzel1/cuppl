@@ -23,14 +23,14 @@ export default function ListsLayout() {
 
   useEffect(() => {
     const shouldHideTabBar = pathname.startsWith('/co_z');
+
     setTimeout(
       () => {
         setShowTabBar(!shouldHideTabBar);
       },
-      shouldHideTabBar ? 100 : 0
+      shouldHideTabBar ? 200 : 0
     );
   }, [pathname]);
-
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <MaterialTopTabs

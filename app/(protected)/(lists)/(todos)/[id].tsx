@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -26,23 +26,7 @@ export default function ListDetailScreen() {
     }
   }, [list?.items]);
 
-  // useEffect(() => {
-  //   console.log('list', list);
-  //   if (!list || !couple) return;
-  //   list.items = TodoItems.create([
-  //     TodoItem.create(
-  //       {
-  //         title: 'ttest',
-  //         completed: false,
-  //         deleted: false,
-  //         creatorAccID: '1',
-  //       },
-  //       { owner: couple?._owner }
-  //     ),
-  //   ]);
-  // }, [list?.id, couple?.id]);
-
-  const handleToggle = (title: string) => {
+  const handleToggle = useCallback((title: string) => {
     setExpandedSections((expandedSections) => {
       // Using Set here but you can use an array too
       const next = new Set(expandedSections);
@@ -53,7 +37,8 @@ export default function ListDetailScreen() {
       }
       return next;
     });
-  };
+  }, []);
+
   return (
     <>
       <Stack.Screen
@@ -93,7 +78,7 @@ export default function ListDetailScreen() {
             { title: partnerProfile?.nickname ?? 'partner todos', data: list?.items ?? [] },
             { title: 'Our todos', data: list?.items ?? [] },
           ]}
-          keyExtractor={(item, index) => (item!.id as string) + index}
+          keyExtractor={(item, index) => (item?.id as string) + index}
           extraData={expandedSections}
           renderItem={({ section: { title }, item }) => {
             const isExpanded = expandedSections.has(title);

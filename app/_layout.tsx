@@ -23,7 +23,7 @@ function InitialLayout() {
     if (!isLoaded) return;
     const inAuthGroup = segments[0] === '(protected)';
     if (isSignedIn && !inAuthGroup) {
-      router.replace('/(protected)/home');
+      router.replace('/(protected)');
     } else if (!isSignedIn && pathname !== '/signin') {
       router.replace('/signin');
     }

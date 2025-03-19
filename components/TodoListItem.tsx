@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ProgressiveImg } from 'jazz-react-native';
 import { ImageDefinition } from 'jazz-tools';
+import { memo } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-export default function TodoListItem({
+function TodoListItem({
   avatar,
   backgroundColor,
   emoji,
@@ -84,3 +85,5 @@ export default function TodoListItem({
     </TouchableOpacity>
   );
 }
+
+export default memo(TodoListItem);
