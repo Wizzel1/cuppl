@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ProgressiveImg } from 'jazz-react-native';
 import { ImageDefinition } from 'jazz-tools';
-import { memo } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 function TodoListItem({
@@ -86,4 +85,4 @@ function TodoListItem({
   );
 }
 
-export default memo(TodoListItem);
+export default TodoListItem;
