@@ -4,6 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { useRouter } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import EmojiPicker from 'rn-emoji-keyboard';
@@ -22,6 +23,7 @@ export default function Todos() {
   };
 
   const couple = useCouple();
+  const router = useRouter();
 
   // useEffect(() => {
   //   if (!couple) return;
@@ -109,7 +111,9 @@ export default function Todos() {
             title={item?.title ?? ''}
             todosCount={2}
             completedCount={2}
-            onPress={() => {}}
+            onPress={() => {
+              router.push(`/(protected)/(lists)/(todos)/${item?.id}`);
+            }}
             backgroundColor="red"
             emoji={item?.emoji}
           />
