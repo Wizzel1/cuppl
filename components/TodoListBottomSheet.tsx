@@ -22,6 +22,242 @@ import {
 
 import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 
+// Title Input Component
+type TitleInputProps = {
+  title: string;
+  onChangeText: (text: string) => void;
+  onSubmitEditing: () => void;
+};
+
+const TitleInput = ({ title, onChangeText, onSubmitEditing }: TitleInputProps) => (
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      justifyContent: 'space-between',
+    }}>
+    <TextInput
+      placeholder="New Todo List"
+      style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
+      value={title}
+      onChangeText={onChangeText}
+      onSubmitEditing={onSubmitEditing}
+    />
+  </View>
+);
+
+// Toggle Switch Component
+type ToggleSwitchProps = {
+  label: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+};
+
+const ToggleSwitch = ({ label, value, onValueChange }: ToggleSwitchProps) => (
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 16,
+    }}>
+    <Text style={{ fontSize: 16, color: '#27272A' }}>{label}</Text>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        backgroundColor: '#D4D4D8',
+        borderRadius: 20,
+      }}>
+      <Switch
+        trackColor={{ true: 'transparent', false: 'transparent' }}
+        thumbColor="white"
+        value={value}
+        onValueChange={onValueChange}
+      />
+    </View>
+  </View>
+);
+
+// Due Date Section Component
+type DueDateSectionProps = {
+  hasDueDate: boolean;
+  setHasDueDate: (value: boolean) => void;
+  dueDate: Date;
+  setDueDate: (date: Date) => void;
+  showDatePicker: boolean;
+  setShowDatePicker: (show: boolean) => void;
+  showTimePicker: boolean;
+  setShowTimePicker: (show: boolean) => void;
+};
+
+const DueDateSection = ({
+  hasDueDate,
+  setHasDueDate,
+  dueDate,
+  setDueDate,
+  showDatePicker,
+  setShowDatePicker,
+  showTimePicker,
+  setShowTimePicker,
+}: DueDateSectionProps) => (
+  <View style={{ marginTop: 16 }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+      }}>
+      <Text style={{ fontSize: 16, color: '#27272A' }}>Due Date</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+          backgroundColor: '#D4D4D8',
+          borderRadius: 20,
+        }}>
+        <Switch
+          trackColor={{ true: 'transparent', false: 'transparent' }}
+          thumbColor="white"
+          value={hasDueDate}
+          onValueChange={setHasDueDate}
+        />
+      </View>
+    </View>
+
+    {hasDueDate && (
+      <View style={styles.dateTimeContainer}>
+        <Pressable style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+          <Text style={styles.dateButtonText}>
+            {dueDate.toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </Text>
+        </Pressable>
+        <Pressable style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
+          <Text style={styles.dateButtonText}>
+            {dueDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+          </Text>
+        </Pressable>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={dueDate}
+            mode="date"
+            display="inline"
+            onChange={(event, date) => {
+              setShowDatePicker(false);
+              if (date) setDueDate(date);
+            }}
+          />
+        )}
+
+        {showTimePicker && (
+          <DateTimePicker
+            value={dueDate}
+            mode="time"
+            display="default"
+            onChange={(event, date) => {
+              setShowTimePicker(false);
+              if (date) setDueDate(date);
+            }}
+          />
+        )}
+      </View>
+    )}
+  </View>
+);
+
+// Option Section Component (used for Alert, Second Alert, Repeat)
+type OptionSectionProps = {
+  label: string;
+  value: string;
+  onPress: () => void;
+};
+
+const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
+  <View style={styles.sectionContainer}>
+    <View style={styles.rowBetween}>
+      <Text style={styles.sectionLabel}>{label}</Text>
+      <Pressable style={styles.optionButton} onPress={onPress}>
+        <Text style={styles.optionText}>{value}</Text>
+      </Pressable>
+    </View>
+  </View>
+);
+
+// Photo Section Component
+type PhotoSectionProps = {
+  photoUri: string | null;
+  onPress: () => void;
+};
+
+const PhotoSection = ({ photoUri, onPress }: PhotoSectionProps) => (
+  <View style={styles.sectionContainer}>
+    <View style={styles.rowBetween}>
+      <Text style={styles.sectionLabel}>Photo</Text>
+      <Pressable style={styles.photoButton} onPress={onPress}>
+        {photoUri ? (
+          <Image source={{ uri: photoUri }} style={styles.photoImage} />
+        ) : (
+          <Ionicons name="image-outline" size={20} color="#71717B" />
+        )}
+      </Pressable>
+    </View>
+  </View>
+);
+
+// Modal components
+type AlertModalProps = {
+  visible: boolean;
+  onClose: () => void;
+  options: string[];
+  selectedOption: string;
+  onSelect: (option: string) => void;
+  title?: string;
+};
+
+const AlertModal = ({
+  visible,
+  onClose,
+  options,
+  selectedOption,
+  onSelect,
+  title = 'Select Alert Time',
+}: AlertModalProps) => (
+  <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <View style={modalStyles.container}>
+      <View style={modalStyles.content}>
+        <Text style={modalStyles.title}>{title}</Text>
+        <ScrollView style={modalStyles.optionList}>
+          {options.map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                modalStyles.optionItem,
+                selectedOption === option && modalStyles.selectedOption,
+              ]}
+              onPress={() => onSelect(option)}>
+              <Text style={modalStyles.optionItemText}>{option}</Text>
+              {selectedOption === option && <Ionicons name="checkmark" size={20} color="#27272A" />}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <TouchableOpacity style={modalStyles.closeButton} onPress={onClose}>
+          <Text style={modalStyles.closeButtonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>
+);
+
+// Main TodoListBottomSheet Component
 const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const snapPoints = useMemo(() => ['80%'], []);
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
@@ -29,27 +265,37 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   }, []);
   const couple = useCouple();
   const { myProfile } = usePartnerProfiles();
+
+  // Form state
   const [emoji, setEmoji] = useState('🖊');
   const [isHidden, setIsHidden] = useState(false);
   const [title, setTitle] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+
+  // Due date state
   const [hasDueDate, setHasDueDate] = useState(false);
   const [dueDate, setDueDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  // Alert state
   const [hasAlert, setHasAlert] = useState(false);
   const [alertOption, setAlertOption] = useState('None');
+  const [showAlertModal, setShowAlertModal] = useState(false);
+
+  // Second alert state
   const [hasSecondAlert, setHasSecondAlert] = useState(false);
   const [secondAlertOption, setSecondAlertOption] = useState('None');
-  const [repeatMode, setRepeatMode] = useState('Never');
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
-
-  // Modal visibility states
-  const [showAlertModal, setShowAlertModal] = useState(false);
   const [showSecondAlertModal, setShowSecondAlertModal] = useState(false);
+
+  // Repeat state
+  const [repeatMode, setRepeatMode] = useState('Never');
   const [showRepeatModal, setShowRepeatModal] = useState(false);
 
-  // Alert options
+  // Photo state
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+
+  // Alert and repeat options
   const alertOptions = [
     'None',
     '5 minutes before',
@@ -61,6 +307,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   ];
   const repeatOptions = ['Never', 'Daily', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
 
+  // Handlers
   const handleSubmit = () => {
     if (!couple?.todoLists) return;
 
@@ -78,11 +325,14 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
       { owner: couple._owner }
     );
     couple.todoLists.push(newList);
+
+    // Reset form
     setTitle('');
-    setEmoji('');
+    setEmoji('🖊');
     setIsHidden(false);
     setBackgroundColor('#FFFFFF');
     setHasDueDate(false);
+
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
     }
@@ -119,158 +369,40 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         snapPoints={snapPoints}
         enablePanDownToClose>
         <BottomSheetView style={styles.sheetContainer}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              justifyContent: 'space-between',
-            }}>
-            <TextInput
-              placeholder="New Todo List"
-              style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
-              value={title}
-              onChangeText={setTitle}
-              onSubmitEditing={handleSubmit}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: 16,
-            }}>
-            <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                backgroundColor: '#D4D4D8',
-                borderRadius: 20,
-              }}>
-              <Switch
-                trackColor={{ true: 'transparent', false: 'transparent' }}
-                thumbColor="white"
-                value={isHidden}
-                onValueChange={setIsHidden}
-              />
-            </View>
-          </View>
+          <TitleInput title={title} onChangeText={setTitle} onSubmitEditing={handleSubmit} />
 
-          <View
-            style={{
-              marginTop: 16,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 8,
-              }}>
-              <Text style={{ fontSize: 16, color: '#27272A' }}>Due Date</Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                  backgroundColor: '#D4D4D8',
-                  borderRadius: 20,
-                }}>
-                <Switch
-                  trackColor={{ true: 'transparent', false: 'transparent' }}
-                  thumbColor="white"
-                  value={hasDueDate}
-                  onValueChange={setHasDueDate}
-                />
-              </View>
-            </View>
+          <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
 
-            {hasDueDate && (
-              <View style={styles.dateTimeContainer}>
-                <Pressable style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
-                  <Text style={styles.dateButtonText}>
-                    {dueDate.toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </Text>
-                </Pressable>
-                <Pressable style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
-                  <Text style={styles.dateButtonText}>
-                    {dueDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
-                </Pressable>
+          <DueDateSection
+            hasDueDate={hasDueDate}
+            setHasDueDate={setHasDueDate}
+            dueDate={dueDate}
+            setDueDate={setDueDate}
+            showDatePicker={showDatePicker}
+            setShowDatePicker={setShowDatePicker}
+            showTimePicker={showTimePicker}
+            setShowTimePicker={setShowTimePicker}
+          />
 
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={dueDate}
-                    mode="date"
-                    display="inline"
-                    onChange={(event, date) => {
-                      setShowDatePicker(false);
-                      if (date) setDueDate(date);
-                    }}
-                  />
-                )}
+          <OptionSection
+            label="Alert"
+            value={alertOption}
+            onPress={() => setShowAlertModal(true)}
+          />
 
-                {showTimePicker && (
-                  <DateTimePicker
-                    value={dueDate}
-                    mode="time"
-                    display="default"
-                    onChange={(event, date) => {
-                      setShowTimePicker(false);
-                      if (date) setDueDate(date);
-                    }}
-                  />
-                )}
-              </View>
-            )}
-          </View>
+          <OptionSection
+            label="Second Alert"
+            value={secondAlertOption}
+            onPress={() => setShowSecondAlertModal(true)}
+          />
 
-          <View style={styles.sectionContainer}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.sectionLabel}>Alert</Text>
-              <Pressable style={styles.optionButton} onPress={() => setShowAlertModal(true)}>
-                <Text style={styles.optionText}>{alertOption}</Text>
-              </Pressable>
-            </View>
-          </View>
+          <OptionSection
+            label="Repeat"
+            value={repeatMode}
+            onPress={() => setShowRepeatModal(true)}
+          />
 
-          <View style={styles.sectionContainer}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.sectionLabel}>Second Alert</Text>
-              <Pressable style={styles.optionButton} onPress={() => setShowSecondAlertModal(true)}>
-                <Text style={styles.optionText}>{secondAlertOption}</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.sectionContainer}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.sectionLabel}>Repeat</Text>
-              <Pressable style={styles.optionButton} onPress={() => setShowRepeatModal(true)}>
-                <Text style={styles.optionText}>{repeatMode}</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.sectionContainer}>
-            <View style={styles.rowBetween}>
-              <Text style={styles.sectionLabel}>Photo</Text>
-              <Pressable style={styles.photoButton} onPress={handleSelectPhoto}>
-                {photoUri ? (
-                  <Image source={{ uri: photoUri }} style={styles.photoImage} />
-                ) : (
-                  <Ionicons name="image-outline" size={20} color="#71717B" />
-                )}
-              </Pressable>
-            </View>
-          </View>
+          <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
         </BottomSheetView>
       </BottomSheetModal>
 
@@ -302,48 +434,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     </>
   );
 });
-
-// Modal components
-const AlertModal = ({
-  visible,
-  onClose,
-  options,
-  selectedOption,
-  onSelect,
-  title = 'Select Alert Time',
-}: {
-  visible: boolean;
-  onClose: () => void;
-  options: string[];
-  selectedOption: string;
-  onSelect: (option: string) => void;
-  title?: string;
-}) => (
-  <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-    <View style={modalStyles.container}>
-      <View style={modalStyles.content}>
-        <Text style={modalStyles.title}>{title}</Text>
-        <ScrollView style={modalStyles.optionList}>
-          {options.map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                modalStyles.optionItem,
-                selectedOption === option && modalStyles.selectedOption,
-              ]}
-              onPress={() => onSelect(option)}>
-              <Text style={modalStyles.optionItemText}>{option}</Text>
-              {selectedOption === option && <Ionicons name="checkmark" size={20} color="#27272A" />}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        <TouchableOpacity style={modalStyles.closeButton} onPress={onClose}>
-          <Text style={modalStyles.closeButtonText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </Modal>
-);
 
 // Separate styles for modals
 const modalStyles = StyleSheet.create({
