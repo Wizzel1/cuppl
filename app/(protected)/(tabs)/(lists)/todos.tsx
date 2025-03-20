@@ -6,9 +6,10 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, Pressable, SectionList, StyleSheet, Switch, Text, View } from 'react-native';
 import EmojiPicker from 'rn-emoji-keyboard';
+import * as DropdownMenu from 'zeego/dropdown-menu';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListItem';
@@ -145,7 +146,6 @@ export default function Todos() {
 }
 
 const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
-  const snapPoints = useMemo(() => ['40%'], []);
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
@@ -155,7 +155,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const [emoji, setEmoji] = useState('🖊');
   const [isHidden, setIsHidden] = useState(false);
   const [title, setTitle] = useState('');
+  const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>('us');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+  const [showHideFromPartner, setShowHideFromPartner] = useState(false);
+  const [owner, setOwner] = useState('Both of us');
   const handleSubmit = () => {
     if (!couple?.todoLists) return;
 
@@ -167,7 +170,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         isHidden,
         backgroundColor,
         creatorAccID: myProfile!.accountId,
-        assignedTo: 'us',
+        assignedTo,
         deleted: false,
       },
       { owner: couple._owner }
@@ -182,13 +185,31 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     }
   };
 
+  useEffect(() => {
+    switch (assignedTo) {
+      case 'us':
+        setOwner('Both of us');
+        setShowHideFromPartner(false);
+        break;
+      case 'partner':
+        setOwner('Partner');
+        setShowHideFromPartner(false);
+        break;
+      case 'me':
+        setOwner('Me');
+        setShowHideFromPartner(true);
+        break;
+    }
+  }, [assignedTo]);
+
   return (
     <BottomSheetModal
       ref={ref}
       backdropComponent={backdropComponent}
-      snapPoints={snapPoints}
-      enablePanDownToClose>
-      <BottomSheetView style={styles.sheetContainer}>
+      enablePanDownToClose
+      enableDynamicSizing>
+      <BottomSheetView
+        style={{ ...styles.sheetContainer, height: showHideFromPartner ? 250 : 200 }}>
         <View
           style={{
             flexDirection: 'row',
@@ -239,27 +260,78 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         <View
           style={{
             flexDirection: 'row',
-            alignItems: 'center',
             justifyContent: 'space-between',
             marginTop: 16,
+            alignItems: 'center',
           }}>
-          <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
+          <Text style={{ fontSize: 16, color: '#27272A' }}>Owner</Text>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <View
+                style={{
+                  paddingVertical: 9,
+                  paddingHorizontal: 20,
+                  borderRadius: 20,
+                  width: 120,
+                  backgroundColor: '#F4F4F5',
+                  alignItems: 'center',
+                }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: '#8E51FF' }}>{owner}</Text>
+              </View>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item
+                key="me"
+                onSelect={() => {
+                  setAssignedTo('me');
+                }}>
+                <DropdownMenu.ItemTitle>Me</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                key="us"
+                onSelect={() => {
+                  setAssignedTo('us');
+                }}>
+                <DropdownMenu.ItemTitle>Both</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                key="partner"
+                onSelect={() => {
+                  setAssignedTo('partner');
+                }}>
+                <DropdownMenu.ItemTitle>Partner</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        </View>
+        {showHideFromPartner && (
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              gap: 8,
-              backgroundColor: '#D4D4D8',
-              borderRadius: 20,
+              justifyContent: 'space-between',
+              marginTop: 16,
             }}>
-            <Switch
-              trackColor={{ true: 'transparent', false: 'transparent' }}
-              thumbColor="white"
-              value={isHidden}
-              onValueChange={setIsHidden}
-            />
+            <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                backgroundColor: isHidden ? '#8E51FF' : '#E4E4E7',
+                borderRadius: 20,
+              }}>
+              <Switch
+                trackColor={{ true: 'transparent', false: 'transparent' }}
+                thumbColor="white"
+                value={isHidden}
+                onValueChange={setIsHidden}
+                style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
+              />
+            </View>
           </View>
-        </View>
+        )}
+        <View style={{ height: 86 }} />
       </BottomSheetView>
     </BottomSheetModal>
   );
@@ -270,8 +342,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   sheetContainer: {
-    flex: 1,
-    padding: 24,
     zIndex: 1000,
+    paddingTop: 12,
+    paddingHorizontal: 24,
   },
 });
