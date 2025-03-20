@@ -121,6 +121,7 @@ export default function Todos() {
               fontSize: 18,
               color: '#18181B',
               fontWeight: '600',
+              backgroundColor: 'white',
             }}>
             {section.title}
           </Text>
