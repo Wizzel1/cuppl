@@ -30,7 +30,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.cuppl.app"
+      "bundleIdentifier": "com.cuppl.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": true
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -38,6 +41,15 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.cuppl.app"
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d16a87a5-3459-402d-aa61-7d5818ca6e87"
+      }
+    },
+    "owner": "cuppl"
   }
 }
