@@ -1,6 +1,8 @@
+import { useAccount, useCoState } from 'jazz-react-native';
 import {
   Account,
   co,
+  CoList,
   CoMap,
   createInviteLink,
   Group,
@@ -8,17 +10,7 @@ import {
   ImageDefinition,
   Profile,
 } from 'jazz-tools';
-
-/**
- * Represents partner profile information that can be edited by both members of a couple.
- *
- * Properties:
- *  - name: The partner's name.
- *  - nickname: Optional nickname for the partner.
- *  - birthday: Optional birthday date.
- *  - avatar: Optional profile avatar image.
- *  - accountId: ID of the account this profile belongs to (for identification).
- */
+import { useMemo } from 'react';
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;
@@ -36,39 +28,56 @@ export class PartnerProfile extends CoMap {
   }
 }
 
-/**
- * Represents a couple in the app, serving as the foundation for all activities.
- *
- * Properties:
- *  - anniversary: Optional anniversary date of the couple.
- *  - backgroundPhoto: Optional photo displayed on the homescreen.
- *  - partnerA: Reference to the first partner's profile.
- *  - partnerB: Optional reference to the second partner's profile.
- *  - deleted: Soft delete flag.
- */
+export class TodoItem extends CoMap {
+  title = co.string;
+  description = co.optional.string;
+  completed = co.boolean;
+  dueDate = co.optional.Date;
+  notes = co.optional.string;
+  deleted = co.boolean;
+  photo = co.optional.ref(ImageDefinition);
+  creatorAccID = co.string;
+  assignedTo = co.literal('me', 'partner', 'us');
+}
+
+export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}
+
+export class TodoList extends CoMap {
+  title = co.string;
+  emoji = co.optional.string;
+  backgroundColor = co.optional.string;
+  items = co.ref(TodoItems);
+  isHidden = co.boolean;
+  creatorAccID = co.string;
+  assignedTo = co.literal('me', 'partner', 'us');
+  deleted = co.boolean;
+}
+
+export class TodoLists extends CoList.Of(co.ref(TodoList)) {}
+export class DefaultTodoList extends CoMap {
+  items = co.ref(TodoItems);
+}
+
 export class Couple extends CoMap {
   anniversary = co.optional.Date;
   backgroundPhoto = co.optional.ref(ImageDefinition);
-  partnerA = co.ref(PartnerProfile); // First partner (the one who created the couple)
-  partnerB = co.optional.ref(PartnerProfile); // Second partner (may be null if not joined yet)
+  partnerA = co.ref(PartnerProfile);
+  partnerB = co.optional.ref(PartnerProfile);
+  // Default todo lists
+  partnerATodos = co.ref(DefaultTodoList);
+  partnerBTodos = co.ref(DefaultTodoList);
+  ourTodos = co.ref(TodoList);
+  // Additional todo lists
+  todoLists = co.ref(TodoLists);
   deleted = co.boolean;
 
-  // Methods to manage the relationship
   getPartners() {
-    // Returns the members of the group that owns this Couple
     return this._owner
       .castAs(Group)
       .members.filter((member) => member.role === 'admin' || member.role === 'writer');
   }
 }
 
-/**
- * The top-level account root for the Couple app.
- *
- * Properties:
- *  - couple: A reference to the user's couple.
- *  - version: Optional version number for migrations.
- */
 export class CoupleAccountRoot extends CoMap {
   couple = co.ref(Couple);
   version = co.optional.number;
@@ -195,8 +204,6 @@ export class CoupleAccount extends Account {
       const secondMemberAccount = groupMembers.find(
         (member) => member.account?.id && member.account.id !== couple.partnerA?.accountId
       );
-      //mbEM
-      //Wg2C
 
       if (secondMemberAccount?.account?.id) {
         // Create a partner profile for the second account
@@ -267,6 +274,55 @@ export class CoupleAccount extends Account {
     // Create a private group for couple data
     const privateGroup = Group.create({ owner: this });
 
+    // Create a sample personal todo list
+    const myTodoList = this.createTodoList({
+      title: 'My To-Dos',
+      isHidden: false,
+      owner: 'me',
+      emoji: '📝',
+      backgroundColor: '#000000',
+    });
+    if (!myTodoList) return;
+    myTodoList!.items!.push(
+      TodoItem.create(
+        {
+          title: 'Welcome to your todo list!',
+          completed: false,
+          dueDate: null,
+          notes: null,
+          deleted: false,
+          creatorAccID: this.id,
+          assignedTo: 'me',
+        },
+        privateGroup
+      )
+    );
+
+    const partnerATodos = DefaultTodoList.create(
+      {
+        items: TodoItems.create([], privateGroup),
+      },
+      privateGroup
+    );
+
+    const partnerBTodos = DefaultTodoList.create(
+      {
+        items: TodoItems.create([], privateGroup),
+      },
+      privateGroup
+    );
+
+    const ourTodos = TodoList.create(
+      {
+        title: 'Our To-Dos',
+        assignedTo: 'us',
+        isHidden: false,
+        items: TodoItems.create([], privateGroup),
+        creatorAccID: this.id,
+        deleted: false,
+      },
+      privateGroup
+    );
     // Create a temporary partner profile first - we'll replace it with the proper one after
     const tempPartnerProfile = PartnerProfile.create(
       {
@@ -286,20 +342,24 @@ export class CoupleAccount extends Account {
         anniversary: new Date(),
         partnerA: tempPartnerProfile, // Use temporary profile initially
         partnerB: null, // Second partner is null until someone joins
+        ourTodos,
+        partnerATodos,
+        partnerBTodos,
+        todoLists: TodoLists.create([], privateGroup),
         deleted: false,
       },
       privateGroup
     );
 
     // Now create the proper partner profile using the createPartnerProfile helper
-    const partnerProfile = createPartnerProfile(
+    const myProfile = createPartnerProfile(
       initialCouple,
       this.profile?.name || 'New Partner',
       this.id
     );
 
     // Replace the temporary profile with the proper one
-    initialCouple.partnerA = partnerProfile;
+    initialCouple.partnerA = myProfile;
 
     // Initialize the account root with version tracking and the couple
     this.root = CoupleAccountRoot.create(
@@ -311,62 +371,71 @@ export class CoupleAccount extends Account {
     );
   }
 
-  /**
-   * Updates the account to join an existing couple after accepting an invite.
-   * @param coupleId The ID of the couple being joined
-   */
   async acceptCoupleInvite(coupleId: string) {
-    // 1. Load the invited couple
     const invitedCouple = await Couple.load(coupleId as ID<Couple>, []);
+    if (!invitedCouple) throw new Error('Could not load the couple you were invited to');
+    if (invitedCouple.partnerB) throw new Error('This couple already has two partners');
 
-    if (!invitedCouple) {
-      throw new Error('Could not load the couple you were invited to');
-    }
-
-    if (invitedCouple.partnerB) {
-      throw new Error('This couple already has two partners');
-    }
-
-    // 2. Store the original couple ID for cleanup later if needed
-    const originalCoupleId = this.coupleId;
-
-    // 3. Create a partner profile for this user using the helper function
-    const partnerProfile = createPartnerProfile(
+    const myProfile = createPartnerProfile(
       invitedCouple,
       this.profile?.name || 'New Partner',
       this.id
     );
 
-    // Set this profile as partnerB
-    invitedCouple.partnerB = partnerProfile;
+    invitedCouple.partnerB = myProfile;
+    if (this.root) this.root.couple = invitedCouple;
 
-    // 4. Update the root to point to the new couple
-    if (this.root) {
-      this.root.couple = invitedCouple;
-    }
-
-    // 5. Optionally mark the original couple as deleted if we want to clean up
+    const originalCoupleId = this.coupleId;
     if (originalCoupleId) {
       try {
         const originalCouple = await Couple.load(originalCoupleId, { owner: this });
-        if (originalCouple) {
-          originalCouple.deleted = true;
-        }
+        if (originalCouple) originalCouple.deleted = true;
       } catch (error) {
-        // Just log this error, don't block the main flow
         console.error('Could not mark original couple as deleted', error);
       }
     }
 
     return invitedCouple;
   }
+
+  createTodoList(args: {
+    title: string;
+    isHidden: boolean;
+    owner: 'me' | 'partner' | 'us';
+    emoji: string;
+    backgroundColor: string;
+  }): TodoList | null {
+    console.log('createTodoList', args);
+    if (!this.root?.couple) return null;
+
+    const couple = this.root.couple;
+    const coupleGroup = couple._owner;
+    if (!coupleGroup) throw new Error('No couple group found');
+
+    const newList = TodoList.create(
+      {
+        title: args.title,
+        emoji: args.emoji,
+        backgroundColor: args.backgroundColor,
+        creatorAccID: this.id,
+        items: TodoItems.create([], { owner: coupleGroup }),
+        isHidden: args.isHidden,
+        assignedTo: args.owner,
+        deleted: false,
+      },
+      { owner: coupleGroup }
+    );
+
+    if (couple.todoLists) {
+      couple.todoLists.push(newList);
+    } else {
+      throw new Error('No todo lists found');
+    }
+
+    return newList;
+  }
 }
 
-/**
- * Creates a sharable invite link for a couple.
- * Returns a string that can be used by another user to join this couple.
- * Returns null if the couple is not properly owned.
- */
 export const shareCouple = (couple: Couple): string | null => {
   if (couple._owner) {
     return createInviteLink(couple, 'admin', 'invite');
@@ -390,10 +459,7 @@ export const createPartnerProfile = (
   accountId: ID<Account>,
   options?: { nickname?: string; birthday?: Date; avatar?: ImageDefinition }
 ): PartnerProfile => {
-  // Get the group that owns the couple
   const coupleGroup = couple._owner.castAs(Group);
-
-  // Create a new profile owned by the couple's group
   return PartnerProfile.create(
     {
       name,
@@ -408,47 +474,40 @@ export const createPartnerProfile = (
 };
 
 /**
- * Gets the current user's partner profile from a couple.
+ * Custom hook that returns the couple that the current user is in.
  *
- * @param couple The couple instance
- * @param currentAccountId The current user's account ID
- * @returns The partner profile for the current user, or null if not found
+ * This hook simplifies access to the couple data and handles the loading state.
+ * It automatically retrieves the couple from the user's account root.
+ *
+ * @returns The couple instance or undefined if not loaded yet
  */
-export const getMyPartnerProfile = (
-  couple: Couple,
-  currentAccountId: string
-): PartnerProfile | null => {
-  const partnerA = couple.partnerA;
-  const partnerB = couple.partnerB;
+export const useCouple = () => {
+  const { me } = useAccount();
+  const couple = useCoState(Couple, me?.root?.couple?.id);
 
-  if (partnerA && partnerA.accountId === currentAccountId) {
-    return partnerA;
-  }
-  if (partnerB && partnerB.accountId === currentAccountId) {
-    return partnerB;
-  }
-  return null;
+  return couple;
 };
 
-/**
- * Gets the partner's profile (the other person in the couple).
- *
- * @param couple The couple instance
- * @param currentAccountId The current user's account ID
- * @returns The other partner's profile, or null if not found
- */
-export const getPartnerProfile = (
-  couple: Couple,
-  currentAccountId: string
-): PartnerProfile | null => {
-  const partnerA = couple.partnerA;
-  const partnerB = couple.partnerB;
+export const usePartnerProfiles = () => {
+  const { me } = useAccount();
+  const couple = useCoState(Couple, me?.root?.couple?.id);
 
-  if (partnerA && partnerA.accountId === currentAccountId) {
-    return partnerB || null;
-  }
-  if (partnerB && partnerB.accountId === currentAccountId) {
-    return partnerA;
-  }
-  return null;
+  const profiles = useMemo(() => {
+    if (!couple || !me?.id) {
+      return { myProfile: null, partnerProfile: null };
+    }
+
+    const partnerA = couple.partnerA;
+    const partnerB = couple.partnerB;
+
+    if (partnerA && partnerA.accountId === me.id) {
+      return { myProfile: partnerA, partnerProfile: partnerB || null };
+    } else if (partnerB && partnerB.accountId === me.id) {
+      return { myProfile: partnerB, partnerProfile: partnerA || null };
+    }
+
+    return { myProfile: null, partnerProfile: null };
+  }, [couple?.partnerA?.id, couple?.partnerB?.id, me?.id]);
+
+  return profiles;
 };

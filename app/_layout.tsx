@@ -23,7 +23,7 @@ function InitialLayout() {
     if (!isLoaded) return;
     const inAuthGroup = segments[0] === '(protected)';
     if (isSignedIn && !inAuthGroup) {
-      router.replace('/(protected)/home');
+      router.replace('/(protected)');
     } else if (!isSignedIn && pathname !== '/signin') {
       router.replace('/signin');
     }
@@ -43,7 +43,7 @@ function InitialLayout() {
         // This prevents directory group names from showing as headers
         headerTitle: '',
       }}>
-      <Stack.Screen name="(protected)/home" options={{ headerShown: false }} />
+      <Stack.Screen name="(protected)" options={{ headerShown: false }} />
       <Stack.Screen name="signin" options={{ headerShown: false }} />
       <Stack.Screen name="signup" options={{ headerShown: false }} />
     </Stack>

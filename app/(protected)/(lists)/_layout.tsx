@@ -5,7 +5,8 @@ import {
 } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import Constants from 'expo-constants';
-import { withLayoutContext } from 'expo-router';
+import { usePathname, withLayoutContext } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 const { Navigator } = createMaterialTopTabNavigator<MaterialTopTabNavigationEventMap>();
@@ -17,12 +18,27 @@ export const MaterialTopTabs = withLayoutContext<
 >(Navigator);
 
 export default function ListsLayout() {
+  const [showTabBar, setShowTabBar] = useState(true);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const shouldHideTabBar = pathname.startsWith('/co_z');
+
+    setTimeout(
+      () => {
+        setShowTabBar(!shouldHideTabBar);
+      },
+      shouldHideTabBar ? 200 : 0
+    );
+  }, [pathname]);
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <MaterialTopTabs
-        style={{ marginTop: 24 }}
         screenOptions={{
-          tabBarStyle: styles.containerStyle,
+          swipeEnabled: showTabBar,
+          tabBarStyle: showTabBar
+            ? styles.containerStyle
+            : { display: 'none', height: 0, marginBottom: 0 },
           tabBarIndicatorStyle: styles.indicator,
           tabBarActiveTintColor: '#F4F4F5',
           tabBarInactiveTintColor: '#27272A',
@@ -30,7 +46,7 @@ export default function ListsLayout() {
             color: 'transparent',
           },
         }}>
-        <MaterialTopTabs.Screen name="todos" options={{ title: 'To-Do Lists' }} />
+        <MaterialTopTabs.Screen name="(todos)" options={{ title: 'To-Do Lists' }} />
         <MaterialTopTabs.Screen name="shopping" options={{ title: 'Shopping Lists' }} />
       </MaterialTopTabs>
     </View>
@@ -53,8 +69,8 @@ const styles = StyleSheet.create({
     marginTop: Constants.statusBarHeight,
     backgroundColor: '#F4F4F5',
     width: '90%',
-    height: 50,
     alignSelf: 'center',
+    height: 50,
     borderRadius: 24,
     shadowColor: 'transparent',
     marginBottom: 24,
