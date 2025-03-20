@@ -65,6 +65,65 @@ export default function ListDetailScreen() {
     });
   };
 
+  const renderItem = ({
+    section: { title },
+    item,
+  }: {
+    section: { title: string };
+    item: TodoItem;
+  }) => {
+    const isExpanded = expandedSections.has(title);
+    if (!isExpanded) return null;
+
+    return (
+      <Pressable
+        onPress={() => {
+          item!.completed = !item!.completed;
+        }}>
+        <View
+          style={{
+            flexDirection: 'column',
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 'normal',
+              textDecorationLine: item?.completed ? 'line-through' : 'none',
+              color: item?.completed ? '#A1A1AA' : 'black',
+            }}>
+            {item?.title}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#71717B',
+                textDecorationLine: item?.completed ? 'line-through' : 'none',
+              }}>
+              {item?.dueDate
+                ? new Date(item.dueDate).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                  })
+                : ''}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#71717B',
+                textDecorationLine: item?.completed ? 'line-through' : 'none',
+              }}>
+              Weekly
+            </Text>
+          </View>
+        </View>
+      </Pressable>
+    );
+  };
+
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
   };
@@ -111,38 +170,7 @@ export default function ListDetailScreen() {
           keyExtractor={(item, index) => (item?.id as string) + index}
           extraData={expandedSections}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-          renderItem={({ section: { title }, item }) => {
-            const isExpanded = expandedSections.has(title);
-            if (!isExpanded) return null;
-
-            return (
-              <Pressable
-                onPress={() => {
-                  item!.completed = !item!.completed;
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'column',
-                  }}>
-                  <Text style={{ fontSize: 16, fontWeight: 'normal' }}>{item?.title}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 14, color: '#71717B' }}>
-                      {item?.dueDate
-                        ? new Date(item.dueDate).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit',
-                          })
-                        : ''}
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#71717B' }}>Weekly</Text>
-                  </View>
-                </View>
-              </Pressable>
-            );
-          }}
+          renderItem={renderItem}
           renderSectionHeader={({ section: { title } }) => {
             const isopen = expandedSections.has(title);
             return (
