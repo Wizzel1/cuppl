@@ -3,6 +3,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
+  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -16,7 +17,6 @@ import {
   StyleSheet,
   Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -38,7 +38,7 @@ const TitleInput = ({ title, onChangeText, onFocus }: TitleInputProps) => (
       gap: 8,
       justifyContent: 'space-between',
     }}>
-    <TextInput
+    <BottomSheetTextInput
       placeholder="New Todo"
       style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
       value={title}

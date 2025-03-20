@@ -2,11 +2,12 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
+  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, SectionList, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Dimensions, Pressable, SectionList, StyleSheet, Switch, Text, View } from 'react-native';
 import EmojiPicker from 'rn-emoji-keyboard';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -194,7 +195,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
             gap: 8,
             justifyContent: 'space-between',
           }}>
-          <TextInput
+          <BottomSheetTextInput
             placeholder="New Todo List"
             style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
             value={title}
@@ -205,6 +206,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
             <EmojiPicker
               onEmojiSelected={(emoji) => setEmoji(emoji.emoji)}
               open={pickerOpen}
+              defaultHeight={Dimensions.get('window').height * 0.7}
               onClose={() => setPickerOpen(false)}
             />
             <Pressable onPress={() => setPickerOpen(true)}>
