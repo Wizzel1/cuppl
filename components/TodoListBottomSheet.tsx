@@ -20,7 +20,7 @@ import {
   View,
 } from 'react-native';
 
-import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import { TodoItem, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 
 // Title Input Component
 type TitleInputProps = {
@@ -38,7 +38,7 @@ const TitleInput = ({ title, onChangeText, onSubmitEditing }: TitleInputProps) =
       justifyContent: 'space-between',
     }}>
     <TextInput
-      placeholder="New Todo List"
+      placeholder="New Todo"
       style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
       value={title}
       onChangeText={onChangeText}
@@ -258,7 +258,12 @@ const AlertModal = ({
 );
 
 // Main TodoListBottomSheet Component
-const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
+type TodoListBottomSheetProps = {
+  onCreate?: (newTodo: TodoItem) => void;
+};
+
+const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
+  const { onCreate } = props;
   const snapPoints = useMemo(() => ['80%'], []);
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -309,22 +314,16 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
 
   // Handlers
   const handleSubmit = () => {
-    if (!couple?.todoLists) return;
-
-    const newList = TodoList.create(
-      {
-        title: title.trim(),
-        items: TodoItems.create([]),
-        emoji,
-        isHidden,
-        backgroundColor,
-        creatorAccID: myProfile!.accountId,
-        assignedTo: 'us',
-        deleted: false,
-      },
-      { owner: couple._owner }
-    );
-    couple.todoLists.push(newList);
+    if (!onCreate) return;
+    const newTodo = TodoItem.create({
+      title: title.trim(),
+      completed: false,
+      creatorAccID: myProfile!.accountId,
+      assignedTo: 'us',
+      deleted: false,
+      dueDate,
+    });
+    onCreate(newTodo);
 
     // Reset form
     setTitle('');
