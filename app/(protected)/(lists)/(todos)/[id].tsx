@@ -8,7 +8,7 @@ import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListBottomSheet from '~/components/TodoListBottomSheet';
-import { TodoList, usePartnerProfiles } from '~/src/schema.jazz';
+import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function ListDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -20,9 +20,33 @@ export default function ListDetailScreen() {
   const [completedTodos, setCompletedTodos] = useState(0);
   const [totalTodos, setTotalTodos] = useState(0);
 
+  const [assignedToMe, setAssignedToMe] = useState<TodoItem[]>([]);
+  const [assignedToPartner, setAssignedToPartner] = useState<TodoItem[]>([]);
+  const [assignedToBoth, setAssignedToBoth] = useState<TodoItem[]>([]);
+
   useEffect(() => {
     if (list?.items) {
-      const completed = list.items.filter((item) => item?.completed || false).length;
+      const assignedToMe: TodoItem[] = [];
+      const assignedToPartner: TodoItem[] = [];
+      const assignedToBoth: TodoItem[] = [];
+      let completed = 0;
+
+      for (const item of list.items) {
+        if (item?.completed) {
+          completed++;
+        }
+        if (item?.assignedTo === 'me') {
+          assignedToMe.push(item);
+        } else if (item?.assignedTo === 'partner') {
+          assignedToPartner.push(item);
+        } else if (item?.assignedTo === 'us') {
+          assignedToBoth.push(item);
+        }
+      }
+
+      setAssignedToMe(assignedToMe);
+      setAssignedToPartner(assignedToPartner);
+      setAssignedToBoth(assignedToBoth);
       setCompletedTodos(completed);
       setTotalTodos(list.items.length);
     }
@@ -80,12 +104,13 @@ export default function ListDetailScreen() {
         <SectionList
           style={{ paddingHorizontal: 24, paddingTop: 16 }}
           sections={[
-            { title: 'My todos', data: list?.items ?? [] },
-            { title: partnerProfile?.nickname ?? 'partner todos', data: list?.items ?? [] },
-            { title: 'Our todos', data: list?.items ?? [] },
+            { title: 'My To-Dos', data: assignedToMe },
+            { title: partnerProfile?.nickname ?? 'Partner To-Dos', data: assignedToPartner },
+            { title: 'Our To-Dos', data: assignedToBoth },
           ]}
           keyExtractor={(item, index) => (item?.id as string) + index}
           extraData={expandedSections}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
           renderItem={({ section: { title }, item }) => {
             const isExpanded = expandedSections.has(title);
             if (!isExpanded) return null;
@@ -95,7 +120,26 @@ export default function ListDetailScreen() {
                 onPress={() => {
                   item!.completed = !item!.completed;
                 }}>
-                <Text>{item?.title}</Text>
+                <View
+                  style={{
+                    flexDirection: 'column',
+                  }}>
+                  <Text style={{ fontSize: 16, fontWeight: 'normal' }}>{item?.title}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: 14, color: '#71717B' }}>
+                      {item?.dueDate
+                        ? new Date(item.dueDate).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })
+                        : ''}
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#71717B' }}>Weekly</Text>
+                  </View>
+                </View>
               </Pressable>
             );
           }}
@@ -119,7 +163,15 @@ export default function ListDetailScreen() {
         />
 
         <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
-        <TodoListBottomSheet ref={bottomSheetModalRef} />
+        <TodoListBottomSheet
+          ref={bottomSheetModalRef}
+          onCreate={(newTodo) => {
+            console.log('New todo created:', newTodo);
+            if (list?.items) {
+              list.items.push(newTodo);
+            }
+          }}
+        />
       </View>
     </>
   );
