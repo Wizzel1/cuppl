@@ -26,10 +26,9 @@ import { TodoItem, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 type TitleInputProps = {
   title: string;
   onChangeText: (text: string) => void;
-  onSubmitEditing: () => void;
 };
 
-const TitleInput = ({ title, onChangeText, onSubmitEditing }: TitleInputProps) => (
+const TitleInput = ({ title, onChangeText }: TitleInputProps) => (
   <View
     style={{
       flexDirection: 'row',
@@ -42,7 +41,6 @@ const TitleInput = ({ title, onChangeText, onSubmitEditing }: TitleInputProps) =
       style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
       value={title}
       onChangeText={onChangeText}
-      onSubmitEditing={onSubmitEditing}
     />
   </View>
 );
@@ -368,7 +366,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
         snapPoints={snapPoints}
         enablePanDownToClose>
         <BottomSheetView style={styles.sheetContainer}>
-          <TitleInput title={title} onChangeText={setTitle} onSubmitEditing={handleSubmit} />
+          <TitleInput title={title} onChangeText={setTitle} />
 
           <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
 
@@ -402,6 +400,20 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
           />
 
           <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: '75%',
+              alignItems: 'center',
+            }}>
+            <Pressable style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600' }}>Cancel</Text>
+            </Pressable>
+            <Pressable style={{ flex: 1, alignItems: 'flex-end' }} onPress={handleSubmit}>
+              <Text style={{ fontSize: 16, fontWeight: '600' }}>Save To-Do</Text>
+            </Pressable>
+          </View>
         </BottomSheetView>
       </BottomSheetModal>
 
