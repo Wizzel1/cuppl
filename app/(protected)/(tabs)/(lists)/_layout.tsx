@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   containerStyle: {
-    marginTop: Constants.statusBarHeight,
+    marginTop: Constants.statusBarHeight + 16,
     backgroundColor: '#F4F4F5',
     width: '90%',
     alignSelf: 'center',

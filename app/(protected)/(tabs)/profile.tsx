@@ -14,7 +14,7 @@ export default function Profile() {
   }, [couple?.id]);
 
   return (
-    <View>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Profile</Text>
       <Button title="Log Out" onPress={logOut} />
       {couple ? <Text>Couple {couple.id}</Text> : <Text>No couple</Text>}

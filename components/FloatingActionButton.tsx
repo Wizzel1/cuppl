@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 999,
-    bottom: 20,
+    bottom: 30,
     left: '50%',
     right: '50%',
     // transform: [{ translateX: -28 }], // Half of the default size (56/2)
