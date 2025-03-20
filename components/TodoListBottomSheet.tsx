@@ -8,6 +8,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { forwardRef, useCallback, useMemo, useState } from 'react';
 import {
+  Dimensions,
   Image,
   Modal,
   Pressable,
@@ -26,9 +27,10 @@ import { TodoItem, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 type TitleInputProps = {
   title: string;
   onChangeText: (text: string) => void;
+  onFocus: () => void;
 };
 
-const TitleInput = ({ title, onChangeText }: TitleInputProps) => (
+const TitleInput = ({ title, onChangeText, onFocus }: TitleInputProps) => (
   <View
     style={{
       flexDirection: 'row',
@@ -40,6 +42,7 @@ const TitleInput = ({ title, onChangeText }: TitleInputProps) => (
       placeholder="New Todo"
       style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
       value={title}
+      onFocus={onFocus}
       onChangeText={onChangeText}
     />
   </View>
@@ -298,6 +301,8 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   // Photo state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
 
+  const [isFocused, setIsFocused] = useState(false);
+
   // Alert and repeat options
   const alertOptions = [
     'None',
@@ -364,9 +369,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
         ref={ref}
         backdropComponent={backdropComponent}
         snapPoints={snapPoints}
-        enablePanDownToClose>
+        enablePanDownToClose
+        enableDynamicSizing>
         <BottomSheetView style={styles.sheetContainer}>
-          <TitleInput title={title} onChangeText={setTitle} />
+          <TitleInput title={title} onChangeText={setTitle} onFocus={() => setIsFocused(true)} />
 
           <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
 
@@ -404,7 +410,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginTop: '75%',
+              position: 'absolute',
+              top: Dimensions.get('window').height * 0.68,
+              left: 16,
+              right: 16,
               alignItems: 'center',
             }}>
             <Pressable
