@@ -323,16 +323,16 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     });
     onCreate(newTodo);
 
+    if (ref && 'current' in ref) {
+      ref.current?.dismiss();
+    }
+
     // Reset form
     setTitle('');
     setEmoji('🖊');
     setIsHidden(false);
     setBackgroundColor('#FFFFFF');
     setHasDueDate(false);
-
-    if (ref && 'current' in ref) {
-      ref.current?.dismiss();
-    }
   };
 
   const selectAlertOption = (option: string) => {
@@ -407,7 +407,12 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
               marginTop: '75%',
               alignItems: 'center',
             }}>
-            <Pressable style={{ flex: 1 }}>
+            <Pressable
+              style={{ flex: 1 }}
+              onPress={() => {
+                //@ts-ignore
+                ref.current?.dismiss();
+              }}>
               <Text style={{ fontSize: 16, fontWeight: '600' }}>Cancel</Text>
             </Pressable>
             <Pressable style={{ flex: 1, alignItems: 'flex-end' }} onPress={handleSubmit}>
