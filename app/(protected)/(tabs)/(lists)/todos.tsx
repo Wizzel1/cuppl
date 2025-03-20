@@ -134,7 +134,7 @@ export default function Todos() {
             todosCount={2}
             completedCount={2}
             onPress={() => onItemPress(item)}
-            backgroundColor="red"
+            backgroundColor={item?.backgroundColor}
             emoji={item?.emoji}
           />
         )}
@@ -153,12 +153,13 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const { myProfile } = usePartnerProfiles();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [emoji, setEmoji] = useState('🖊');
-  const [isHidden, setIsHidden] = useState(false);
+  const [hideFromPartner, setHideFromPartner] = useState(false);
   const [title, setTitle] = useState('');
   const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>('us');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [showHideFromPartner, setShowHideFromPartner] = useState(false);
   const [owner, setOwner] = useState('Both of us');
+  const [activeScreen, setActiveScreen] = useState<'todo' | 'color' | 'emoji'>('todo');
   const handleSubmit = () => {
     if (!couple?.todoLists) return;
 
@@ -167,7 +168,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         title: title.trim(),
         items: TodoItems.create([]),
         emoji,
-        isHidden,
+        isHidden: hideFromPartner,
         backgroundColor,
         creatorAccID: myProfile!.accountId,
         assignedTo,
@@ -178,7 +179,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     couple.todoLists.push(newList);
     setTitle('');
     setEmoji('');
-    setIsHidden(false);
+    setHideFromPartner(false);
     setBackgroundColor('#FFFFFF');
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
@@ -202,14 +203,16 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     }
   }, [assignedTo]);
 
-  return (
-    <BottomSheetModal
-      ref={ref}
-      backdropComponent={backdropComponent}
-      enablePanDownToClose
-      enableDynamicSizing>
-      <BottomSheetView
-        style={{ ...styles.sheetContainer, height: showHideFromPartner ? 250 : 200 }}>
+  const getScreenHeight = () => {
+    if (activeScreen === 'color') return 400;
+    if (activeScreen === 'emoji') return 150;
+    if (showHideFromPartner) return 250;
+    return 200;
+  };
+
+  const TodoScreen = () => {
+    return (
+      <>
         <View
           style={{
             flexDirection: 'row',
@@ -244,17 +247,19 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
                 <Text style={{ fontSize: 20, textAlign: 'center' }}>{emoji}</Text>
               </View>
             </Pressable>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                borderWidth: 1,
-                borderColor: '#E4E4E7',
-                justifyContent: 'center',
-                backgroundColor: '#F4F4F5',
-              }}
-            />
+            <Pressable onPress={() => setActiveScreen('color')}>
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: '#E4E4E7',
+                  justifyContent: 'center',
+                  backgroundColor,
+                }}
+              />
+            </Pressable>
           </View>
         </View>
         <View
@@ -318,24 +323,113 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 8,
-                backgroundColor: isHidden ? '#8E51FF' : '#E4E4E7',
+                backgroundColor: hideFromPartner ? '#8E51FF' : '#E4E4E7',
                 borderRadius: 20,
               }}>
               <Switch
                 trackColor={{ true: 'transparent', false: 'transparent' }}
                 thumbColor="white"
-                value={isHidden}
-                onValueChange={setIsHidden}
+                value={hideFromPartner}
+                onValueChange={setHideFromPartner}
                 style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
               />
             </View>
           </View>
         )}
         <View style={{ height: 86 }} />
+      </>
+    );
+  };
+
+  const colors = [
+    '#F7E987',
+    '#FFD4D4',
+    '#FFEEB3',
+    '#FFFAC0',
+    '#FBFFA3',
+    '#E3FCBF',
+    '#D0F5BE',
+    '#C8FFE0',
+    '#B8F1F1',
+    '#D0F5FF',
+    '#D9F8FF',
+    '#D6E5FA',
+    '#E5DBFF',
+    '#F1E4FF',
+    '#F9ECFF',
+    '#FFE9F9',
+    '#FFDDF3',
+    '#FFD6E5',
+  ];
+
+  const ColorPickerScreen = () => {
+    return (
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 16,
+          }}>
+          <Pressable onPress={() => setActiveScreen('todo')}>
+            <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
+          </Pressable>
+          <Text style={{ fontSize: 18, fontWeight: '600' }}>Choose Color</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          {colors.map((color) => (
+            <Pressable
+              key={color}
+              onPress={() => {
+                setBackgroundColor(color);
+                setActiveScreen('todo');
+              }}
+              style={{ marginBottom: 16 }}>
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
+                  backgroundColor: color,
+                  borderWidth: 1,
+                  borderColor: '#E4E4E7',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                {color === backgroundColor && (
+                  <View
+                    style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#8E51FF' }}
+                  />
+                )}
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <BottomSheetModal
+      ref={ref}
+      backdropComponent={backdropComponent}
+      enablePanDownToClose
+      enableDynamicSizing>
+      <BottomSheetView
+        style={{
+          ...styles.sheetContainer,
+          height: getScreenHeight(),
+        }}>
+        {activeScreen === 'todo' && <TodoScreen />}
+        {activeScreen === 'color' && <ColorPickerScreen />}
+        {/* {activeScreen === 'emoji' && <EmojiPickerScreen />} */}
       </BottomSheetView>
     </BottomSheetModal>
   );
 });
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
