@@ -1,6 +1,7 @@
 import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack, usePathname, useRouter, useSegments } from 'expo-router';
+import { useAccount } from 'jazz-react-native';
 import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -16,6 +17,7 @@ if (!publishableKey) {
 function InitialLayout() {
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
+  const { me } = useAccount();
   const segments = useSegments();
   const pathname = usePathname();
 
@@ -27,7 +29,7 @@ function InitialLayout() {
     } else if (!isSignedIn && pathname !== '/signin') {
       router.replace('/signin');
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, me.id]);
 
   if (!isLoaded) {
     return (
