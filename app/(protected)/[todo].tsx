@@ -11,9 +11,9 @@ import TodoListBottomSheet from '~/components/TodoListBottomSheet';
 import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function ListDetailScreen() {
-  const { id } = useLocalSearchParams();
+  const { todo } = useLocalSearchParams<{ todo: string }>();
   const [expandedSections, setExpandedSections] = useState(new Set());
-  const list = useCoState(TodoList, id as ID<TodoList>);
+  const list = useCoState(TodoList, todo as ID<TodoList>);
   const { partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 

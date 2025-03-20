@@ -5,8 +5,7 @@ import {
 } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import Constants from 'expo-constants';
-import { usePathname, withLayoutContext } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { withLayoutContext } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 const { Navigator } = createMaterialTopTabNavigator<MaterialTopTabNavigationEventMap>();
@@ -18,27 +17,11 @@ export const MaterialTopTabs = withLayoutContext<
 >(Navigator);
 
 export default function ListsLayout() {
-  const [showTabBar, setShowTabBar] = useState(true);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const shouldHideTabBar = pathname.startsWith('/co_z');
-
-    setTimeout(
-      () => {
-        setShowTabBar(!shouldHideTabBar);
-      },
-      shouldHideTabBar ? 200 : 0
-    );
-  }, [pathname]);
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <MaterialTopTabs
         screenOptions={{
-          swipeEnabled: showTabBar,
-          tabBarStyle: showTabBar
-            ? styles.containerStyle
-            : { display: 'none', height: 0, marginBottom: 0 },
+          tabBarStyle: styles.containerStyle,
           tabBarIndicatorStyle: styles.indicator,
           tabBarActiveTintColor: '#F4F4F5',
           tabBarInactiveTintColor: '#27272A',
@@ -46,7 +29,7 @@ export default function ListsLayout() {
             color: 'transparent',
           },
         }}>
-        <MaterialTopTabs.Screen name="(todos)" options={{ title: 'To-Do Lists' }} />
+        <MaterialTopTabs.Screen name="todos" options={{ title: 'To-Do Lists' }} />
         <MaterialTopTabs.Screen name="shopping" options={{ title: 'Shopping Lists' }} />
       </MaterialTopTabs>
     </View>

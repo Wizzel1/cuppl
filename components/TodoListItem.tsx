@@ -43,7 +43,7 @@ function TodoListItem({
               <Text style={{ fontSize: 20 }}>{emoji}</Text>
             </View>
           ) : (
-            <ProgressiveImg image={avatar} maxWidth={200}>
+            <ProgressiveImg image={avatar} maxWidth={400}>
               {({ src, originalSize, res }) => (
                 <Image
                   source={{ uri: src }}

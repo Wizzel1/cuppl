@@ -1,12 +1,9 @@
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 
-export default function ProtectedLayout() {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="home" options={{ tabBarLabel: 'Home' }} />
-      <Tabs.Screen name="(lists)" options={{ tabBarLabel: 'Lists' }} />
-      <Tabs.Screen name="invite" options={{ href: null }} />
-      <Tabs.Screen name="profile" options={{ tabBarLabel: 'Profile' }} />
-    </Tabs>
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Lists' }} />
+    </Stack>
   );
 }

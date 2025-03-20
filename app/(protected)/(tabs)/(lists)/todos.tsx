@@ -70,7 +70,12 @@ export default function Todos() {
   }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
 
   const onItemPress = (list: TodoList | DefaultTodoList) => {
-    router.push(`/(protected)/(lists)/(todos)/${list.id}`);
+    router.push({
+      pathname: '/(protected)/[todo]',
+      params: {
+        todo: list.id,
+      },
+    });
   };
 
   return (
