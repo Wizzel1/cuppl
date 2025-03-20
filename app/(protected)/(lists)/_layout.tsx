@@ -35,6 +35,7 @@ export default function ListsLayout() {
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <MaterialTopTabs
         screenOptions={{
+          swipeEnabled: showTabBar,
           tabBarStyle: showTabBar
             ? styles.containerStyle
             : { display: 'none', height: 0, marginBottom: 0 },
