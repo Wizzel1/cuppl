@@ -12,7 +12,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { forwardRef, useCallback, useState } from 'react';
 import {
   Image,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -163,48 +162,52 @@ const PhotoSection = ({ photoUri, onPress }: PhotoSectionProps) => (
   </View>
 );
 
-// Modal components
-type AlertModalProps = {
-  visible: boolean;
-  onClose: () => void;
+// OptionList Component for displaying option selections
+type OptionListProps = {
+  title: string;
   options: string[];
   selectedOption: string;
   onSelect: (option: string) => void;
-  title?: string;
+  onBack: () => void;
 };
 
-const AlertModal = ({
-  visible,
-  onClose,
-  options,
-  selectedOption,
-  onSelect,
-  title = 'Select Alert Time',
-}: AlertModalProps) => (
-  <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-    <View style={modalStyles.container}>
-      <View style={modalStyles.content}>
-        <Text style={modalStyles.title}>{title}</Text>
-        <ScrollView style={modalStyles.optionList}>
-          {options.map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                modalStyles.optionItem,
-                selectedOption === option && modalStyles.selectedOption,
-              ]}
-              onPress={() => onSelect(option)}>
-              <Text style={modalStyles.optionItemText}>{option}</Text>
-              {selectedOption === option && <Ionicons name="checkmark" size={20} color="#27272A" />}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        <TouchableOpacity style={modalStyles.closeButton} onPress={onClose}>
-          <Text style={modalStyles.closeButtonText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
+const OptionList = ({ title, options, selectedOption, onSelect, onBack }: OptionListProps) => (
+  <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+      }}>
+      <Pressable onPress={onBack}>
+        <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
+      </Pressable>
+      <Text style={{ fontSize: 18, fontWeight: '600' }}>{title}</Text>
+      <View style={{ width: 40 }} />
     </View>
-  </Modal>
+    <ScrollView style={{ maxHeight: 300 }}>
+      {options.map((option) => (
+        <TouchableOpacity
+          key={option}
+          style={[
+            {
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingVertical: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: '#F4F4F5',
+            },
+            selectedOption === option && { backgroundColor: '#F4F4F5' },
+          ]}
+          onPress={() => onSelect(option)}>
+          <Text style={{ fontSize: 16 }}>{option}</Text>
+          {selectedOption === option && <Ionicons name="checkmark" size={20} color="#27272A" />}
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  </View>
 );
 
 // Main TodoListBottomSheet Component
@@ -219,6 +222,11 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   }, []);
   const { myProfile } = usePartnerProfiles();
 
+  // Active screen state
+  const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
+    'todo'
+  );
+
   // Form state
   const [emoji, setEmoji] = useState('🖊');
   const [isHidden, setIsHidden] = useState(false);
@@ -226,23 +234,20 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
 
   // Due date state
   const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [dueDate, setDueDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   // Alert state
   const [hasAlert, setHasAlert] = useState(false);
   const [alertOption, setAlertOption] = useState('None');
-  const [showAlertModal, setShowAlertModal] = useState(false);
 
   // Second alert state
   const [hasSecondAlert, setHasSecondAlert] = useState(false);
   const [secondAlertOption, setSecondAlertOption] = useState('None');
-  const [showSecondAlertModal, setShowSecondAlertModal] = useState(false);
 
   // Repeat state
   const [repeatMode, setRepeatMode] = useState('Never');
-  const [showRepeatModal, setShowRepeatModal] = useState(false);
 
   // Photo state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -268,7 +273,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
       creatorAccID: myProfile!.accountId,
       assignedTo: 'us',
       deleted: false,
-      dueDate,
+      dueDate: hasDueDate ? dueDate : null,
     });
     onCreate(newTodo);
 
@@ -281,23 +286,24 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setEmoji('🖊');
     setIsHidden(false);
     setHasDueDate(false);
+    setActiveScreen('todo');
   };
 
   const selectAlertOption = (option: string) => {
     setAlertOption(option);
     setHasAlert(option !== 'None');
-    setShowAlertModal(false);
+    setActiveScreen('todo');
   };
 
   const selectSecondAlertOption = (option: string) => {
     setSecondAlertOption(option);
     setHasSecondAlert(option !== 'None');
-    setShowSecondAlertModal(false);
+    setActiveScreen('todo');
   };
 
   const selectRepeatOption = (option: string) => {
     setRepeatMode(option);
-    setShowRepeatModal(false);
+    setActiveScreen('todo');
   };
 
   const handleSelectPhoto = () => {
@@ -306,155 +312,124 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setPhotoUri('https://via.placeholder.com/150');
   };
 
+  const getScreenHeight = () => {
+    if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
+      return 400; // Height for option screens
+    }
+    return hasDueDate ? 450 : 300; // Default height for main screen
+  };
+
   const renderFooter = useCallback(
-    (props: BottomSheetFooterProps) => (
-      <BottomSheetFooter {...props} bottomInset={24}>
-        <Pressable onPress={handleSubmit}>
-          <View
-            style={{
-              ...styles.footerContainer,
-              backgroundColor: title.trim() === '' ? 'grey' : 'blue',
-            }}>
-            <Text style={styles.footerText}>Footer</Text>
-          </View>
-        </Pressable>
-      </BottomSheetFooter>
-    ),
-    [title]
+    (props: BottomSheetFooterProps) => {
+      if (activeScreen !== 'todo') return null;
+
+      return (
+        <BottomSheetFooter {...props} bottomInset={24}>
+          <Pressable onPress={handleSubmit} disabled={title.trim() === ''}>
+            <View
+              style={{
+                ...styles.footerContainer,
+                backgroundColor: title.trim() === '' ? '#A1A1AA' : '#8E51FF',
+              }}>
+              <Text style={styles.footerText}>Create Todo</Text>
+            </View>
+          </Pressable>
+        </BottomSheetFooter>
+      );
+    },
+    [title, activeScreen]
   );
+
   return (
-    <>
-      <BottomSheetModal
-        ref={ref}
-        backdropComponent={backdropComponent}
-        enablePanDownToClose
-        enableDynamicSizing
-        footerComponent={renderFooter}>
-        <BottomSheetView style={{ ...styles.sheetContainer, height: hasDueDate ? 450 : 300 }}>
-          <BottomSheetTextInput
-            placeholder="New Todo"
-            style={{
-              fontSize: 24,
-              fontWeight: '600',
-              color: '#27272A',
-            }}
-            onChangeText={setTitle}
+    <BottomSheetModal
+      ref={ref}
+      backdropComponent={backdropComponent}
+      enablePanDownToClose
+      enableDynamicSizing
+      footerComponent={renderFooter}>
+      <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
+        {activeScreen === 'todo' && (
+          <>
+            <BottomSheetTextInput
+              placeholder="New Todo"
+              style={{
+                fontSize: 24,
+                fontWeight: '600',
+                color: '#27272A',
+              }}
+              onChangeText={setTitle}
+              value={title}
+            />
+
+            <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
+
+            <DueDateSection
+              hasDueDate={hasDueDate}
+              setHasDueDate={setHasDueDate}
+              dueDate={dueDate}
+              setDueDate={setDueDate}
+              showDatePicker={showDatePicker}
+              setShowDatePicker={setShowDatePicker}
+              showTimePicker={showTimePicker}
+              setShowTimePicker={setShowTimePicker}
+            />
+
+            {hasDueDate && (
+              <>
+                <OptionSection
+                  label="Alert"
+                  value={alertOption}
+                  onPress={() => setActiveScreen('alert')}
+                />
+
+                <OptionSection
+                  label="Second Alert"
+                  value={secondAlertOption}
+                  onPress={() => setActiveScreen('secondAlert')}
+                />
+              </>
+            )}
+            <OptionSection
+              label="Repeat"
+              value={repeatMode}
+              onPress={() => setActiveScreen('repeat')}
+            />
+            <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
+          </>
+        )}
+
+        {activeScreen === 'alert' && (
+          <OptionList
+            title="Select Alert Time"
+            options={alertOptions}
+            selectedOption={alertOption}
+            onSelect={selectAlertOption}
+            onBack={() => setActiveScreen('todo')}
           />
+        )}
 
-          <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
-
-          <DueDateSection
-            hasDueDate={hasDueDate}
-            setHasDueDate={setHasDueDate}
-            dueDate={dueDate ?? new Date()}
-            setDueDate={setDueDate}
-            showDatePicker={showDatePicker}
-            setShowDatePicker={setShowDatePicker}
-            showTimePicker={showTimePicker}
-            setShowTimePicker={setShowTimePicker}
+        {activeScreen === 'secondAlert' && (
+          <OptionList
+            title="Select Second Alert Time"
+            options={alertOptions}
+            selectedOption={secondAlertOption}
+            onSelect={selectSecondAlertOption}
+            onBack={() => setActiveScreen('todo')}
           />
+        )}
 
-          {hasDueDate && (
-            <>
-              <OptionSection
-                label="Alert"
-                value={alertOption}
-                onPress={() => setShowAlertModal(true)}
-              />
-
-              <OptionSection
-                label="Second Alert"
-                value={secondAlertOption}
-                onPress={() => setShowSecondAlertModal(true)}
-              />
-            </>
-          )}
-          <OptionSection
-            label="Repeat"
-            value={repeatMode}
-            onPress={() => setShowRepeatModal(true)}
+        {activeScreen === 'repeat' && (
+          <OptionList
+            title="Repeat"
+            options={repeatOptions}
+            selectedOption={repeatMode}
+            onSelect={selectRepeatOption}
+            onBack={() => setActiveScreen('todo')}
           />
-          <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
-        </BottomSheetView>
-      </BottomSheetModal>
-
-      {/* Alert Modals */}
-      <AlertModal
-        visible={showAlertModal}
-        onClose={() => setShowAlertModal(false)}
-        options={alertOptions}
-        selectedOption={alertOption}
-        onSelect={selectAlertOption}
-      />
-
-      <AlertModal
-        visible={showSecondAlertModal}
-        onClose={() => setShowSecondAlertModal(false)}
-        options={alertOptions}
-        selectedOption={secondAlertOption}
-        onSelect={selectSecondAlertOption}
-      />
-
-      <AlertModal
-        visible={showRepeatModal}
-        onClose={() => setShowRepeatModal(false)}
-        options={repeatOptions}
-        selectedOption={repeatMode}
-        onSelect={selectRepeatOption}
-        title="Repeat"
-      />
-    </>
+        )}
+      </BottomSheetView>
+    </BottomSheetModal>
   );
-});
-
-// Separate styles for modals
-const modalStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  content: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 24,
-    maxHeight: '80%',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  optionList: {
-    maxHeight: 300,
-  },
-  optionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F4F4F5',
-  },
-  selectedOption: {
-    backgroundColor: '#F4F4F5',
-  },
-  optionItemText: {
-    fontSize: 16,
-  },
-  closeButton: {
-    marginTop: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-    backgroundColor: '#F4F4F5',
-    borderRadius: 8,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
 });
 
 const styles = StyleSheet.create({
@@ -471,7 +446,7 @@ const styles = StyleSheet.create({
     padding: 12,
     margin: 12,
     borderRadius: 12,
-    backgroundColor: '#80f',
+    backgroundColor: '#8E51FF',
   },
   footerText: {
     textAlign: 'center',
