@@ -11,10 +11,10 @@ import { useRouter } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
-import * as DropdownMenu from 'zeego/dropdown-menu';
 
 import CustomSwitch from '~/components/CustomSwitch';
 import FloatingActionButton from '~/components/FloatingActionButton';
+import OwnerDropdown, { OwnerAssignment } from '~/components/OwnerDropdown';
 import TodoListItem from '~/components/TodoListItem';
 import {
   DefaultTodoList,
@@ -159,7 +159,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>('us');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [showHideFromPartner, setShowHideFromPartner] = useState(false);
-  const [owner, setOwner] = useState('Both of us');
   const [activeScreen, setActiveScreen] = useState<'todo' | 'color' | 'emoji'>('todo');
   const handleSubmit = useCallback(() => {
     if (!couple) return;
@@ -194,23 +193,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     backgroundColor,
     assignedTo,
   ]);
-
-  useEffect(() => {
-    switch (assignedTo) {
-      case 'us':
-        setOwner('Both of us');
-        setShowHideFromPartner(false);
-        break;
-      case 'partner':
-        setOwner('Partner');
-        setShowHideFromPartner(false);
-        break;
-      case 'me':
-        setOwner('Me');
-        setShowHideFromPartner(true);
-        break;
-    }
-  }, [assignedTo]);
 
   const getScreenHeight = () => {
     if (activeScreen === 'color') return 400;
@@ -331,6 +313,18 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     },
     [activeScreen]
   );
+
+  const handleAssignedToChange = useCallback((newAssignedTo: OwnerAssignment) => {
+    setAssignedTo(newAssignedTo);
+    if (newAssignedTo === 'us') {
+      setShowHideFromPartner(false);
+    } else if (newAssignedTo === 'partner') {
+      setShowHideFromPartner(false);
+    } else {
+      setShowHideFromPartner(true);
+    }
+  }, []);
+
   return (
     <BottomSheetModal
       ref={ref}
@@ -393,54 +387,8 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
                 </Pressable>
               </View>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: 16,
-                alignItems: 'center',
-              }}>
-              <Text style={{ fontSize: 16, color: '#27272A' }}>Owner</Text>
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <View
-                    style={{
-                      paddingVertical: 9,
-                      paddingHorizontal: 20,
-                      borderRadius: 20,
-                      width: 120,
-                      backgroundColor: '#F4F4F5',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#8E51FF' }}>
-                      {owner}
-                    </Text>
-                  </View>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item
-                    key="me"
-                    onSelect={() => {
-                      setAssignedTo('me');
-                    }}>
-                    <DropdownMenu.ItemTitle>Me</DropdownMenu.ItemTitle>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item
-                    key="us"
-                    onSelect={() => {
-                      setAssignedTo('us');
-                    }}>
-                    <DropdownMenu.ItemTitle>Both</DropdownMenu.ItemTitle>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item
-                    key="partner"
-                    onSelect={() => {
-                      setAssignedTo('partner');
-                    }}>
-                    <DropdownMenu.ItemTitle>Partner</DropdownMenu.ItemTitle>
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
+            <View style={{ marginTop: 16 }}>
+              <OwnerDropdown onAssignedToChange={handleAssignedToChange} />
             </View>
             {showHideFromPartner && (
               <View

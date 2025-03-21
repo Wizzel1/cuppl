@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 
 import CustomSwitch from './CustomSwitch';
+import OwnerDropdown, { OwnerAssignment } from './OwnerDropdown';
 
 import { TodoItem, usePartnerProfiles } from '~/src/schema.jazz';
 
@@ -186,7 +187,7 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
       <Text style={{ fontSize: 18, fontWeight: '600' }}>{title}</Text>
       <View style={{ width: 40 }} />
     </View>
-    <ScrollView style={{ maxHeight: 300 }}>
+    <ScrollView style={{ maxHeight: 600, marginBottom: 0, paddingBottom: 0 }}>
       {options.map((option) => (
         <TouchableOpacity
           key={option}
@@ -226,6 +227,9 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
+  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('us');
+  const [showHideFromPartner, setShowHideFromPartner] = useState(false);
+  const [hideFromPartner, setHideFromPartner] = useState(false);
 
   // Form state
   const [emoji, setEmoji] = useState('🖊');
@@ -264,6 +268,17 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   ];
   const repeatOptions = ['Never', 'Daily', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
 
+  const handleAssignedToChange = useCallback((newAssignedTo: OwnerAssignment) => {
+    setAssignedTo(newAssignedTo);
+    if (newAssignedTo === 'us') {
+      setShowHideFromPartner(false);
+    } else if (newAssignedTo === 'partner') {
+      setShowHideFromPartner(false);
+    } else {
+      setShowHideFromPartner(true);
+    }
+  }, []);
+
   // Handlers
   const handleSubmit = () => {
     if (!onCreate) return;
@@ -271,7 +286,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
       title: title.trim(),
       completed: false,
       creatorAccID: myProfile!.accountId,
-      assignedTo: 'us',
+      assignedTo,
       deleted: false,
       dueDate: hasDueDate ? dueDate : null,
     });
@@ -313,10 +328,13 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   };
 
   const getScreenHeight = () => {
+    let height = 300;
     if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
-      return 400; // Height for option screens
+      return 500; // Height for option screens
     }
-    return hasDueDate ? 450 : 300; // Default height for main screen
+    if (showHideFromPartner) height += 50;
+    if (hasDueDate) height += 150;
+    return height; // Default height for main screen
   };
 
   const renderFooter = useCallback(
@@ -360,9 +378,22 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
               onChangeText={setTitle}
               value={title}
             />
+            <View style={{ marginTop: 16 }}>
+              <OwnerDropdown onAssignedToChange={handleAssignedToChange} />
+            </View>
 
-            <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
-
+            {showHideFromPartner && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: 16,
+                }}>
+                <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
+                <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
+              </View>
+            )}
             <DueDateSection
               hasDueDate={hasDueDate}
               setHasDueDate={setHasDueDate}
