@@ -190,7 +190,6 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
 };
 
 const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
-  console.log('TodoListBottomSheet');
   const { onCreate } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -303,11 +302,11 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   const screenHeight = useMemo(() => {
     let height = 300;
     if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
-      height = 500; // Height for option screens
+      height = 500;
     }
     if (showHideFromPartner) height += 50;
     if (hasDueDate) height += 150;
-    return height; // Default height for main screen
+    return height;
   }, [activeScreen, showHideFromPartner, hasDueDate]);
 
   const renderFooter = useCallback(

@@ -38,6 +38,7 @@ export class TodoItem extends CoMap {
   photo = co.optional.ref(ImageDefinition);
   creatorAccID = co.string;
   assignedTo = co.literal('me', 'partner', 'us');
+  recurringUnit = co.optional.literal('daily', 'weekly', 'biweekly', 'monthly', 'yearly');
 }
 
 export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}

@@ -4,15 +4,147 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListBottomSheet from '~/components/TodoListBottomSheet';
 import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
+function TodoSection({ title, todos }: { title: string; todos: TodoItem[] }) {
+  if (todos.length === 0) return null;
+
+  return (
+    <View>
+      <View
+        style={{
+          width: '100%',
+          backgroundColor: '#F4F4F5',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 24,
+        }}>
+        <Text style={{ fontWeight: '600', paddingVertical: 5.5, fontSize: 14 }}>{title}</Text>
+        {title === 'Completed' || title === 'Overdue' ? (
+          <Pressable onPress={() => {}}>
+            <Ionicons name="ellipsis-vertical" size={16} color="black" />
+          </Pressable>
+        ) : null}
+      </View>
+
+      {todos.map((item, index) => (
+        <View key={(item?.id as string) + index}>
+          <Pressable
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 24,
+            }}
+            onPress={() => {
+              item!.completed = !item!.completed;
+            }}>
+            <View
+              style={{
+                flexDirection: 'column',
+              }}>
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'normal',
+                  textDecorationLine: item?.completed ? 'line-through' : 'none',
+                  color: item?.completed ? '#A1A1AA' : 'black',
+                }}>
+                {item?.title}
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: '#71717B',
+                    textDecorationLine: item?.completed ? 'line-through' : 'none',
+                  }}>
+                  {item?.dueDate
+                    ? new Date(item.dueDate).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })
+                    : ''}
+                </Text>
+                {item?.recurringUnit && (
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: '#71717B',
+                      textDecorationLine: item?.completed ? 'line-through' : 'none',
+                    }}>
+                    {item?.recurringUnit}
+                  </Text>
+                )}
+              </View>
+            </View>
+          </Pressable>
+          {index < todos.length - 1 && <View style={{ height: 8 }} />}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function TodoSectionList({ todos }: { todos: TodoItem[] }) {
+  const [overdue, setOverdue] = useState<TodoItem[]>([]);
+  const [dueNext, setDueNext] = useState<TodoItem[]>([]);
+  const [withoutDueDate, setWithoutDueDate] = useState<TodoItem[]>([]);
+  const [recurring, setRecurring] = useState<TodoItem[]>([]);
+  const [completed, setCompleted] = useState<TodoItem[]>([]);
+
+  useEffect(() => {
+    const overdue: TodoItem[] = [];
+    const dueNext: TodoItem[] = [];
+    const withoutDueDate: TodoItem[] = [];
+    const recurring: TodoItem[] = [];
+    const completed: TodoItem[] = [];
+
+    for (const todo of todos) {
+      if (todo.completed) {
+        completed.push(todo);
+        continue;
+      }
+      if (todo.dueDate && new Date(todo.dueDate) < new Date()) {
+        overdue.push(todo);
+      } else if (todo.dueDate && new Date(todo.dueDate) > new Date()) {
+        dueNext.push(todo);
+      } else {
+        withoutDueDate.push(todo);
+      }
+      if (todo.recurringUnit) {
+        recurring.push(todo);
+      }
+    }
+
+    setRecurring(recurring);
+    setOverdue(overdue);
+    setDueNext(dueNext);
+    setWithoutDueDate(withoutDueDate);
+    setCompleted(completed);
+  }, [todos]);
+
+  return (
+    <View>
+      <TodoSection title="Overdue" todos={overdue} />
+      <TodoSection title="Due Next" todos={dueNext} />
+      <TodoSection title="Without Due Date" todos={withoutDueDate} />
+      <TodoSection title="Recurring" todos={recurring} />
+      <TodoSection title="Completed" todos={completed} />
+    </View>
+  );
+}
+
 export default function ListDetailScreen() {
   const { todo } = useLocalSearchParams<{ todo: string }>();
-  const [expandedSections, setExpandedSections] = useState(new Set());
+  const [expandedSections, setExpandedSections] = useState(new Set<string>());
   const list = useCoState(TodoList, todo as ID<TodoList>);
   const { partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -65,67 +197,6 @@ export default function ListDetailScreen() {
     });
   };
 
-  const renderItem = ({
-    section: { title },
-    item,
-  }: {
-    section: { title: string };
-    item: TodoItem;
-  }) => {
-    const isExpanded = expandedSections.has(title);
-    if (!isExpanded) return null;
-
-    return (
-      <Pressable
-        onPress={() => {
-          item!.completed = !item!.completed;
-        }}>
-        <View
-          style={{
-            flexDirection: 'column',
-          }}>
-          <Text
-            numberOfLines={1}
-            style={{
-              fontSize: 16,
-              fontWeight: 'normal',
-
-              textDecorationLine: item?.completed ? 'line-through' : 'none',
-              color: item?.completed ? '#A1A1AA' : 'black',
-            }}>
-            {item?.title}
-          </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#71717B',
-                textDecorationLine: item?.completed ? 'line-through' : 'none',
-              }}>
-              {item?.dueDate
-                ? new Date(item.dueDate).toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                  })
-                : ''}
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#71717B',
-                textDecorationLine: item?.completed ? 'line-through' : 'none',
-              }}>
-              Weekly
-            </Text>
-          </View>
-        </View>
-      </Pressable>
-    );
-  };
-
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
   };
@@ -155,46 +226,88 @@ export default function ListDetailScreen() {
         }}
       />
       <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <View style={styles.progressContainer}>
-          <View style={styles.progressTrack}>
-            <View
-              style={[
-                styles.progressBar,
-                { width: `${totalTodos > 0 ? (completedTodos / totalTodos) * 100 : 0}%` },
-              ]}
-            />
+        <ScrollView>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressTrack}>
+              <View
+                style={[
+                  styles.progressBar,
+                  { width: `${totalTodos > 0 ? (completedTodos / totalTodos) * 100 : 0}%` },
+                ]}
+              />
+            </View>
           </View>
-        </View>
 
-        <SectionList
-          style={{ paddingHorizontal: 24, paddingTop: 16 }}
-          sections={[
-            { title: 'My To-Dos', data: assignedToMe },
-            { title: partnerProfile?.nickname ?? 'Partner To-Dos', data: assignedToPartner },
-            { title: 'Our To-Dos', data: assignedToBoth },
-          ]}
-          keyExtractor={(item, index) => (item?.id as string) + index}
-          extraData={expandedSections}
-          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-          renderItem={renderItem}
-          renderSectionHeader={({ section: { title } }) => {
-            const isopen = expandedSections.has(title);
-            return (
-              <Pressable onPress={() => handleToggle(title)}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingVertical: 16,
-                  }}>
-                  <Text style={styles.sectionHeader}>{title}</Text>
-                  <Ionicons name={isopen ? 'chevron-up' : 'chevron-down'} size={24} color="black" />
-                </View>
-              </Pressable>
-            );
-          }}
-        />
+          <View style={{ paddingTop: 16, paddingBottom: 80 }}>
+            {/* My To-Dos Section */}
+            <Pressable onPress={() => handleToggle('My To-Dos')}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: 16,
+                  paddingHorizontal: 24,
+                }}>
+                <Text style={styles.sectionHeader}>My To-Dos</Text>
+                <Ionicons
+                  name={expandedSections.has('My To-Dos') ? 'chevron-up' : 'chevron-down'}
+                  size={24}
+                  color="black"
+                />
+              </View>
+            </Pressable>
+            {expandedSections.has('My To-Dos') && <TodoSectionList todos={assignedToMe} />}
+
+            {/* Partner To-Dos Section */}
+            <Pressable onPress={() => handleToggle(partnerProfile?.nickname ?? 'Partner To-Dos')}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: 16,
+                  paddingHorizontal: 24,
+                }}>
+                <Text style={styles.sectionHeader}>
+                  {partnerProfile?.nickname ?? 'Partner To-Dos'}
+                </Text>
+                <Ionicons
+                  name={
+                    expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos')
+                      ? 'chevron-up'
+                      : 'chevron-down'
+                  }
+                  size={24}
+                  color="black"
+                />
+              </View>
+            </Pressable>
+            {expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos') && (
+              <TodoSectionList todos={assignedToPartner} />
+            )}
+
+            {/* Our To-Dos Section */}
+            <Pressable onPress={() => handleToggle('Our To-Dos')}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingVertical: 16,
+                  paddingHorizontal: 24,
+                }}>
+                <Text style={styles.sectionHeader}>Our To-Dos</Text>
+                <Ionicons
+                  name={expandedSections.has('Our To-Dos') ? 'chevron-up' : 'chevron-down'}
+                  size={24}
+                  color="black"
+                />
+              </View>
+            </Pressable>
+            {expandedSections.has('Our To-Dos') && <TodoSectionList todos={assignedToBoth} />}
+          </View>
+        </ScrollView>
 
         <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
         <TodoListBottomSheet
