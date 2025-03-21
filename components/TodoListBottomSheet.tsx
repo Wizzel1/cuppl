@@ -9,7 +9,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { forwardRef, useCallback, useState } from 'react';
+import { forwardRef, useCallback, useMemo, useState } from 'react';
 import {
   Image,
   Pressable,
@@ -24,6 +24,7 @@ import CustomSwitch from './CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from './OwnerDropdown';
 
 import { TodoItem, usePartnerProfiles } from '~/src/schema.jazz';
+import { useDebounce } from '~/utils/useDebounce';
 
 // Due Date Section Component
 type DueDateSectionProps = {
@@ -196,7 +197,26 @@ type TodoListBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
 };
 
+const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
+  const [title, setTitle] = useState('');
+  useDebounce(() => onChange(title), 300);
+
+  return (
+    <BottomSheetTextInput
+      placeholder="New Todo"
+      style={{
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#27272A',
+      }}
+      onChangeText={setTitle}
+      value={title}
+    />
+  );
+};
+
 const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
+  console.log('TodoListBottomSheet');
   const { onCreate } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -306,15 +326,15 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setPhotoUri('https://via.placeholder.com/150');
   };
 
-  const getScreenHeight = () => {
+  const screenHeight = useMemo(() => {
     let height = 300;
     if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
-      return 500; // Height for option screens
+      height = 500; // Height for option screens
     }
     if (showHideFromPartner) height += 50;
     if (hasDueDate) height += 150;
     return height; // Default height for main screen
-  };
+  }, [activeScreen, showHideFromPartner, hasDueDate]);
 
   const renderFooter = useCallback(
     (props: BottomSheetFooterProps) => {
@@ -345,19 +365,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
       enableDynamicSizing
       onDismiss={handleDismiss}
       footerComponent={renderFooter}>
-      <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
+      <BottomSheetView style={{ ...styles.sheetContainer, height: screenHeight }}>
         {activeScreen === 'todo' && (
           <>
-            <BottomSheetTextInput
-              placeholder="New Todo"
-              style={{
-                fontSize: 24,
-                fontWeight: '600',
-                color: '#27272A',
-              }}
-              onChangeText={setTitle}
-              value={title}
-            />
+            <InputField onChange={setTitle} />
             <View style={{ marginTop: 16 }}>
               <OwnerDropdown onAssignedToChange={handleAssignedToChange} />
             </View>

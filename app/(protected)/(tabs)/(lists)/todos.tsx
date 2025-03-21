@@ -23,6 +23,7 @@ import {
   useCouple,
   usePartnerProfiles,
 } from '~/src/schema.jazz';
+import { useDebounce } from '~/utils/useDebounce';
 
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
@@ -146,7 +147,23 @@ export default function Todos() {
     </View>
   );
 }
+const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
+  const [title, setTitle] = useState('');
+  useDebounce(() => onChange(title), 300);
 
+  return (
+    <BottomSheetTextInput
+      placeholder="New Todo"
+      style={{
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#27272A',
+      }}
+      onChangeText={setTitle}
+      value={title}
+    />
+  );
+};
 const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -343,17 +360,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
                 gap: 8,
                 justifyContent: 'space-between',
               }}>
-              <BottomSheetTextInput
-                placeholder="New Todo List"
-                style={{
-                  flex: 1,
-                  fontSize: 24,
-                  fontWeight: '600',
-                  color: '#27272A',
-                }}
-                onChangeText={setTitle}
-                value={title}
-              />
+              <InputField onChange={setTitle} />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Pressable onPress={() => setActiveScreen('emoji')}>
                   <View

@@ -3,7 +3,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -85,9 +85,11 @@ export default function ListDetailScreen() {
             flexDirection: 'column',
           }}>
           <Text
+            numberOfLines={1}
             style={{
               fontSize: 16,
               fontWeight: 'normal',
+
               textDecorationLine: item?.completed ? 'line-through' : 'none',
               color: item?.completed ? '#A1A1AA' : 'black',
             }}>
@@ -128,19 +130,23 @@ export default function ListDetailScreen() {
     bottomSheetModalRef.current?.present();
   };
 
+  const renderHeaderTitle = useCallback(() => {
+    return (
+      <View style={{ flexDirection: 'column' }}>
+        <Text style={{ fontSize: 18, fontWeight: '600' }}>{list?.title ?? 'To-Do List'}</Text>
+        <Text style={{ fontSize: 12, color: '#71717B' }}>
+          {completedTodos} / {totalTodos} completed
+        </Text>
+      </View>
+    );
+  }, [completedTodos, totalTodos]);
+
   return (
     <>
       <Stack.Screen
         options={{
           // title: list?.title ?? 'To-Do List',
-          headerTitle: (s) => (
-            <View style={{ flexDirection: 'column' }}>
-              <Text style={{ fontSize: 18, fontWeight: '600' }}>{list?.title ?? 'To-Do List'}</Text>
-              <Text style={{ fontSize: 12, color: '#71717B' }}>
-                {completedTodos} / {totalTodos} completed
-              </Text>
-            </View>
-          ),
+          headerTitle: renderHeaderTitle,
           headerRight: () => (
             <Pressable onPress={() => {}}>
               <Ionicons name="pencil" size={24} color="black" />
