@@ -177,10 +177,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
       { owner: couple._owner }
     );
     couple.todoLists.push(newList);
-    setTitle('');
-    setEmoji('🖊');
-    setHideFromPartner(false);
-    setBackgroundColor('#FFFFFF');
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
     }
@@ -325,9 +321,17 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     }
   }, []);
 
+  const handleDismiss = useCallback(() => {
+    setTitle('');
+    setEmoji('🖊');
+    setHideFromPartner(false);
+    setBackgroundColor(colors[0]);
+  }, []);
+
   return (
     <BottomSheetModal
       ref={ref}
+      onDismiss={handleDismiss}
       backdropComponent={backdropComponent}
       enablePanDownToClose
       enableDynamicSizing

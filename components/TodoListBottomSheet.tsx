@@ -25,26 +25,6 @@ import OwnerDropdown, { OwnerAssignment } from './OwnerDropdown';
 
 import { TodoItem, usePartnerProfiles } from '~/src/schema.jazz';
 
-// Toggle Switch Component
-type ToggleSwitchProps = {
-  label: string;
-  value: boolean;
-  onValueChange: (value: boolean) => void;
-};
-
-const ToggleSwitch = ({ label, value, onValueChange }: ToggleSwitchProps) => (
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginTop: 16,
-    }}>
-    <Text style={{ fontSize: 16, color: '#27272A' }}>{label}</Text>
-    <CustomSwitch value={value} onValueChange={onValueChange} />
-  </View>
-);
-
 // Due Date Section Component
 type DueDateSectionProps = {
   hasDueDate: boolean;
@@ -232,7 +212,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
   // Form state
-  const [emoji, setEmoji] = useState('🖊');
   const [isHidden, setIsHidden] = useState(false);
   const [title, setTitle] = useState('');
 
@@ -295,14 +274,14 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
     }
+  };
 
-    // Reset form
+  const handleDismiss = useCallback(() => {
     setTitle('');
-    setEmoji('🖊');
     setIsHidden(false);
     setHasDueDate(false);
     setActiveScreen('todo');
-  };
+  }, []);
 
   const selectAlertOption = (option: string) => {
     setAlertOption(option);
@@ -364,6 +343,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
       backdropComponent={backdropComponent}
       enablePanDownToClose
       enableDynamicSizing
+      onDismiss={handleDismiss}
       footerComponent={renderFooter}>
       <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
         {activeScreen === 'todo' && (
