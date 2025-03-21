@@ -62,44 +62,18 @@ const DueDateSection = ({
 
     {hasDueDate && (
       <View style={styles.dateTimeContainer}>
-        <Pressable style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
-          <Text style={styles.dateButtonText}>
-            {dueDate.toLocaleDateString(undefined, {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </Text>
-        </Pressable>
-        <Pressable style={styles.timeButton} onPress={() => setShowTimePicker(true)}>
-          <Text style={styles.dateButtonText}>
-            {dueDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-          </Text>
-        </Pressable>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={dueDate}
-            mode="date"
-            display="inline"
-            onChange={(event, date) => {
-              setShowDatePicker(false);
-              if (date) setDueDate(date);
-            }}
-          />
-        )}
-
-        {showTimePicker && (
-          <DateTimePicker
-            value={dueDate}
-            mode="time"
-            display="default"
-            onChange={(event, date) => {
-              setShowTimePicker(false);
-              if (date) setDueDate(date);
-            }}
-          />
-        )}
+        <DateTimePicker
+          value={dueDate}
+          style={{ flex: 1 }}
+          mode="datetime"
+          display="compact"
+          accentColor="#8E51FF"
+          minimumDate={new Date(new Date().setHours(new Date().getHours() + 1))}
+          onChange={(event, date) => {
+            setShowTimePicker(false);
+            if (date) setDueDate(date);
+          }}
+        />
       </View>
     )}
   </View>
@@ -461,6 +435,7 @@ const styles = StyleSheet.create({
   },
   dateTimeContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     marginTop: 8,
   },
