@@ -52,17 +52,16 @@ export default function Todos() {
     const myListsArray: TodoList[] = [];
     const partnerListsArray: TodoList[] = [];
     const sharedListsArray: TodoList[] = [];
-    console.log(couple.todoLists.length);
-
     for (const list of couple.todoLists) {
       if (!list) return;
       switch (list.assignedTo) {
         case 'me':
           if (list.creatorAccID === myAccountId) myListsArray.push(list);
+          if (list.creatorAccID === partnerAccountId) partnerListsArray.push(list);
           break;
         case 'partner':
-          if (list.creatorAccID === partnerAccountId) myListsArray.push(list);
           if (list.creatorAccID === myAccountId) partnerListsArray.push(list);
+          if (list.creatorAccID === partnerAccountId) myListsArray.push(list);
           break;
         case 'us':
           sharedListsArray.push(list);
@@ -165,7 +164,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const handleSubmit = useCallback(() => {
     if (!couple) return;
     if (couple.todoLists === null) return;
-    console.log('title', title);
     const newList = TodoList.create(
       {
         title: title.trim(),
