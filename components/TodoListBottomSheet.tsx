@@ -2,51 +2,28 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { forwardRef, useCallback, useMemo, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 import {
-  Dimensions,
   Image,
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-import { TodoItem, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import CustomSwitch from './CustomSwitch';
 
-// Title Input Component
-type TitleInputProps = {
-  title: string;
-  onChangeText: (text: string) => void;
-  onFocus: () => void;
-};
-
-const TitleInput = ({ title, onChangeText, onFocus }: TitleInputProps) => (
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      justifyContent: 'space-between',
-    }}>
-    <BottomSheetTextInput
-      placeholder="New Todo"
-      style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
-      value={title}
-      onFocus={onFocus}
-      onChangeText={onChangeText}
-    />
-  </View>
-);
+import { TodoItem, usePartnerProfiles } from '~/src/schema.jazz';
 
 // Toggle Switch Component
 type ToggleSwitchProps = {
@@ -64,21 +41,7 @@ const ToggleSwitch = ({ label, value, onValueChange }: ToggleSwitchProps) => (
       marginTop: 16,
     }}>
     <Text style={{ fontSize: 16, color: '#27272A' }}>{label}</Text>
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        backgroundColor: '#D4D4D8',
-        borderRadius: 20,
-      }}>
-      <Switch
-        trackColor={{ true: 'transparent', false: 'transparent' }}
-        thumbColor="white"
-        value={value}
-        onValueChange={onValueChange}
-      />
-    </View>
+    <CustomSwitch value={value} onValueChange={onValueChange} />
   </View>
 );
 
@@ -113,21 +76,7 @@ const DueDateSection = ({
         marginBottom: 8,
       }}>
       <Text style={{ fontSize: 16, color: '#27272A' }}>Due Date</Text>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 8,
-          backgroundColor: '#D4D4D8',
-          borderRadius: 20,
-        }}>
-        <Switch
-          trackColor={{ true: 'transparent', false: 'transparent' }}
-          thumbColor="white"
-          value={hasDueDate}
-          onValueChange={setHasDueDate}
-        />
-      </View>
+      <CustomSwitch value={hasDueDate} onValueChange={setHasDueDate} />
     </View>
 
     {hasDueDate && (
@@ -265,22 +214,19 @@ type TodoListBottomSheetProps = {
 
 const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
   const { onCreate } = props;
-  const snapPoints = useMemo(() => ['80%'], []);
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
-  const couple = useCouple();
   const { myProfile } = usePartnerProfiles();
 
   // Form state
   const [emoji, setEmoji] = useState('🖊');
   const [isHidden, setIsHidden] = useState(false);
   const [title, setTitle] = useState('');
-  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
 
   // Due date state
   const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(new Date());
+  const [dueDate, setDueDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -300,8 +246,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
 
   // Photo state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-
-  const [isFocused, setIsFocused] = useState(false);
 
   // Alert and repeat options
   const alertOptions = [
@@ -336,7 +280,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setTitle('');
     setEmoji('🖊');
     setIsHidden(false);
-    setBackgroundColor('#FFFFFF');
     setHasDueDate(false);
   };
 
@@ -363,23 +306,47 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setPhotoUri('https://via.placeholder.com/150');
   };
 
+  const renderFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props} bottomInset={24}>
+        <Pressable onPress={handleSubmit}>
+          <View
+            style={{
+              ...styles.footerContainer,
+              backgroundColor: title.trim() === '' ? 'grey' : 'blue',
+            }}>
+            <Text style={styles.footerText}>Footer</Text>
+          </View>
+        </Pressable>
+      </BottomSheetFooter>
+    ),
+    [title]
+  );
   return (
     <>
       <BottomSheetModal
         ref={ref}
         backdropComponent={backdropComponent}
-        snapPoints={snapPoints}
         enablePanDownToClose
-        enableDynamicSizing>
-        <BottomSheetView style={styles.sheetContainer}>
-          <TitleInput title={title} onChangeText={setTitle} onFocus={() => setIsFocused(true)} />
+        enableDynamicSizing
+        footerComponent={renderFooter}>
+        <BottomSheetView style={{ ...styles.sheetContainer, height: hasDueDate ? 450 : 300 }}>
+          <BottomSheetTextInput
+            placeholder="New Todo"
+            style={{
+              fontSize: 24,
+              fontWeight: '600',
+              color: '#27272A',
+            }}
+            onChangeText={setTitle}
+          />
 
           <ToggleSwitch label="Hide from partner" value={isHidden} onValueChange={setIsHidden} />
 
           <DueDateSection
             hasDueDate={hasDueDate}
             setHasDueDate={setHasDueDate}
-            dueDate={dueDate}
+            dueDate={dueDate ?? new Date()}
             setDueDate={setDueDate}
             showDatePicker={showDatePicker}
             setShowDatePicker={setShowDatePicker}
@@ -387,47 +354,27 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
             setShowTimePicker={setShowTimePicker}
           />
 
-          <OptionSection
-            label="Alert"
-            value={alertOption}
-            onPress={() => setShowAlertModal(true)}
-          />
+          {hasDueDate && (
+            <>
+              <OptionSection
+                label="Alert"
+                value={alertOption}
+                onPress={() => setShowAlertModal(true)}
+              />
 
-          <OptionSection
-            label="Second Alert"
-            value={secondAlertOption}
-            onPress={() => setShowSecondAlertModal(true)}
-          />
-
+              <OptionSection
+                label="Second Alert"
+                value={secondAlertOption}
+                onPress={() => setShowSecondAlertModal(true)}
+              />
+            </>
+          )}
           <OptionSection
             label="Repeat"
             value={repeatMode}
             onPress={() => setShowRepeatModal(true)}
           />
-
           <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              position: 'absolute',
-              top: Dimensions.get('window').height * 0.68,
-              left: 16,
-              right: 16,
-              alignItems: 'center',
-            }}>
-            <Pressable
-              style={{ flex: 1 }}
-              onPress={() => {
-                //@ts-ignore
-                ref.current?.dismiss();
-              }}>
-              <Text style={{ fontSize: 16, fontWeight: '600' }}>Cancel</Text>
-            </Pressable>
-            <Pressable style={{ flex: 1, alignItems: 'flex-end' }} onPress={handleSubmit}>
-              <Text style={{ fontSize: 16, fontWeight: '600' }}>Save To-Do</Text>
-            </Pressable>
-          </View>
         </BottomSheetView>
       </BottomSheetModal>
 
@@ -512,7 +459,6 @@ const modalStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   sheetContainer: {
-    flex: 1,
     padding: 24,
     zIndex: 1000,
   },
@@ -520,6 +466,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     marginTop: 8,
+  },
+  footerContainer: {
+    padding: 12,
+    margin: 12,
+    borderRadius: 12,
+    backgroundColor: '#80f',
+  },
+  footerText: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '800',
   },
   dateButton: {
     flex: 1,

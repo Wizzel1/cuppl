@@ -1,16 +1,19 @@
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, Pressable, SectionList, StyleSheet, Switch, Text, View } from 'react-native';
-import EmojiPicker from 'rn-emoji-keyboard';
+import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import * as DropdownMenu from 'zeego/dropdown-menu';
 
+import CustomSwitch from '~/components/CustomSwitch';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListItem';
 import {
@@ -151,7 +154,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   }, []);
   const couple = useCouple();
   const { myProfile } = usePartnerProfiles();
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [emoji, setEmoji] = useState('🖊');
   const [hideFromPartner, setHideFromPartner] = useState(false);
   const [title, setTitle] = useState('');
@@ -160,9 +162,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const [showHideFromPartner, setShowHideFromPartner] = useState(false);
   const [owner, setOwner] = useState('Both of us');
   const [activeScreen, setActiveScreen] = useState<'todo' | 'color' | 'emoji'>('todo');
-  const handleSubmit = () => {
-    if (!couple?.todoLists) return;
-
+  const handleSubmit = useCallback(() => {
+    if (!couple) return;
+    if (couple.todoLists === null) return;
+    console.log('title', title);
     const newList = TodoList.create(
       {
         title: title.trim(),
@@ -178,13 +181,21 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     );
     couple.todoLists.push(newList);
     setTitle('');
-    setEmoji('');
+    setEmoji('🖊');
     setHideFromPartner(false);
     setBackgroundColor('#FFFFFF');
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
     }
-  };
+  }, [
+    couple?.todoLists?.id,
+    myProfile,
+    title,
+    emoji,
+    hideFromPartner,
+    backgroundColor,
+    assignedTo,
+  ]);
 
   useEffect(() => {
     switch (assignedTo) {
@@ -205,140 +216,9 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
 
   const getScreenHeight = () => {
     if (activeScreen === 'color') return 400;
-    if (activeScreen === 'emoji') return 150;
+    if (activeScreen === 'emoji') return 550;
     if (showHideFromPartner) return 250;
     return 200;
-  };
-
-  const TodoScreen = () => {
-    return (
-      <>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            justifyContent: 'space-between',
-          }}>
-          <BottomSheetTextInput
-            placeholder="New Todo List"
-            style={{ fontSize: 24, fontWeight: '600', color: '#27272A' }}
-            value={title}
-            onChangeText={setTitle}
-            onSubmitEditing={handleSubmit}
-          />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <EmojiPicker
-              onEmojiSelected={(emoji) => setEmoji(emoji.emoji)}
-              open={pickerOpen}
-              defaultHeight={Dimensions.get('window').height * 0.7}
-              onClose={() => setPickerOpen(false)}
-            />
-            <Pressable onPress={() => setPickerOpen(true)}>
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  borderColor: '#E4E4E7',
-                  justifyContent: 'center',
-                }}>
-                <Text style={{ fontSize: 20, textAlign: 'center' }}>{emoji}</Text>
-              </View>
-            </Pressable>
-            <Pressable onPress={() => setActiveScreen('color')}>
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  borderColor: '#E4E4E7',
-                  justifyContent: 'center',
-                  backgroundColor,
-                }}
-              />
-            </Pressable>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 16,
-            alignItems: 'center',
-          }}>
-          <Text style={{ fontSize: 16, color: '#27272A' }}>Owner</Text>
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger>
-              <View
-                style={{
-                  paddingVertical: 9,
-                  paddingHorizontal: 20,
-                  borderRadius: 20,
-                  width: 120,
-                  backgroundColor: '#F4F4F5',
-                  alignItems: 'center',
-                }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: '#8E51FF' }}>{owner}</Text>
-              </View>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-              <DropdownMenu.Item
-                key="me"
-                onSelect={() => {
-                  setAssignedTo('me');
-                }}>
-                <DropdownMenu.ItemTitle>Me</DropdownMenu.ItemTitle>
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                key="us"
-                onSelect={() => {
-                  setAssignedTo('us');
-                }}>
-                <DropdownMenu.ItemTitle>Both</DropdownMenu.ItemTitle>
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                key="partner"
-                onSelect={() => {
-                  setAssignedTo('partner');
-                }}>
-                <DropdownMenu.ItemTitle>Partner</DropdownMenu.ItemTitle>
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
-        </View>
-        {showHideFromPartner && (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: 16,
-            }}>
-            <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                backgroundColor: hideFromPartner ? '#8E51FF' : '#E4E4E7',
-                borderRadius: 20,
-              }}>
-              <Switch
-                trackColor={{ true: 'transparent', false: 'transparent' }}
-                thumbColor="white"
-                value={hideFromPartner}
-                onValueChange={setHideFromPartner}
-                style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
-              />
-            </View>
-          </View>
-        )}
-        <View style={{ height: 86 }} />
-      </>
-    );
   };
 
   const colors = [
@@ -411,20 +291,175 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     );
   };
 
+  const EmojiPickerScreen = () => {
+    return (
+      <View style={{ flex: 1 }}>
+        <EmojiKeyboard
+          styles={{
+            category: {
+              container: {
+                backgroundColor: 'red',
+              },
+            },
+            container: {
+              backgroundColor: 'red',
+              shadowColor: 'transparent',
+              paddingVertical: 0,
+              paddingHorizontal: 0,
+            },
+          }}
+          onEmojiSelected={(emoji) => {
+            setEmoji(emoji.emoji);
+            setActiveScreen('todo');
+          }}
+          defaultHeight={550}
+        />
+      </View>
+    );
+  };
+
+  const renderFooter = useCallback(
+    (props: BottomSheetFooterProps) => {
+      if (activeScreen !== 'todo') return null;
+      return (
+        <BottomSheetFooter {...props} bottomInset={24}>
+          <Pressable onPress={handleSubmit}>
+            <View style={styles.footerContainer}>
+              <Text style={styles.footerText}>Add List</Text>
+            </View>
+          </Pressable>
+        </BottomSheetFooter>
+      );
+    },
+    [activeScreen]
+  );
   return (
     <BottomSheetModal
       ref={ref}
       backdropComponent={backdropComponent}
       enablePanDownToClose
-      enableDynamicSizing>
+      enableDynamicSizing
+      footerComponent={renderFooter}
+      keyboardBehavior="interactive">
       <BottomSheetView
         style={{
           ...styles.sheetContainer,
           height: getScreenHeight(),
         }}>
-        {activeScreen === 'todo' && <TodoScreen />}
+        {activeScreen === 'todo' && (
+          <>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                justifyContent: 'space-between',
+              }}>
+              <BottomSheetTextInput
+                placeholder="New Todo List"
+                style={{
+                  flex: 1,
+                  fontSize: 24,
+                  fontWeight: '600',
+                  color: '#27272A',
+                }}
+                onChangeText={setTitle}
+                value={title}
+              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Pressable onPress={() => setActiveScreen('emoji')}>
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      borderWidth: 1,
+                      borderColor: '#E4E4E7',
+                      justifyContent: 'center',
+                    }}>
+                    <Text style={{ fontSize: 20, textAlign: 'center' }}>{emoji}</Text>
+                  </View>
+                </Pressable>
+                <Pressable onPress={() => setActiveScreen('color')}>
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      borderWidth: 1,
+                      borderColor: '#E4E4E7',
+                      justifyContent: 'center',
+                      backgroundColor,
+                    }}
+                  />
+                </Pressable>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 16,
+                alignItems: 'center',
+              }}>
+              <Text style={{ fontSize: 16, color: '#27272A' }}>Owner</Text>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <View
+                    style={{
+                      paddingVertical: 9,
+                      paddingHorizontal: 20,
+                      borderRadius: 20,
+                      width: 120,
+                      backgroundColor: '#F4F4F5',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#8E51FF' }}>
+                      {owner}
+                    </Text>
+                  </View>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item
+                    key="me"
+                    onSelect={() => {
+                      setAssignedTo('me');
+                    }}>
+                    <DropdownMenu.ItemTitle>Me</DropdownMenu.ItemTitle>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    key="us"
+                    onSelect={() => {
+                      setAssignedTo('us');
+                    }}>
+                    <DropdownMenu.ItemTitle>Both</DropdownMenu.ItemTitle>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    key="partner"
+                    onSelect={() => {
+                      setAssignedTo('partner');
+                    }}>
+                    <DropdownMenu.ItemTitle>Partner</DropdownMenu.ItemTitle>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </View>
+            {showHideFromPartner && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: 16,
+                }}>
+                <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
+                <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
+              </View>
+            )}
+          </>
+        )}
         {activeScreen === 'color' && <ColorPickerScreen />}
-        {/* {activeScreen === 'emoji' && <EmojiPickerScreen />} */}
+        {activeScreen === 'emoji' && <EmojiPickerScreen />}
       </BottomSheetView>
     </BottomSheetModal>
   );
@@ -439,5 +474,17 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     paddingTop: 12,
     paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  footerContainer: {
+    padding: 12,
+    margin: 12,
+    borderRadius: 12,
+    backgroundColor: '#80f',
+  },
+  footerText: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '800',
   },
 });
