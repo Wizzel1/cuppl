@@ -160,7 +160,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [showHideFromPartner, setShowHideFromPartner] = useState(false);
   const [activeScreen, setActiveScreen] = useState<'todo' | 'color' | 'emoji'>('todo');
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     if (!couple) return;
     if (couple.todoLists === null) return;
     const newList = TodoList.create(
@@ -180,15 +180,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
     }
-  }, [
-    couple?.todoLists?.id,
-    myProfile,
-    title,
-    emoji,
-    hideFromPartner,
-    backgroundColor,
-    assignedTo,
-  ]);
+  };
 
   const getScreenHeight = () => {
     if (activeScreen === 'color') return 400;
@@ -299,7 +291,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
       if (activeScreen !== 'todo') return null;
       return (
         <BottomSheetFooter {...props} bottomInset={24}>
-          <Pressable onPress={handleSubmit}>
+          <Pressable onPress={handleSubmit} disabled={title.trim() === ''}>
             <View style={styles.footerContainer}>
               <Text style={styles.footerText}>Add List</Text>
             </View>
@@ -307,7 +299,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         </BottomSheetFooter>
       );
     },
-    [activeScreen]
+    [activeScreen, handleSubmit]
   );
 
   const handleAssignedToChange = useCallback((newAssignedTo: OwnerAssignment) => {

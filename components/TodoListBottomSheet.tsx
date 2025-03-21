@@ -334,7 +334,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
         </BottomSheetFooter>
       );
     },
-    [title, activeScreen]
+    [activeScreen, handleSubmit]
   );
 
   return (
