@@ -9,7 +9,8 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { forwardRef, useCallback, useMemo, useState } from 'react';
+import { useAccount } from 'jazz-react-native';
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
   Pressable,
@@ -23,7 +24,7 @@ import {
 import CustomSwitch from './CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from './OwnerDropdown';
 
-import { TodoItem, usePartnerProfiles } from '~/src/schema.jazz';
+import { TodoItem, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 // Due Date Section Component
@@ -169,6 +170,7 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
 // Main TodoListBottomSheet Component
 type TodoListBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
+  defaultAssignedTo?: OwnerAssignment;
 };
 
 const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
@@ -190,27 +192,33 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
 };
 
 const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
-  const { onCreate } = props;
+  const { onCreate, defaultAssignedTo } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
-  const { myProfile } = usePartnerProfiles();
+  const couple = useCouple();
+  const { me } = useAccount();
 
   // Active screen state
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('us');
-  const [showHideFromPartner, setShowHideFromPartner] = useState(false);
+  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
+  const [showHideFromPartner, setShowHideFromPartner] = useState(true);
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
-  // Form state
-  const [isHidden, setIsHidden] = useState(false);
+  useEffect(() => {
+    setAssignedTo(defaultAssignedTo ?? 'me');
+    setShowHideFromPartner(defaultAssignedTo === 'me');
+  }, [defaultAssignedTo]);
+
   const [title, setTitle] = useState('');
 
   // Due date state
   const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(new Date());
+  const [dueDate, setDueDate] = useState<Date>(
+    new Date(new Date().setMinutes(new Date().getMinutes() + 1))
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -244,24 +252,31 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setAssignedTo(newAssignedTo);
     if (newAssignedTo === 'us') {
       setShowHideFromPartner(false);
+      setHideFromPartner(false);
     } else if (newAssignedTo === 'partner') {
       setShowHideFromPartner(false);
+      setHideFromPartner(false);
     } else {
       setShowHideFromPartner(true);
+      setHideFromPartner(false);
     }
   }, []);
 
   // Handlers
   const handleSubmit = () => {
-    if (!onCreate) return;
-    const newTodo = TodoItem.create({
-      title: title.trim(),
-      completed: false,
-      creatorAccID: myProfile!.accountId,
-      assignedTo,
-      deleted: false,
-      dueDate: hasDueDate ? dueDate : null,
-    });
+    if (!onCreate || !couple) return;
+    const newTodo = TodoItem.create(
+      {
+        title: title.trim(),
+        completed: false,
+        creatorAccID: me.id,
+        assignedTo,
+        deleted: false,
+        isHidden: hideFromPartner,
+        dueDate: hasDueDate ? dueDate : null,
+      },
+      { owner: hideFromPartner ? me : couple._owner }
+    );
     onCreate(newTodo);
 
     if (ref && 'current' in ref) {
@@ -271,7 +286,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
 
   const handleDismiss = useCallback(() => {
     setTitle('');
-    setIsHidden(false);
+    setHideFromPartner(false);
     setHasDueDate(false);
     setActiveScreen('todo');
   }, []);
@@ -343,7 +358,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
           <>
             <InputField onChange={setTitle} />
             <View style={{ marginTop: 16 }}>
-              <OwnerDropdown onAssignedToChange={handleAssignedToChange} />
+              <OwnerDropdown
+                onAssignedToChange={handleAssignedToChange}
+                selectedAssignedTo={assignedTo}
+              />
             </View>
 
             {showHideFromPartner && (

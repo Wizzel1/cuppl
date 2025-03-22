@@ -36,6 +36,7 @@ export class TodoItem extends CoMap {
   notes = co.optional.string;
   deleted = co.boolean;
   photo = co.optional.ref(ImageDefinition);
+  isHidden = co.boolean;
   creatorAccID = co.string;
   assignedTo = co.literal('me', 'partner', 'us');
   recurringUnit = co.optional.literal('daily', 'weekly', 'biweekly', 'monthly', 'yearly');
@@ -292,6 +293,7 @@ export class CoupleAccount extends Account {
           dueDate: null,
           notes: null,
           deleted: false,
+          isHidden: false,
           creatorAccID: this.id,
           assignedTo: 'me',
         },
