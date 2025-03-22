@@ -6,25 +6,30 @@ export type OwnerAssignment = 'me' | 'partner' | 'us';
 
 interface OwnerDropdownProps {
   onAssignedToChange: (assignedTo: OwnerAssignment) => void;
+  selectedAssignedTo: OwnerAssignment;
 }
 
-function OwnerDropdown({ onAssignedToChange }: OwnerDropdownProps) {
-  const [assignedTo, setAssignedTo] = useState<OwnerAssignment>('us');
-  const [owner, setOwner] = useState('Both of us');
+function OwnerDropdown({ onAssignedToChange, selectedAssignedTo }: OwnerDropdownProps) {
+  const [assignedTo, setAssignedTo] = useState<OwnerAssignment>(selectedAssignedTo);
+
+  // Set initial owner text based on selectedAssignedTo
+  const getOwnerText = (type: OwnerAssignment) => {
+    switch (type) {
+      case 'us':
+        return 'Both of us';
+      case 'partner':
+        return 'Partner';
+      case 'me':
+        return 'Me';
+      default:
+        return 'Both of us';
+    }
+  };
+
+  const [owner, setOwner] = useState(getOwnerText(selectedAssignedTo));
 
   useEffect(() => {
-    switch (assignedTo) {
-      case 'us':
-        setOwner('Both of us');
-        break;
-      case 'partner':
-        setOwner('Partner');
-        break;
-      case 'me':
-        setOwner('Me');
-        break;
-    }
-    onAssignedToChange(assignedTo);
+    setOwner(getOwnerText(assignedTo));
   }, [assignedTo]);
 
   return (

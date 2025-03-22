@@ -239,7 +239,6 @@ export default function ListDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          // title: list?.title ?? 'To-Do List',
           headerTitle: renderHeaderTitle,
           headerRight: () => (
             <Pressable onPress={() => {}}>
@@ -333,15 +332,18 @@ export default function ListDetailScreen() {
         </ScrollView>
 
         <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
-        <TodoListBottomSheet
-          ref={bottomSheetModalRef}
-          onCreate={(newTodo) => {
-            if (list?.items) {
-              console.log('New todo created:', newTodo);
-              list.items.push(newTodo);
-            }
-          }}
-        />
+        {list && (
+          <TodoListBottomSheet
+            ref={bottomSheetModalRef}
+            defaultAssignedTo={list.assignedTo}
+            onCreate={(newTodo) => {
+              if (list?.items) {
+                console.log('New todo created:', newTodo);
+                list.items.push(newTodo);
+              }
+            }}
+          />
+        )}
       </View>
     </>
   );

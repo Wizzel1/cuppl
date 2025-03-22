@@ -169,6 +169,7 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
 // Main TodoListBottomSheet Component
 type TodoListBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
+  defaultAssignedTo?: OwnerAssignment;
 };
 
 const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
@@ -190,7 +191,7 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
 };
 
 const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
-  const { onCreate } = props;
+  const { onCreate, defaultAssignedTo } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
@@ -200,7 +201,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('us');
+  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>(defaultAssignedTo ?? 'me');
   const [showHideFromPartner, setShowHideFromPartner] = useState(false);
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
@@ -343,7 +344,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
           <>
             <InputField onChange={setTitle} />
             <View style={{ marginTop: 16 }}>
-              <OwnerDropdown onAssignedToChange={handleAssignedToChange} />
+              <OwnerDropdown
+                onAssignedToChange={handleAssignedToChange}
+                selectedAssignedTo={assignedTo}
+              />
             </View>
 
             {showHideFromPartner && (

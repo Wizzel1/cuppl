@@ -426,7 +426,10 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
               </View>
             </View>
             <View style={{ marginTop: 16 }}>
-              <OwnerDropdown onAssignedToChange={handleAssignedToChange} />
+              <OwnerDropdown
+                onAssignedToChange={handleAssignedToChange}
+                selectedAssignedTo={assignedTo}
+              />
             </View>
             {showHideFromPartner && (
               <View
