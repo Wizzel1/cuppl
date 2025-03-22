@@ -31,7 +31,14 @@ function TodoListItem({
     setCompletedTodos(todos.filter((todo) => todo?.completed ?? false).length);
     setBackgroundColor(list?.backgroundColor ?? null);
     setEmoji(list?.emoji ?? null);
-  }, [list?.items, defaultList?.items]);
+  }, [
+    list?.items,
+    defaultList?.items,
+    list?.backgroundColor,
+    list?.emoji,
+    list?.title,
+    list?.isHidden,
+  ]);
 
   return (
     <TouchableOpacity onPress={onPress}>

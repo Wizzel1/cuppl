@@ -8,7 +8,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useAccount } from 'jazz-react-native';
-import { forwardRef, useCallback, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
@@ -22,9 +22,21 @@ interface TodoListBottomSheetProps {
   toUpdate?: TodoList;
 }
 
-const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
-  const [title, setTitle] = useState('');
+const InputField = ({
+  onChange,
+  initialValue,
+}: {
+  onChange: (value: string) => void;
+  initialValue?: string;
+}) => {
+  const [title, setTitle] = useState(initialValue || '');
   useDebounce(() => onChange(title), 300);
+
+  useEffect(() => {
+    if (initialValue) {
+      setTitle(initialValue);
+    }
+  }, [initialValue]);
 
   return (
     <BottomSheetTextInput
@@ -40,6 +52,7 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
     />
   );
 };
+
 export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>(
   (props, ref) => {
     const { toUpdate } = props;
@@ -49,30 +62,57 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
     const { me } = useAccount();
     const couple = useCouple();
     const { myProfile } = usePartnerProfiles();
-    const [emoji, setEmoji] = useState('🖊');
-    const [hideFromPartner, setHideFromPartner] = useState(false);
-    const [title, setTitle] = useState('');
-    const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>('us');
-    const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-    const [showHideFromPartner, setShowHideFromPartner] = useState(false);
+    const [emoji, setEmoji] = useState(toUpdate?.emoji || '🖊');
+    const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden || false);
+    const [title, setTitle] = useState(toUpdate?.title || '');
+    const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>(
+      toUpdate?.assignedTo || 'us'
+    );
+    const [backgroundColor, setBackgroundColor] = useState(toUpdate?.backgroundColor || '#FFFFFF');
+    const [showHideFromPartner, setShowHideFromPartner] = useState(toUpdate?.assignedTo === 'me');
     const [activeScreen, setActiveScreen] = useState<'todo' | 'color' | 'emoji'>('todo');
+
+    // Update state when toUpdate changes
+    useEffect(() => {
+      if (toUpdate) {
+        setEmoji(toUpdate.emoji || '🖊');
+        setHideFromPartner(toUpdate.isHidden || false);
+        setTitle(toUpdate.title || '');
+        setAssignedTo(toUpdate.assignedTo || 'us');
+        setBackgroundColor(toUpdate.backgroundColor || '#FFFFFF');
+        setShowHideFromPartner(toUpdate.assignedTo === 'me');
+      }
+    }, [toUpdate]);
+
     const handleSubmit = () => {
       if (!couple) return;
       if (couple.todoLists === null) return;
-      const newList = TodoList.create(
-        {
-          title: title.trim(),
-          items: TodoItems.create([]),
-          emoji,
-          isHidden: hideFromPartner,
-          backgroundColor,
-          creatorAccID: myProfile!.accountId,
-          assignedTo,
-          deleted: false,
-        },
-        { owner: hideFromPartner ? me : couple._owner }
-      );
-      couple.todoLists.push(newList);
+
+      if (toUpdate) {
+        // Update existing TodoList
+        toUpdate.title = title.trim();
+        toUpdate.emoji = emoji;
+        toUpdate.isHidden = hideFromPartner;
+        toUpdate.backgroundColor = backgroundColor;
+        toUpdate.assignedTo = assignedTo;
+      } else {
+        // Create new TodoList
+        const newList = TodoList.create(
+          {
+            title: title.trim(),
+            items: TodoItems.create([]),
+            emoji,
+            isHidden: hideFromPartner,
+            backgroundColor,
+            creatorAccID: myProfile!.accountId,
+            assignedTo,
+            deleted: false,
+          },
+          { owner: hideFromPartner ? me : couple._owner }
+        );
+        couple.todoLists.push(newList);
+      }
+
       if (ref && 'current' in ref) {
         ref.current?.dismiss();
       }
@@ -194,13 +234,13 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
           <BottomSheetFooter {...props} bottomInset={24}>
             <Pressable onPress={handleSubmit} disabled={title.trim() === ''}>
               <View style={styles.footerContainer}>
-                <Text style={styles.footerText}>Add List</Text>
+                <Text style={styles.footerText}>{toUpdate ? 'Update List' : 'Add List'}</Text>
               </View>
             </Pressable>
           </BottomSheetFooter>
         );
       },
-      [activeScreen, handleSubmit]
+      [activeScreen, handleSubmit, toUpdate?.id]
     );
 
     const handleAssignedToChange = useCallback((newAssignedTo: OwnerAssignment) => {
@@ -247,7 +287,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
                   gap: 8,
                   justifyContent: 'space-between',
                 }}>
-                <InputField onChange={setTitle} />
+                <InputField onChange={setTitle} initialValue={toUpdate?.title} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Pressable onPress={() => setActiveScreen('emoji')}>
                     <View
