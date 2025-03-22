@@ -205,19 +205,20 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   );
   const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
   const [showHideFromPartner, setShowHideFromPartner] = useState(true);
+  const [hideFromPartner, setHideFromPartner] = useState(false);
 
   useEffect(() => {
     setAssignedTo(defaultAssignedTo ?? 'me');
     setShowHideFromPartner(defaultAssignedTo === 'me');
   }, [defaultAssignedTo]);
 
-  const [hideFromPartner, setHideFromPartner] = useState(false);
-
   const [title, setTitle] = useState('');
 
   // Due date state
   const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(new Date());
+  const [dueDate, setDueDate] = useState<Date>(
+    new Date(new Date().setMinutes(new Date().getMinutes() + 1))
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -251,10 +252,13 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
     setAssignedTo(newAssignedTo);
     if (newAssignedTo === 'us') {
       setShowHideFromPartner(false);
+      setHideFromPartner(false);
     } else if (newAssignedTo === 'partner') {
       setShowHideFromPartner(false);
+      setHideFromPartner(false);
     } else {
       setShowHideFromPartner(true);
+      setHideFromPartner(false);
     }
   }, []);
 

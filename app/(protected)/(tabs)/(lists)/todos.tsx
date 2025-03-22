@@ -358,10 +358,13 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
     setAssignedTo(newAssignedTo);
     if (newAssignedTo === 'us') {
       setShowHideFromPartner(false);
+      setHideFromPartner(false);
     } else if (newAssignedTo === 'partner') {
       setShowHideFromPartner(false);
+      setHideFromPartner(false);
     } else {
       setShowHideFromPartner(true);
+      setHideFromPartner(false);
     }
   }, []);
 
