@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
@@ -42,64 +42,68 @@ function TodoSection({ title, todos }: { title: string; todos: TodoItem[] }) {
             onPress={() => {
               item!.completed = !item!.completed;
             }}>
-            <View
-              style={{
-                flexDirection: 'column',
-              }}>
-              <Text
-                numberOfLines={1}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View
                 style={{
-                  fontSize: 16,
-                  fontWeight: 'normal',
-                  textDecorationLine: item?.completed ? 'line-through' : 'none',
-                  color: item?.completed ? '#A1A1AA' : 'black',
+                  flexDirection: 'column',
+                  flex: 1,
                 }}>
-                {item?.title}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text
+                  numberOfLines={1}
                   style={{
-                    fontSize: 14,
-                    color: '#71717B',
+                    fontSize: 16,
+                    fontWeight: 'normal',
                     textDecorationLine: item?.completed ? 'line-through' : 'none',
+                    color: item?.completed ? '#A1A1AA' : 'black',
                   }}>
-                  {item?.dueDate
-                    ? (() => {
-                        const dueDate = new Date(item.dueDate);
-                        const today = new Date();
-                        const isToday =
-                          dueDate.getDate() === today.getDate() &&
-                          dueDate.getMonth() === today.getMonth() &&
-                          dueDate.getFullYear() === today.getFullYear();
-
-                        if (isToday) {
-                          return `Today, ${dueDate.toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                          })}`;
-                        } else {
-                          return dueDate.toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit',
-                          });
-                        }
-                      })()
-                    : ''}
+                  {item?.title}
                 </Text>
-                {item?.recurringUnit && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Text
                     style={{
                       fontSize: 14,
                       color: '#71717B',
                       textDecorationLine: item?.completed ? 'line-through' : 'none',
                     }}>
-                    {item?.recurringUnit}
+                    {item?.dueDate
+                      ? (() => {
+                          const dueDate = new Date(item.dueDate);
+                          const today = new Date();
+                          const isToday =
+                            dueDate.getDate() === today.getDate() &&
+                            dueDate.getMonth() === today.getMonth() &&
+                            dueDate.getFullYear() === today.getFullYear();
+
+                          if (isToday) {
+                            return `Today, ${dueDate.toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            })}`;
+                          } else {
+                            return dueDate.toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            });
+                          }
+                        })()
+                      : ''}
                   </Text>
-                )}
+                  {item?.recurringUnit && (
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: '#71717B',
+                        textDecorationLine: item?.completed ? 'line-through' : 'none',
+                      }}>
+                      {item?.recurringUnit}
+                    </Text>
+                  )}
+                </View>
               </View>
+              {item?.isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="black" />}
             </View>
           </Pressable>
           {index < todos.length - 1 && <View style={{ height: 8 }} />}

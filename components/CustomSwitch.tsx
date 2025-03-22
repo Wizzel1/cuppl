@@ -1,4 +1,4 @@
-import { StyleSheet, Switch } from 'react-native';
+import { Switch } from 'react-native';
 
 interface CustomSwitchProps {
   value: boolean;
@@ -26,12 +26,3 @@ export default function CustomSwitch({
     />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    borderRadius: 20,
-  },
-});

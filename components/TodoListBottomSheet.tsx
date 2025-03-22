@@ -211,8 +211,6 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
 
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
-  // Form state
-  const [isHidden, setIsHidden] = useState(false);
   const [title, setTitle] = useState('');
 
   // Due date state
@@ -267,6 +265,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
       creatorAccID: myProfile!.accountId,
       assignedTo,
       deleted: false,
+      isHidden: hideFromPartner,
       dueDate: hasDueDate ? dueDate : null,
     });
     onCreate(newTodo);
@@ -278,7 +277,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
 
   const handleDismiss = useCallback(() => {
     setTitle('');
-    setIsHidden(false);
+    setHideFromPartner(false);
     setHasDueDate(false);
     setActiveScreen('todo');
   }, []);
