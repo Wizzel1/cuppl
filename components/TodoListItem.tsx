@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProgressiveImg, useCoState } from 'jazz-react-native';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { memo, useEffect, useState } from 'react';
@@ -86,6 +86,8 @@ function TodoListItem({
               {completedTodos} / {totalTodos}
             </Text>
           </View>
+
+          {list?.isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="black" />}
         </View>
         <Ionicons
           name="chevron-forward-outline"
