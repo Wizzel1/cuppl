@@ -9,6 +9,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import NewTodoBottomSheet from '~/components/TodoListDetailsScreen/NewTodoBottomSheet';
 import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
+import { TodoListBottomSheet } from '~/components/TodoListsScreen/NewTodoListBottomSheet';
 import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function TodoListScreen() {
@@ -16,7 +17,8 @@ export default function TodoListScreen() {
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
   const list = useCoState(TodoList, todoListId as ID<TodoList>);
   const { partnerProfile } = usePartnerProfiles();
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const newTodoSheetRef = useRef<BottomSheetModal>(null);
+  const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const [completedTodos, setCompletedTodos] = useState(0);
   const [totalTodos, setTotalTodos] = useState(0);
@@ -67,7 +69,7 @@ export default function TodoListScreen() {
   };
 
   const handlePress = () => {
-    bottomSheetModalRef.current?.present();
+    newTodoSheetRef.current?.present();
   };
 
   const renderHeaderTitle = useCallback(() => {
@@ -94,7 +96,10 @@ export default function TodoListScreen() {
         options={{
           headerTitle: renderHeaderTitle,
           headerRight: () => (
-            <Pressable onPress={() => {}}>
+            <Pressable
+              onPress={() => {
+                todoListBottomSheetRef.current?.present();
+              }}>
               <Ionicons name="pencil" size={24} color="black" />
             </Pressable>
           ),
@@ -187,16 +192,17 @@ export default function TodoListScreen() {
         <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
         {list && (
           <NewTodoBottomSheet
-            ref={bottomSheetModalRef}
+            ref={newTodoSheetRef}
             defaultAssignedTo={list.assignedTo}
             onCreate={(newTodo) => {
-              if (list?.items) {
+              if (list.items) {
                 console.log('New todo created:', newTodo);
                 list.items.push(newTodo);
               }
             }}
           />
         )}
+        {list && <TodoListBottomSheet ref={todoListBottomSheetRef} toUpdate={list} />}
       </View>
     </>
   );
