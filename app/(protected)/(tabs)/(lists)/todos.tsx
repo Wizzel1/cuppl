@@ -8,6 +8,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
+import { useAccount } from 'jazz-react-native';
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
@@ -20,7 +21,6 @@ import {
   DefaultTodoList,
   TodoItems,
   TodoList,
-  TodoLists,
   useCouple,
   usePartnerProfiles,
 } from '~/src/schema.jazz';
@@ -43,32 +43,32 @@ export default function Todos() {
   const couple = useCouple();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!couple) return;
-    if (couple.todoLists?.length === 0) return;
-    couple.todoLists = TodoLists.create([], { owner: couple._owner });
-    couple.partnerATodos = DefaultTodoList.create(
-      { items: TodoItems.create([]) },
-      { owner: couple._owner }
-    );
-    couple.partnerBTodos = DefaultTodoList.create(
-      { items: TodoItems.create([]) },
-      { owner: couple._owner }
-    );
-    couple.ourTodos = TodoList.create(
-      {
-        title: 'Our To-Dos',
-        items: TodoItems.create([]),
-        isHidden: false,
-        creatorAccID: couple.partnerA!.accountId,
-        emoji: '🖊',
-        backgroundColor: '#FFFFFF',
-        assignedTo: 'us',
-        deleted: false,
-      },
-      { owner: couple._owner }
-    );
-  }, []);
+  // useEffect(() => {
+  //   if (!couple) return;
+  //   if (couple.todoLists?.length === 0) return;
+  //   couple.todoLists = TodoLists.create([], { owner: couple._owner });
+  //   couple.partnerATodos = DefaultTodoList.create(
+  //     { items: TodoItems.create([]) },
+  //     { owner: couple._owner }
+  //   );
+  //   couple.partnerBTodos = DefaultTodoList.create(
+  //     { items: TodoItems.create([]) },
+  //     { owner: couple._owner }
+  //   );
+  //   couple.ourTodos = TodoList.create(
+  //     {
+  //       title: 'Our To-Dos',
+  //       items: TodoItems.create([]),
+  //       isHidden: false,
+  //       creatorAccID: couple.partnerA!.accountId,
+  //       emoji: '🖊',
+  //       backgroundColor: '#FFFFFF',
+  //       assignedTo: 'us',
+  //       deleted: false,
+  //     },
+  //     { owner: couple._owner }
+  //   );
+  // }, []);
 
   useEffect(() => {
     if (!couple?.todoLists) return;
@@ -202,6 +202,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
+  const { me } = useAccount();
   const couple = useCouple();
   const { myProfile } = usePartnerProfiles();
   const [emoji, setEmoji] = useState('🖊');
@@ -225,7 +226,7 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal>((props, ref) => {
         assignedTo,
         deleted: false,
       },
-      { owner: couple._owner }
+      { owner: hideFromPartner ? me : couple._owner }
     );
     couple.todoLists.push(newList);
     if (ref && 'current' in ref) {
