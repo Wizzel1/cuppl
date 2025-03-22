@@ -9,6 +9,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useAccount } from 'jazz-react-native';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
@@ -23,7 +24,7 @@ import {
 import CustomSwitch from './CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from './OwnerDropdown';
 
-import { TodoItem, usePartnerProfiles } from '~/src/schema.jazz';
+import { TodoItem, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 // Due Date Section Component
@@ -195,7 +196,8 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
-  const { myProfile } = usePartnerProfiles();
+  const couple = useCouple();
+  const { me } = useAccount();
 
   // Active screen state
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
@@ -258,16 +260,19 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
 
   // Handlers
   const handleSubmit = () => {
-    if (!onCreate) return;
-    const newTodo = TodoItem.create({
-      title: title.trim(),
-      completed: false,
-      creatorAccID: myProfile!.accountId,
-      assignedTo,
-      deleted: false,
-      isHidden: hideFromPartner,
-      dueDate: hasDueDate ? dueDate : null,
-    });
+    if (!onCreate || !couple) return;
+    const newTodo = TodoItem.create(
+      {
+        title: title.trim(),
+        completed: false,
+        creatorAccID: me.id,
+        assignedTo,
+        deleted: false,
+        isHidden: hideFromPartner,
+        dueDate: hasDueDate ? dueDate : null,
+      },
+      { owner: hideFromPartner ? me : couple._owner }
+    );
     onCreate(newTodo);
 
     if (ref && 'current' in ref) {
