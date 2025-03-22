@@ -7,8 +7,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import TodoListBottomSheet from '~/components/TodoListBottomSheet';
-import TodoSectionList from '~/components/TodoListScreen/TodoDueSection';
+import NewTodoBottomSheet from '~/components/TodoListDetailsScreen/NewTodoBottomSheet';
+import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
 import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function TodoListScreen() {
@@ -186,7 +186,7 @@ export default function TodoListScreen() {
 
         <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
         {list && (
-          <TodoListBottomSheet
+          <NewTodoBottomSheet
             ref={bottomSheetModalRef}
             defaultAssignedTo={list.assignedTo}
             onCreate={(newTodo) => {
