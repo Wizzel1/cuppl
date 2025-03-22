@@ -7,9 +7,9 @@ import TodoListItem from './TodoListItem';
 
 import { TodoItem } from '~/src/schema.jazz';
 
-const _entering = FadeInDown.springify().damping(25).stiffness(200);
-const _exiting = FadeOutDown.springify(200).damping(25).stiffness(200);
-const _layout = LinearTransition.springify().damping(25).stiffness(200);
+const _entering = FadeInDown.damping(50).stiffness(200);
+const _exiting = FadeOutDown.springify(200).damping(50).stiffness(100);
+const _layout = LinearTransition.springify().damping(5000).stiffness(200);
 
 function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) {
   if (todos.length === 0) return null;
@@ -37,7 +37,7 @@ function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) 
         <Animated.View
           key={item.id + index}
           entering={_entering}
-          exiting={_exiting}
+          // exiting={_exiting}
           layout={_layout}>
           <TodoListItem item={item} index={index} />
         </Animated.View>

@@ -21,8 +21,8 @@ import {
   View,
 } from 'react-native';
 
-import CustomSwitch from './CustomSwitch';
-import OwnerDropdown, { OwnerAssignment } from './OwnerDropdown';
+import CustomSwitch from '../CustomSwitch';
+import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
 import { TodoItem, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
@@ -191,7 +191,7 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
   );
 };
 
-const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
+const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
   const { onCreate, defaultAssignedTo } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -528,4 +528,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TodoListBottomSheet;
+export default NewTodoBottomSheet;
