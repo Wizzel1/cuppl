@@ -1,16 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeOutDown, LinearTransition } from 'react-native-reanimated';
 
 import TodoListItem from './TodoListItem';
 
 import { TodoItem } from '~/src/schema.jazz';
 
+const _entering = FadeInDown.springify().damping(25).stiffness(200);
+const _exiting = FadeOutDown.springify(200).damping(25).stiffness(200);
+const _layout = LinearTransition.springify().damping(25).stiffness(200);
+
 function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) {
   if (todos.length === 0) return null;
 
   return (
-    <View>
+    <Animated.View layout={_layout}>
       <View
         style={{
           width: '100%',
@@ -29,9 +34,15 @@ function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) 
       </View>
 
       {todos.map((item, index) => (
-        <TodoListItem key={item.id || index} item={item} index={index} />
+        <Animated.View
+          key={item.id + index}
+          entering={_entering}
+          exiting={_exiting}
+          layout={_layout}>
+          <TodoListItem item={item} index={index} />
+        </Animated.View>
       ))}
-    </View>
+    </Animated.View>
   );
 }
 
