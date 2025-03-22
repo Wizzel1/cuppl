@@ -233,7 +233,7 @@ export default function ListDetailScreen() {
         </Text>
       </View>
     );
-  }, [completedTodos, totalTodos]);
+  }, [completedTodos, totalTodos, list?.title]);
 
   return (
     <>
