@@ -102,7 +102,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
         const newList = TodoList.create(
           {
             title: title.trim(),
-            items: TodoItems.create([]),
+            items: TodoItems.create([], { owner: couple._owner }),
             emoji,
             isHidden: hideFromPartner,
             backgroundColor,
