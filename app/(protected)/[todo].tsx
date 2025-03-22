@@ -202,9 +202,16 @@ export default function ListDetailScreen() {
   };
 
   const renderHeaderTitle = useCallback(() => {
+    const title = list?.title ?? 'To-Do List';
+    const titleLength = title.length;
+    const titleSubstring = title.substring(0, 24);
+    const titleRemaining = titleLength - titleSubstring.length;
+
     return (
-      <View style={{ flexDirection: 'column' }}>
-        <Text style={{ fontSize: 18, fontWeight: '600' }}>{list?.title ?? 'To-Do List'}</Text>
+      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, fontWeight: '600' }}>
+          {titleSubstring} {titleRemaining ? '...' : ''}
+        </Text>
         <Text style={{ fontSize: 12, color: '#71717B' }}>
           {completedTodos} / {totalTodos} completed
         </Text>
@@ -313,8 +320,8 @@ export default function ListDetailScreen() {
         <TodoListBottomSheet
           ref={bottomSheetModalRef}
           onCreate={(newTodo) => {
-            console.log('New todo created:', newTodo);
             if (list?.items) {
+              console.log('New todo created:', newTodo);
               list.items.push(newTodo);
             }
           }}
