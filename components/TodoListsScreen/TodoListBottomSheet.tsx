@@ -15,7 +15,7 @@ import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
-import { TodoItems, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import { TodoItems, TodoList, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 interface TodoListBottomSheetProps {
@@ -61,7 +61,6 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
     }, []);
     const { me } = useAccount();
     const couple = useCouple();
-    const { myProfile } = usePartnerProfiles();
     const [emoji, setEmoji] = useState(toUpdate?.emoji || '🖊');
     const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden || false);
     const [title, setTitle] = useState(toUpdate?.title || '');
@@ -107,7 +106,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
             emoji,
             isHidden: hideFromPartner,
             backgroundColor,
-            creatorAccID: myProfile!.accountId,
+            creatorAccID: me.id,
             assignedTo,
             deleted: false,
           },

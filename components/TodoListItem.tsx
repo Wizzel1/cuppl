@@ -14,11 +14,11 @@ function TodoListItem({
 }: {
   avatar?: ImageDefinition | null;
   title: string;
-  listId: ID<TodoList | DefaultTodoList>;
+  listId: string;
   onPress: () => void;
 }) {
-  const list = useCoState(TodoList, listId);
-  const defaultList = useCoState(DefaultTodoList, listId);
+  const list = useCoState(TodoList, listId as ID<TodoList>);
+  const defaultList = useCoState(DefaultTodoList, listId as ID<DefaultTodoList>);
   const [totalTodos, setTotalTodos] = useState(0);
   const [completedTodos, setCompletedTodos] = useState(0);
   const [backgroundColor, setBackgroundColor] = useState<string | null>(null);

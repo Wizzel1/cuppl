@@ -1,5 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
+import { ID } from 'jazz-tools';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 
@@ -11,9 +12,9 @@ import { DefaultTodoList, TodoList, useCouple, usePartnerProfiles } from '~/src/
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const [myDefaultList, setMyDefaultList] = useState<DefaultTodoList | null>(null);
-  const [partnerDefaultList, setPartnerDefaultList] = useState<DefaultTodoList | null>(null);
-  const [sharedDefaultList, setSharedDefaultList] = useState<DefaultTodoList | null>(null);
+  const [myDefaultListId, setMyDefaultListId] = useState<string | null>(null);
+  const [partnerDefaultListId, setPartnerDefaultListId] = useState<string | null>(null);
+  const [sharedDefaultListId, setSharedDefaultListId] = useState<string | null>(null);
 
   const [myLists, setMyLists] = useState<TodoList[]>([]);
   const [partnerLists, setPartnerLists] = useState<TodoList[]>([]);
@@ -63,13 +64,13 @@ export default function Todos() {
     const sharedListsArray: TodoList[] = [];
 
     if (myAccountId === couple.partnerA?.accountId) {
-      setMyDefaultList(couple.partnerATodos);
-      setPartnerDefaultList(couple.partnerBTodos);
+      setMyDefaultListId(couple.partnerATodos?.id ?? null);
+      setPartnerDefaultListId(couple.partnerBTodos?.id ?? null);
     } else {
-      setMyDefaultList(couple.partnerBTodos);
-      setPartnerDefaultList(couple.partnerATodos);
+      setMyDefaultListId(couple.partnerBTodos?.id ?? null);
+      setPartnerDefaultListId(couple.partnerATodos?.id ?? null);
     }
-    setSharedDefaultList(couple.ourTodos);
+    setSharedDefaultListId(couple.ourTodos?.id ?? null);
 
     for (const list of couple.todoLists) {
       if (!list) return;
@@ -92,38 +93,38 @@ export default function Todos() {
     setSharedLists(sharedListsArray);
   }, [couple, myProfile?.accountId, partnerProfile?.accountId]);
 
-  const onItemPress = useCallback((list: TodoList | DefaultTodoList) => {
+  const onItemPress = useCallback((listId: string) => {
     router.push({
       pathname: '/(protected)/[todoListId]',
       params: {
-        todoListId: list.id,
+        todoListId: listId,
       },
     });
   }, []);
 
   return (
     <View style={styles.container}>
-      {myProfile?.avatar && myDefaultList && (
+      {myProfile?.avatar && myDefaultListId && (
         <TodoListItem
           avatar={myProfile.avatar}
           title="My To-Dos"
-          listId={myDefaultList.id}
-          onPress={() => onItemPress(myDefaultList)}
+          listId={myDefaultListId as ID<TodoList | DefaultTodoList>}
+          onPress={() => onItemPress(myDefaultListId as ID<TodoList | DefaultTodoList>)}
         />
       )}
-      {partnerProfile?.avatar && partnerDefaultList && (
+      {partnerProfile?.avatar && partnerDefaultListId && (
         <TodoListItem
           avatar={partnerProfile.avatar}
           title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
-          listId={partnerDefaultList.id}
-          onPress={() => onItemPress(partnerDefaultList)}
+          listId={partnerDefaultListId as ID<TodoList | DefaultTodoList>}
+          onPress={() => onItemPress(partnerDefaultListId as ID<TodoList | DefaultTodoList>)}
         />
       )}
-      {sharedDefaultList && (
+      {sharedDefaultListId && (
         <TodoListItem
           title="Shared To-Dos"
-          listId={sharedDefaultList.id}
-          onPress={() => onItemPress(sharedDefaultList)}
+          listId={sharedDefaultListId}
+          onPress={() => onItemPress(sharedDefaultListId)}
         />
       )}
       <SectionList
@@ -151,7 +152,7 @@ export default function Todos() {
             <TodoListItem
               key={item.id}
               title={item.title}
-              onPress={() => onItemPress(item)}
+              onPress={() => onItemPress(item.id)}
               listId={item.id}
             />
           );
