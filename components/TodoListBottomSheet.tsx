@@ -9,7 +9,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { forwardRef, useCallback, useMemo, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
   Pressable,
@@ -201,8 +201,14 @@ const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProp
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>(defaultAssignedTo ?? 'me');
-  const [showHideFromPartner, setShowHideFromPartner] = useState(false);
+  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
+  const [showHideFromPartner, setShowHideFromPartner] = useState(true);
+
+  useEffect(() => {
+    setAssignedTo(defaultAssignedTo ?? 'me');
+    setShowHideFromPartner(defaultAssignedTo === 'me');
+  }, [defaultAssignedTo]);
+
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
   // Form state
