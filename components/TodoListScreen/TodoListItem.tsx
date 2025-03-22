@@ -5,6 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { TodoItem } from '~/src/schema.jazz';
 
 const TodoListItem = ({ item, index }: { item: TodoItem; index: number }) => {
+  const isOverdue = item?.dueDate && new Date(item.dueDate) < new Date();
   return (
     <View key={(item?.id as string) + index}>
       <Pressable
@@ -35,7 +36,7 @@ const TodoListItem = ({ item, index }: { item: TodoItem; index: number }) => {
               <Text
                 style={{
                   fontSize: 14,
-                  color: '#71717B',
+                  color: isOverdue && !item?.completed ? '#FF0000' : '#A1A1AA',
                   textDecorationLine: item?.completed ? 'line-through' : 'none',
                 }}>
                 {item?.dueDate
@@ -76,7 +77,7 @@ const TodoListItem = ({ item, index }: { item: TodoItem; index: number }) => {
               )}
             </View>
           </View>
-          {item?.isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="black" />}
+          {item?.isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="#A1A1AA" />}
         </View>
       </Pressable>
       {/* {index < todos.length - 1 && <View style={{ height: 8 }} />} */}

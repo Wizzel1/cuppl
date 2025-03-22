@@ -86,8 +86,7 @@ function TodoListItem({
               {completedTodos} / {totalTodos}
             </Text>
           </View>
-
-          {list?.isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="black" />}
+          {list?.isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="#A1A1AA" />}
         </View>
         <Ionicons
           name="chevron-forward-outline"
