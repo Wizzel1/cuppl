@@ -1,25 +1,38 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ProgressiveImg } from 'jazz-react-native';
-import { ImageDefinition } from 'jazz-tools';
+import { ProgressiveImg, useCoState } from 'jazz-react-native';
+import { ID, ImageDefinition } from 'jazz-tools';
+import { memo, useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
+
+import { DefaultTodoList, TodoList } from '~/src/schema.jazz';
 
 function TodoListItem({
   avatar,
-  backgroundColor,
-  emoji,
   title,
-  todosCount,
-  completedCount,
+  listId,
   onPress,
 }: {
   avatar?: ImageDefinition | null;
-  backgroundColor?: string;
-  emoji?: string;
   title: string;
-  todosCount: number;
-  completedCount: number;
+  listId: ID<TodoList | DefaultTodoList>;
   onPress: () => void;
 }) {
+  const list = useCoState(TodoList, listId);
+  const defaultList = useCoState(DefaultTodoList, listId);
+  const [totalTodos, setTotalTodos] = useState(0);
+  const [completedTodos, setCompletedTodos] = useState(0);
+  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
+  const [emoji, setEmoji] = useState<string | null>(null);
+
+  useEffect(() => {
+    const todos = list?.items ?? defaultList?.items;
+    if (!todos) return;
+    setTotalTodos(todos.length);
+    setCompletedTodos(todos.filter((todo) => todo?.completed ?? false).length);
+    setBackgroundColor(list?.backgroundColor ?? null);
+    setEmoji(list?.emoji ?? null);
+  }, [list?.items, defaultList?.items]);
+
   return (
     <TouchableOpacity onPress={onPress}>
       <View
@@ -70,7 +83,7 @@ function TodoListItem({
               {title}
             </Text>
             <Text style={{ fontSize: 14, color: '#71717B' }}>
-              {completedCount} / {todosCount}
+              {completedTodos} / {totalTodos}
             </Text>
           </View>
         </View>
@@ -85,4 +98,4 @@ function TodoListItem({
   );
 }
 
-export default TodoListItem;
+export default memo(TodoListItem);

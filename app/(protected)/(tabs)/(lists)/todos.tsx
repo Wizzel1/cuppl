@@ -20,6 +20,7 @@ import {
   DefaultTodoList,
   TodoItems,
   TodoList,
+  TodoLists,
   useCouple,
   usePartnerProfiles,
 } from '~/src/schema.jazz';
@@ -28,6 +29,10 @@ import { useDebounce } from '~/utils/useDebounce';
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [myDefaultList, setMyDefaultList] = useState<DefaultTodoList | null>(null);
+  const [partnerDefaultList, setPartnerDefaultList] = useState<DefaultTodoList | null>(null);
+  const [sharedDefaultList, setSharedDefaultList] = useState<DefaultTodoList | null>(null);
+
   const [myLists, setMyLists] = useState<TodoList[]>([]);
   const [partnerLists, setPartnerLists] = useState<TodoList[]>([]);
   const [sharedLists, setSharedLists] = useState<TodoList[]>([]);
@@ -38,11 +43,32 @@ export default function Todos() {
   const couple = useCouple();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (!couple) return;
-  //   if (couple.todoLists?.length === 0) return;
-  //   couple.todoLists = TodoLists.create([], { owner: couple._owner });
-  // }, []);
+  useEffect(() => {
+    if (!couple) return;
+    if (couple.todoLists?.length === 0) return;
+    couple.todoLists = TodoLists.create([], { owner: couple._owner });
+    couple.partnerATodos = DefaultTodoList.create(
+      { items: TodoItems.create([]) },
+      { owner: couple._owner }
+    );
+    couple.partnerBTodos = DefaultTodoList.create(
+      { items: TodoItems.create([]) },
+      { owner: couple._owner }
+    );
+    couple.ourTodos = TodoList.create(
+      {
+        title: 'Our To-Dos',
+        items: TodoItems.create([]),
+        isHidden: false,
+        creatorAccID: couple.partnerA!.accountId,
+        emoji: '🖊',
+        backgroundColor: '#FFFFFF',
+        assignedTo: 'us',
+        deleted: false,
+      },
+      { owner: couple._owner }
+    );
+  }, []);
 
   useEffect(() => {
     if (!couple?.todoLists) return;
@@ -53,6 +79,16 @@ export default function Todos() {
     const myListsArray: TodoList[] = [];
     const partnerListsArray: TodoList[] = [];
     const sharedListsArray: TodoList[] = [];
+
+    if (myAccountId === couple.partnerA?.accountId) {
+      setMyDefaultList(couple.partnerATodos);
+      setPartnerDefaultList(couple.partnerBTodos);
+    } else {
+      setMyDefaultList(couple.partnerBTodos);
+      setPartnerDefaultList(couple.partnerATodos);
+    }
+    setSharedDefaultList(couple.ourTodos);
+
     for (const list of couple.todoLists) {
       if (!list) return;
       switch (list.assignedTo) {
@@ -72,45 +108,42 @@ export default function Todos() {
     setMyLists(myListsArray);
     setPartnerLists(partnerListsArray);
     setSharedLists(sharedListsArray);
-  }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
+  }, [couple, myProfile?.accountId, partnerProfile?.accountId]);
 
-  const onItemPress = (list: TodoList | DefaultTodoList) => {
+  const onItemPress = useCallback((list: TodoList | DefaultTodoList) => {
     router.push({
       pathname: '/(protected)/[todo]',
       params: {
         todo: list.id,
       },
     });
-  };
+  }, []);
 
   return (
     <View style={styles.container}>
-      {myProfile?.avatar && (
+      {myProfile?.avatar && myDefaultList && (
         <TodoListItem
           avatar={myProfile.avatar}
           title="My To-Dos"
-          todosCount={10}
-          completedCount={5}
-          onPress={() => onItemPress(myLists[0])}
+          listId={myDefaultList.id}
+          onPress={() => onItemPress(myDefaultList)}
         />
       )}
-      {partnerProfile?.avatar && (
+      {partnerProfile?.avatar && partnerDefaultList && (
         <TodoListItem
           avatar={partnerProfile.avatar}
           title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
-          todosCount={10}
-          completedCount={5}
-          onPress={() => onItemPress(partnerLists[0])}
+          listId={partnerDefaultList.id}
+          onPress={() => onItemPress(partnerDefaultList)}
         />
       )}
-      <TodoListItem
-        backgroundColor="#ADD8E6"
-        emoji="😮‍💨"
-        title="Shared To-Dos"
-        todosCount={10}
-        completedCount={5}
-        onPress={() => onItemPress(sharedLists[0])}
-      />
+      {sharedDefaultList && (
+        <TodoListItem
+          title="Shared To-Dos"
+          listId={sharedDefaultList.id}
+          onPress={() => onItemPress(sharedDefaultList)}
+        />
+      )}
       <SectionList
         sections={[
           { title: 'My Lists', data: myLists },
@@ -130,17 +163,17 @@ export default function Todos() {
             {section.title}
           </Text>
         )}
-        renderItem={({ item }) => (
-          <TodoListItem
-            key={item?.id}
-            title={item?.title ?? ''}
-            todosCount={2}
-            completedCount={2}
-            onPress={() => onItemPress(item)}
-            backgroundColor={item?.backgroundColor}
-            emoji={item?.emoji}
-          />
-        )}
+        renderItem={({ item }) => {
+          if (!item) return null;
+          return (
+            <TodoListItem
+              key={item.id}
+              title={item.title}
+              onPress={() => onItemPress(item)}
+              listId={item.id}
+            />
+          );
+        }}
       />
       <TodoListBottomSheet ref={bottomSheetModalRef} />
       <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
@@ -157,6 +190,7 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
       style={{
         fontSize: 24,
         fontWeight: '600',
+        flex: 1,
         color: '#27272A',
       }}
       onChangeText={setTitle}
