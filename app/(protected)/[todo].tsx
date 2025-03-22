@@ -64,13 +64,29 @@ function TodoSection({ title, todos }: { title: string; todos: TodoItem[] }) {
                     textDecorationLine: item?.completed ? 'line-through' : 'none',
                   }}>
                   {item?.dueDate
-                    ? new Date(item.dueDate).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })
+                    ? (() => {
+                        const dueDate = new Date(item.dueDate);
+                        const today = new Date();
+                        const isToday =
+                          dueDate.getDate() === today.getDate() &&
+                          dueDate.getMonth() === today.getMonth() &&
+                          dueDate.getFullYear() === today.getFullYear();
+
+                        if (isToday) {
+                          return `Today, ${dueDate.toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}`;
+                        } else {
+                          return dueDate.toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          });
+                        }
+                      })()
                     : ''}
                 </Text>
                 {item?.recurringUnit && (
