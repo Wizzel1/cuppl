@@ -5,7 +5,7 @@ import { SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListItem';
-import { TodoListBottomSheet } from '~/components/TodoListsScreen/NewTodoListBottomSheet';
+import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
 import { DefaultTodoList, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function Todos() {

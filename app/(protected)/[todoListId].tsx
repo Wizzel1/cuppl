@@ -9,7 +9,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import NewTodoBottomSheet from '~/components/TodoListDetailsScreen/NewTodoBottomSheet';
 import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
-import { TodoListBottomSheet } from '~/components/TodoListsScreen/NewTodoListBottomSheet';
+import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
 import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function TodoListScreen() {
