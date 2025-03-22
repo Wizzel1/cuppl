@@ -163,9 +163,9 @@ function TodoSectionList({ todos }: { todos: TodoItem[] }) {
 }
 
 export default function ListDetailScreen() {
-  const { todo } = useLocalSearchParams<{ todo: string }>();
+  const { todoListId } = useLocalSearchParams<{ todoListId: string }>();
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
-  const list = useCoState(TodoList, todo as ID<TodoList>);
+  const list = useCoState(TodoList, todoListId as ID<TodoList>);
   const { partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 

@@ -112,9 +112,9 @@ export default function Todos() {
 
   const onItemPress = useCallback((list: TodoList | DefaultTodoList) => {
     router.push({
-      pathname: '/(protected)/[todo]',
+      pathname: '/(protected)/[todoListId]',
       params: {
-        todo: list.id,
+        todoListId: list.id,
       },
     });
   }, []);
