@@ -31,17 +31,17 @@ export default function Todos() {
   //   if (couple.todoLists?.length === 0) return;
   //   couple.todoLists = TodoLists.create([], { owner: couple._owner });
   //   couple.partnerATodos = DefaultTodoList.create(
-  //     { items: TodoItems.create([]) },
+  //     { items: TodoItems.create([], { owner: couple._owner }) },
   //     { owner: couple._owner }
   //   );
   //   couple.partnerBTodos = DefaultTodoList.create(
-  //     { items: TodoItems.create([]) },
+  //     { items: TodoItems.create([], { owner: couple._owner }) },
   //     { owner: couple._owner }
   //   );
   //   couple.ourTodos = TodoList.create(
   //     {
   //       title: 'Our To-Dos',
-  //       items: TodoItems.create([]),
+  //       items: TodoItems.create([], { owner: couple._owner }),
   //       isHidden: false,
   //       creatorAccID: couple.partnerA!.accountId,
   //       emoji: '🖊',
