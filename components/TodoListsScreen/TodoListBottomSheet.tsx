@@ -90,6 +90,9 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
 
       if (toUpdate) {
         // Update existing TodoList
+        if (hideFromPartner !== toUpdate.isHidden) {
+          throw new Error('Ownership transfer required');
+        }
         toUpdate.title = title.trim();
         toUpdate.emoji = emoji;
         toUpdate.isHidden = hideFromPartner;
