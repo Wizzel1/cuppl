@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { memo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { TodoItem } from '~/src/schema.jazz';
 
@@ -9,36 +9,24 @@ const TodoListItem = ({ item, index }: { item: TodoItem; index: number }) => {
   return (
     <View key={(item?.id as string) + index}>
       <Pressable
-        style={{
-          paddingVertical: 12,
-          paddingHorizontal: 24,
-        }}
+        style={styles.itemContainer}
         onPress={() => {
           item!.completed = !item!.completed;
         }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View
-            style={{
-              flexDirection: 'column',
-              flex: 1,
-            }}>
+        <View style={styles.rowContainer}>
+          <View style={styles.contentContainer}>
             <Text
               numberOfLines={1}
-              style={{
-                fontSize: 16,
-                fontWeight: 'normal',
-                textDecorationLine: item?.completed ? 'line-through' : 'none',
-                color: item?.completed ? '#A1A1AA' : 'black',
-              }}>
+              style={[styles.titleText, item?.completed && styles.completedText]}>
               {item?.title}
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={styles.metaContainer}>
               <Text
-                style={{
-                  fontSize: 14,
-                  color: isOverdue && !item?.completed ? '#FF0000' : '#A1A1AA',
-                  textDecorationLine: item?.completed ? 'line-through' : 'none',
-                }}>
+                style={[
+                  styles.dateText,
+                  isOverdue && !item?.completed && styles.overdueText,
+                  item?.completed && styles.completedText,
+                ]}>
                 {item?.dueDate
                   ? (() => {
                       const dueDate = new Date(item.dueDate);
@@ -66,12 +54,7 @@ const TodoListItem = ({ item, index }: { item: TodoItem; index: number }) => {
                   : ''}
               </Text>
               {item?.recurringUnit && (
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: '#71717B',
-                    textDecorationLine: item?.completed ? 'line-through' : 'none',
-                  }}>
+                <Text style={[styles.recurringText, item?.completed && styles.completedText]}>
                   {item?.recurringUnit}
                 </Text>
               )}
@@ -84,5 +67,45 @@ const TodoListItem = ({ item, index }: { item: TodoItem; index: number }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  itemContainer: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  contentContainer: {
+    flexDirection: 'column',
+    flex: 1,
+  },
+  titleText: {
+    fontSize: 16,
+    fontWeight: 'normal',
+  },
+  completedText: {
+    textDecorationLine: 'line-through',
+    color: '#A1A1AA',
+  },
+  metaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#A1A1AA',
+  },
+  overdueText: {
+    color: '#FF0000',
+  },
+  recurringText: {
+    fontSize: 14,
+    color: '#71717B',
+  },
+});
 
 export default memo(TodoListItem);
