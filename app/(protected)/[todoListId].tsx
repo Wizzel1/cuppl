@@ -16,7 +16,7 @@ export default function TodoListScreen() {
   const { todoListId } = useLocalSearchParams<{ todoListId: string }>();
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
   const list = useCoState(TodoList, todoListId as ID<TodoList>);
-  const { partnerProfile } = usePartnerProfiles();
+  const { partnerProfile, myProfile } = usePartnerProfiles();
   const newTodoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
 
@@ -34,14 +34,26 @@ export default function TodoListScreen() {
       const assignedToBoth: TodoItem[] = [];
       let completed = 0;
 
+      const myAccID = myProfile?.accountId;
+      const partnerAccID = partnerProfile?.accountId;
+
       for (const item of list.items) {
+        if (item?.deleted) continue;
         if (item?.completed) {
           completed++;
         }
         if (item?.assignedTo === 'me') {
-          assignedToMe.push(item);
+          if (item.creatorAccID === myAccID) {
+            assignedToMe.push(item);
+          } else {
+            assignedToPartner.push(item);
+          }
         } else if (item?.assignedTo === 'partner') {
-          assignedToPartner.push(item);
+          if (item.creatorAccID === partnerAccID) {
+            assignedToMe.push(item);
+          } else {
+            assignedToPartner.push(item);
+          }
         } else if (item?.assignedTo === 'us') {
           assignedToBoth.push(item);
         }
