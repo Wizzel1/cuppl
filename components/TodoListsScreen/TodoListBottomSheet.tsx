@@ -15,7 +15,7 @@ import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
-import { TodoItems, TodoList, useCouple } from '~/src/schema.jazz';
+import { TodoList, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 interface TodoListBottomSheetProps {
@@ -92,27 +92,22 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
         if (hideFromPartner !== toUpdate.isHidden) {
           throw new Error('Ownership transfer required');
         }
-        toUpdate.title = title.trim();
-        toUpdate.emoji = emoji;
-        toUpdate.isHidden = hideFromPartner;
-        toUpdate.backgroundColor = backgroundColor;
-        toUpdate.assignedTo = assignedTo;
+        me.updateTodoList({
+          id: toUpdate.id,
+          title: title.trim(),
+          isHidden: hideFromPartner,
+          assignedTo,
+          emoji,
+          backgroundColor,
+        });
       } else {
-        // Create new TodoList
-        const newList = TodoList.create(
-          {
-            title: title.trim(),
-            items: TodoItems.create([], { owner: couple._owner }),
-            emoji,
-            isHidden: hideFromPartner,
-            backgroundColor,
-            creatorAccID: me.id,
-            assignedTo,
-            deleted: false,
-          },
-          { owner: hideFromPartner ? me : couple._owner }
-        );
-        couple.todoLists.push(newList);
+        me.createTodoList({
+          title,
+          isHidden: hideFromPartner,
+          assignedTo,
+          emoji,
+          backgroundColor,
+        });
       }
 
       if (ref && 'current' in ref) {

@@ -85,12 +85,12 @@ export default function TodoSectionList({ todos }: { todos: TodoItem[] }) {
   }, [todos]);
 
   return (
-    <View>
+    <>
       <TodoDueSection title="Overdue" todos={overdue} />
       <TodoDueSection title="Due Next" todos={dueNext} />
       <TodoDueSection title="Without Due Date" todos={withoutDueDate} />
       <TodoDueSection title="Recurring" todos={recurring} />
       <TodoDueSection title="Completed" todos={completed} />
-    </View>
+    </>
   );
 }

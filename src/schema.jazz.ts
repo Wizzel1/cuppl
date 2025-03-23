@@ -280,7 +280,7 @@ export class CoupleAccount extends Account {
     const myTodoList = this.createTodoList({
       title: 'My To-Dos',
       isHidden: false,
-      owner: 'me',
+      assignedTo: 'me',
       emoji: '📝',
       backgroundColor: '#000000',
     });
@@ -404,7 +404,7 @@ export class CoupleAccount extends Account {
   createTodoList(args: {
     title: string;
     isHidden: boolean;
-    owner: 'me' | 'partner' | 'us';
+    assignedTo: 'me' | 'partner' | 'us';
     emoji: string;
     backgroundColor: string;
   }): TodoList | null {
@@ -417,16 +417,16 @@ export class CoupleAccount extends Account {
 
     const newList = TodoList.create(
       {
-        title: args.title,
+        title: args.title.trim(),
         emoji: args.emoji,
         backgroundColor: args.backgroundColor,
         creatorAccID: this.id,
         items: TodoItems.create([], { owner: coupleGroup }),
         isHidden: args.isHidden,
-        assignedTo: args.owner,
+        assignedTo: args.assignedTo,
         deleted: false,
       },
-      { owner: coupleGroup }
+      { owner: args.isHidden ? this : coupleGroup }
     );
 
     if (couple.todoLists) {
@@ -436,6 +436,32 @@ export class CoupleAccount extends Account {
     }
 
     return newList;
+  }
+
+  updateTodoList(args: {
+    id: string;
+    title: string;
+    isHidden: boolean;
+    assignedTo: 'me' | 'partner' | 'us';
+    emoji: string;
+    backgroundColor: string;
+  }): TodoList | null {
+    if (!this.root?.couple) return null;
+
+    const couple = this.root.couple;
+    const coupleGroup = couple._owner;
+    if (!coupleGroup) throw new Error('No couple group found');
+
+    const list = couple.todoLists?.find((list) => list?.id === args.id);
+    if (!list) throw new Error('Todo list not found');
+
+    list.title = args.title.trim();
+    list.isHidden = args.isHidden;
+    list.assignedTo = args.assignedTo;
+    list.emoji = args.emoji;
+    list.backgroundColor = args.backgroundColor;
+
+    return list;
   }
 }
 
