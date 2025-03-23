@@ -19,6 +19,7 @@ export default function Todos() {
   const [myLists, setMyLists] = useState<TodoList[]>([]);
   const [partnerLists, setPartnerLists] = useState<TodoList[]>([]);
   const [sharedLists, setSharedLists] = useState<TodoList[]>([]);
+  const [toUpdate, setToUpdate] = useState<TodoList | null>(null);
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
   };
@@ -74,6 +75,7 @@ export default function Todos() {
 
     for (const list of couple.todoLists) {
       if (!list) return;
+      if (list.deleted) continue;
       switch (list.assignedTo) {
         case 'me':
           if (list.creatorAccID === myAccountId) myListsArray.push(list);
@@ -104,29 +106,36 @@ export default function Todos() {
 
   return (
     <View style={styles.container}>
-      {myProfile?.avatar && myDefaultListId && (
-        <TodoListItem
-          avatar={myProfile.avatar}
-          title="My To-Dos"
-          listId={myDefaultListId as ID<TodoList | DefaultTodoList>}
-          onPress={() => onItemPress(myDefaultListId as ID<TodoList | DefaultTodoList>)}
-        />
-      )}
-      {partnerProfile?.avatar && partnerDefaultListId && (
-        <TodoListItem
-          avatar={partnerProfile.avatar}
-          title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
-          listId={partnerDefaultListId as ID<TodoList | DefaultTodoList>}
-          onPress={() => onItemPress(partnerDefaultListId as ID<TodoList | DefaultTodoList>)}
-        />
-      )}
-      {sharedDefaultListId && (
-        <TodoListItem
-          title="Shared To-Dos"
-          listId={sharedDefaultListId}
-          onPress={() => onItemPress(sharedDefaultListId)}
-        />
-      )}
+      <View style={styles.listContainer}>
+        {myProfile?.avatar && myDefaultListId && (
+          <TodoListItem
+            avatar={myProfile.avatar}
+            title="My To-Dos"
+            listId={myDefaultListId as ID<TodoList | DefaultTodoList>}
+            onPress={() => onItemPress(myDefaultListId as ID<TodoList | DefaultTodoList>)}
+            disableSwipe
+          />
+        )}
+
+        {partnerProfile?.avatar && partnerDefaultListId && (
+          <TodoListItem
+            avatar={partnerProfile.avatar}
+            title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
+            listId={partnerDefaultListId as ID<TodoList | DefaultTodoList>}
+            onPress={() => onItemPress(partnerDefaultListId as ID<TodoList | DefaultTodoList>)}
+            disableSwipe
+          />
+        )}
+        {sharedDefaultListId && (
+          <TodoListItem
+            title="Shared To-Dos"
+            listId={sharedDefaultListId}
+            onPress={() => onItemPress(sharedDefaultListId)}
+            disableSwipe
+          />
+        )}
+      </View>
+
       <SectionList
         sections={[
           { title: 'My Lists', data: myLists },
@@ -137,7 +146,8 @@ export default function Todos() {
           <Text
             style={{
               paddingHorizontal: 24,
-              paddingTop: 24,
+              paddingTop: 12,
+              paddingBottom: 12,
               fontSize: 18,
               color: '#18181B',
               fontWeight: '600',
@@ -146,6 +156,7 @@ export default function Todos() {
             {section.title}
           </Text>
         )}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         renderItem={({ item }) => {
           if (!item) return null;
           return (
@@ -154,11 +165,20 @@ export default function Todos() {
               title={item.title}
               onPress={() => onItemPress(item.id)}
               listId={item.id}
+              onDelete={() => {}}
+              onEdit={() => {
+                setToUpdate(item);
+                bottomSheetModalRef.current?.present();
+              }}
             />
           );
         }}
       />
-      <TodoListBottomSheet ref={bottomSheetModalRef} />
+      <TodoListBottomSheet
+        ref={bottomSheetModalRef}
+        toUpdate={toUpdate}
+        onDismiss={() => setToUpdate(null)}
+      />
       <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
     </View>
   );
@@ -168,6 +188,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  listContainer: {
+    height: 48 * 3 + 16,
+    flexDirection: 'column',
+    gap: 8,
   },
   sheetContainer: {
     zIndex: 1000,

@@ -20,7 +20,8 @@ import { TodoList, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 interface TodoListBottomSheetProps {
-  toUpdate?: TodoList;
+  toUpdate: TodoList | null;
+  onDismiss?: () => void;
 }
 
 const InputField = ({
@@ -56,7 +57,7 @@ const InputField = ({
 
 export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>(
   (props, ref) => {
-    const { toUpdate } = props;
+    const { toUpdate, onDismiss } = props;
     const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
       return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
     }, []);
@@ -262,6 +263,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       setEmoji('🖊');
       setHideFromPartner(false);
       setBackgroundColor(colors[0]);
+      onDismiss?.();
     }, []);
 
     return (
