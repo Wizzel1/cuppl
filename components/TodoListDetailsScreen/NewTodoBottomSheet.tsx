@@ -24,6 +24,7 @@ import {
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
+import * as TodoRepo from '~/src/repositories/todoRepository';
 import { TodoItem, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
@@ -265,18 +266,16 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
   // Handlers
   const handleSubmit = () => {
     if (!onCreate || !couple) return;
-    const newTodo = TodoItem.create(
-      {
-        title: title.trim(),
-        completed: false,
-        creatorAccID: me.id,
-        assignedTo,
-        deleted: false,
-        isHidden: hideFromPartner,
-        dueDate: hasDueDate ? dueDate : null,
-      },
-      { owner: hideFromPartner ? me : couple._owner }
-    );
+
+    const newTodo = TodoRepo.createTodo({
+      me,
+      title,
+      dueDate: hasDueDate ? dueDate : null,
+      completed: false,
+      deleted: false,
+      isHidden: hideFromPartner,
+      assignedTo,
+    });
     onCreate(newTodo);
 
     if (ref && 'current' in ref) {

@@ -11,6 +11,8 @@ import {
   Profile,
 } from 'jazz-tools';
 import { useMemo } from 'react';
+
+import { createTodoList } from './repositories/todoListsRepository';
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;
@@ -277,7 +279,8 @@ export class CoupleAccount extends Account {
     const privateGroup = Group.create({ owner: this });
 
     // Create a sample personal todo list
-    const myTodoList = this.createTodoList({
+    const myTodoList = createTodoList({
+      me: this,
       title: 'My To-Dos',
       isHidden: false,
       assignedTo: 'me',
@@ -399,69 +402,6 @@ export class CoupleAccount extends Account {
     }
 
     return invitedCouple;
-  }
-
-  createTodoList(args: {
-    title: string;
-    isHidden: boolean;
-    assignedTo: 'me' | 'partner' | 'us';
-    emoji: string;
-    backgroundColor: string;
-  }): TodoList | null {
-    console.log('createTodoList', args);
-    if (!this.root?.couple) return null;
-
-    const couple = this.root.couple;
-    const coupleGroup = couple._owner;
-    if (!coupleGroup) throw new Error('No couple group found');
-
-    const newList = TodoList.create(
-      {
-        title: args.title.trim(),
-        emoji: args.emoji,
-        backgroundColor: args.backgroundColor,
-        creatorAccID: this.id,
-        items: TodoItems.create([], { owner: coupleGroup }),
-        isHidden: args.isHidden,
-        assignedTo: args.assignedTo,
-        deleted: false,
-      },
-      { owner: args.isHidden ? this : coupleGroup }
-    );
-
-    if (couple.todoLists) {
-      couple.todoLists.push(newList);
-    } else {
-      throw new Error('No todo lists found');
-    }
-
-    return newList;
-  }
-
-  updateTodoList(args: {
-    id: string;
-    title: string;
-    isHidden: boolean;
-    assignedTo: 'me' | 'partner' | 'us';
-    emoji: string;
-    backgroundColor: string;
-  }): TodoList | null {
-    if (!this.root?.couple) return null;
-
-    const couple = this.root.couple;
-    const coupleGroup = couple._owner;
-    if (!coupleGroup) throw new Error('No couple group found');
-
-    const list = couple.todoLists?.find((list) => list?.id === args.id);
-    if (!list) throw new Error('Todo list not found');
-
-    list.title = args.title.trim();
-    list.isHidden = args.isHidden;
-    list.assignedTo = args.assignedTo;
-    list.emoji = args.emoji;
-    list.backgroundColor = args.backgroundColor;
-
-    return list;
   }
 }
 

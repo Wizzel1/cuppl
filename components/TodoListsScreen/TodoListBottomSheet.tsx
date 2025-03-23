@@ -15,6 +15,7 @@ import { EmojiKeyboard } from 'rn-emoji-keyboard';
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
+import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
 import { TodoList, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
@@ -92,16 +93,18 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
         if (hideFromPartner !== toUpdate.isHidden) {
           throw new Error('Ownership transfer required');
         }
-        me.updateTodoList({
+        TodoListsRepo.updateTodoList({
+          me,
           id: toUpdate.id,
-          title: title.trim(),
+          title,
           isHidden: hideFromPartner,
           assignedTo,
           emoji,
           backgroundColor,
         });
       } else {
-        me.createTodoList({
+        TodoListsRepo.createTodoList({
+          me,
           title,
           isHidden: hideFromPartner,
           assignedTo,
