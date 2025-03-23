@@ -40,7 +40,7 @@ function RightAction(
   );
 }
 
-function TodoListItem({
+function TodoListListItem({
   avatar,
   title,
   listId,
@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(TodoListItem);
+export default memo(TodoListListItem);

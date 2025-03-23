@@ -5,8 +5,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import TodoListItem from '~/components/TodoListItem';
 import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
+import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
 import { DefaultTodoList, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
 
 export default function Todos() {
@@ -108,7 +108,7 @@ export default function Todos() {
     <View style={styles.container}>
       <View style={styles.listContainer}>
         {myProfile?.avatar && myDefaultListId && (
-          <TodoListItem
+          <TodoListListItem
             avatar={myProfile.avatar}
             title="My To-Dos"
             listId={myDefaultListId as ID<TodoList | DefaultTodoList>}
@@ -118,7 +118,7 @@ export default function Todos() {
         )}
 
         {partnerProfile?.avatar && partnerDefaultListId && (
-          <TodoListItem
+          <TodoListListItem
             avatar={partnerProfile.avatar}
             title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
             listId={partnerDefaultListId as ID<TodoList | DefaultTodoList>}
@@ -127,7 +127,7 @@ export default function Todos() {
           />
         )}
         {sharedDefaultListId && (
-          <TodoListItem
+          <TodoListListItem
             title="Shared To-Dos"
             listId={sharedDefaultListId}
             onPress={() => onItemPress(sharedDefaultListId)}
@@ -160,7 +160,7 @@ export default function Todos() {
         renderItem={({ item }) => {
           if (!item) return null;
           return (
-            <TodoListItem
+            <TodoListListItem
               key={item.id}
               title={item.title}
               onPress={() => onItemPress(item.id)}
