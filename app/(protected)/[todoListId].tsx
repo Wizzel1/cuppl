@@ -33,6 +33,7 @@ export default function TodoListScreen() {
       const assignedToPartner: TodoItem[] = [];
       const assignedToBoth: TodoItem[] = [];
       let completed = 0;
+      let total = 0;
 
       const myAccID = myProfile?.accountId;
       const partnerAccID = partnerProfile?.accountId;
@@ -42,6 +43,7 @@ export default function TodoListScreen() {
         if (item?.completed) {
           completed++;
         }
+        total++;
         if (item?.assignedTo === 'me') {
           if (item.creatorAccID === myAccID) {
             assignedToMe.push(item);
@@ -63,7 +65,7 @@ export default function TodoListScreen() {
       setAssignedToPartner(assignedToPartner);
       setAssignedToBoth(assignedToBoth);
       setCompletedTodos(completed);
-      setTotalTodos(list.items.length);
+      setTotalTodos(total);
     }
   }, [list?.items]);
 
@@ -142,11 +144,16 @@ export default function TodoListScreen() {
                   paddingHorizontal: 24,
                 }}>
                 <Text style={styles.sectionHeader}>My To-Dos</Text>
-                <Ionicons
-                  name={expandedSections.has('My To-Dos') ? 'chevron-up' : 'chevron-down'}
-                  size={24}
-                  color="black"
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 14, color: '#71717B' }}>
+                    {assignedToMe.filter((todo) => todo?.completed).length} / {assignedToMe.length}
+                  </Text>
+                  <Ionicons
+                    name={expandedSections.has('My To-Dos') ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color="#71717B"
+                  />
+                </View>
               </View>
             </Pressable>
             {expandedSections.has('My To-Dos') && <TodoSectionList todos={assignedToMe} />}
@@ -164,15 +171,21 @@ export default function TodoListScreen() {
                 <Text style={styles.sectionHeader}>
                   {partnerProfile?.nickname ?? 'Partner To-Dos'}
                 </Text>
-                <Ionicons
-                  name={
-                    expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos')
-                      ? 'chevron-up'
-                      : 'chevron-down'
-                  }
-                  size={24}
-                  color="black"
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 14, color: '#71717B' }}>
+                    {assignedToPartner.filter((todo) => todo?.completed).length} /{' '}
+                    {assignedToPartner.length}
+                  </Text>
+                  <Ionicons
+                    name={
+                      expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos')
+                        ? 'chevron-up'
+                        : 'chevron-down'
+                    }
+                    size={20}
+                    color="#71717B"
+                  />
+                </View>
               </View>
             </Pressable>
             {expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos') && (
@@ -190,11 +203,17 @@ export default function TodoListScreen() {
                   paddingHorizontal: 24,
                 }}>
                 <Text style={styles.sectionHeader}>Our To-Dos</Text>
-                <Ionicons
-                  name={expandedSections.has('Our To-Dos') ? 'chevron-up' : 'chevron-down'}
-                  size={24}
-                  color="black"
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 14, color: '#71717B' }}>
+                    {assignedToBoth.filter((todo) => todo?.completed).length} /{' '}
+                    {assignedToBoth.length}
+                  </Text>
+                  <Ionicons
+                    name={expandedSections.has('Our To-Dos') ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color="#71717B"
+                  />
+                </View>
               </View>
             </Pressable>
             {expandedSections.has('Our To-Dos') && <TodoSectionList todos={assignedToBoth} />}

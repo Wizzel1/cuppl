@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown, LinearTransition } from 'react-native-reanimated';
+import * as DropdownMenu from 'zeego/dropdown-menu';
 
 import TodoListItem from './TodoListItem';
 
@@ -9,7 +10,7 @@ import { TodoItem } from '~/src/schema.jazz';
 
 const _entering = FadeInDown.damping(50).stiffness(200);
 const _exiting = FadeOutDown.springify(200).damping(50).stiffness(100);
-const _layout = LinearTransition.springify().damping(5000).stiffness(200);
+const _layout = LinearTransition.springify(1000).damping(50).stiffness(200);
 
 function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) {
   if (todos.length === 0) return null;
@@ -26,11 +27,71 @@ function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) 
           paddingHorizontal: 24,
         }}>
         <Text style={{ fontWeight: '600', paddingVertical: 5.5, fontSize: 14 }}>{title}</Text>
-        {title === 'Completed' || title === 'Overdue' ? (
-          <Pressable onPress={() => {}}>
-            <Ionicons name="ellipsis-vertical" size={16} color="black" />
-          </Pressable>
-        ) : null}
+        {title === 'Completed' && (
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Ionicons name="ellipsis-vertical" size={16} color="black" />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item
+                key="reset"
+                onSelect={() => {
+                  todos.forEach((todo) => {
+                    todo.completed = false;
+                  });
+                }}>
+                <DropdownMenu.ItemTitle>Reset Completed</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                key="delete"
+                destructive
+                onSelect={() => {
+                  todos.forEach((todo) => {
+                    todo.deleted = true;
+                  });
+                }}>
+                <DropdownMenu.ItemTitle>Delete Completed</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        )}
+        {title === 'Overdue' && (
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Ionicons name="ellipsis-vertical" size={16} color="black" />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              {/* <DropdownMenu.Item
+                key="reschedule"
+                onSelect={() => {
+                  todos.forEach((todo) => {
+                    todo.completed = true;
+                  });
+                }}>
+                <DropdownMenu.ItemTitle>Reschedule Overdue</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item> */}
+              <DropdownMenu.Item
+                key="reset"
+                onSelect={() => {
+                  todos.forEach((todo) => {
+                    todo.completed = true;
+                  });
+                }}>
+                <DropdownMenu.ItemTitle>Mark as Completed</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                key="delete"
+                destructive
+                onSelect={() => {
+                  todos.forEach((todo) => {
+                    todo.deleted = true;
+                  });
+                }}>
+                <DropdownMenu.ItemTitle>Delete Overdue</DropdownMenu.ItemTitle>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        )}
       </View>
 
       {todos.map((item, index) => (
