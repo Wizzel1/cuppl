@@ -23,22 +23,17 @@ interface TodoListBottomSheetProps {
   toUpdate: TodoList | null;
   onDismiss?: () => void;
 }
-
-const InputField = ({
-  onChange,
-  initialValue,
-}: {
+interface InputFieldProps {
   onChange: (value: string) => void;
   initialValue?: string;
-}) => {
-  const [title, setTitle] = useState(initialValue || '');
-  useDebounce(() => onChange(title), 300);
+}
+const InputField = ({ onChange, initialValue }: InputFieldProps) => {
+  const [title, setTitle] = useState(initialValue ?? '');
+  const debouncedTitle = useDebounce(title, 300);
 
   useEffect(() => {
-    if (initialValue) {
-      setTitle(initialValue);
-    }
-  }, [initialValue]);
+    onChange(debouncedTitle);
+  }, [debouncedTitle, onChange]);
 
   return (
     <BottomSheetTextInput

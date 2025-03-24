@@ -66,8 +66,18 @@ function TodoListListItem({
   useEffect(() => {
     const todos = list?.items;
     if (!todos) return;
-    setTotalTodos(todos.length);
-    setCompletedTodos(todos.filter((todo) => todo?.completed ?? false).length);
+
+    let total = 0;
+    let completed = 0;
+
+    for (const todo of todos) {
+      if (todo?.deleted) continue;
+      total++;
+      if (todo?.completed) completed++;
+    }
+
+    setTotalTodos(total);
+    setCompletedTodos(completed);
     setBackgroundColor(list?.backgroundColor ?? null);
     setEmoji(list?.emoji ?? null);
   }, [list?.items, list?.backgroundColor, list?.emoji, list?.title, list?.isHidden]);
