@@ -12,7 +12,15 @@ const _entering = FadeInDown.damping(50).stiffness(200);
 const _exiting = FadeOutDown.springify(200).damping(50).stiffness(100);
 const _layout = LinearTransition.springify(1000).damping(50).stiffness(200);
 
-function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) {
+function TodoDueSection({
+  title,
+  todos,
+  onEditTodo,
+}: {
+  title: string;
+  todos: TodoItem[];
+  onEditTodo: (todo: TodoItem) => void;
+}) {
   if (todos.length === 0) return null;
 
   return (
@@ -100,14 +108,29 @@ function TodoDueSection({ title, todos }: { title: string; todos: TodoItem[] }) 
           entering={_entering}
           // exiting={_exiting}
           layout={_layout}>
-          <TodoListItem item={item} index={index} />
+          <TodoListItem
+            item={item}
+            index={index}
+            onDelete={() => {
+              item.deleted = true;
+            }}
+            onEdit={() => {
+              onEditTodo(item);
+            }}
+          />
         </Animated.View>
       ))}
     </Animated.View>
   );
 }
 
-export default function TodoSectionList({ todos }: { todos: TodoItem[] }) {
+export default function TodoSectionList({
+  todos,
+  onEditTodo,
+}: {
+  todos: TodoItem[];
+  onEditTodo: (todo: TodoItem) => void;
+}) {
   const [overdue, setOverdue] = useState<TodoItem[]>([]);
   const [dueNext, setDueNext] = useState<TodoItem[]>([]);
   const [withoutDueDate, setWithoutDueDate] = useState<TodoItem[]>([]);
@@ -147,11 +170,11 @@ export default function TodoSectionList({ todos }: { todos: TodoItem[] }) {
 
   return (
     <>
-      <TodoDueSection title="Overdue" todos={overdue} />
-      <TodoDueSection title="Due Next" todos={dueNext} />
-      <TodoDueSection title="Without Due Date" todos={withoutDueDate} />
-      <TodoDueSection title="Recurring" todos={recurring} />
-      <TodoDueSection title="Completed" todos={completed} />
+      <TodoDueSection title="Overdue" todos={overdue} onEditTodo={onEditTodo} />
+      <TodoDueSection title="Due Next" todos={dueNext} onEditTodo={onEditTodo} />
+      <TodoDueSection title="Without Due Date" todos={withoutDueDate} onEditTodo={onEditTodo} />
+      <TodoDueSection title="Recurring" todos={recurring} onEditTodo={onEditTodo} />
+      <TodoDueSection title="Completed" todos={completed} onEditTodo={onEditTodo} />
     </>
   );
 }

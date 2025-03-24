@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import NewTodoBottomSheet from '~/components/TodoListDetailsScreen/NewTodoBottomSheet';
+import TodoBottomSheet from '~/components/TodoListDetailsScreen/TodoBottomSheet';
 import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
 import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
 import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
@@ -17,7 +17,7 @@ export default function TodoListScreen() {
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
   const list = useCoState(TodoList, todoListId as ID<TodoList>);
   const { partnerProfile, myProfile } = usePartnerProfiles();
-  const newTodoSheetRef = useRef<BottomSheetModal>(null);
+  const todoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const [completedTodos, setCompletedTodos] = useState(0);
@@ -26,6 +26,8 @@ export default function TodoListScreen() {
   const [assignedToMe, setAssignedToMe] = useState<TodoItem[]>([]);
   const [assignedToPartner, setAssignedToPartner] = useState<TodoItem[]>([]);
   const [assignedToBoth, setAssignedToBoth] = useState<TodoItem[]>([]);
+
+  const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
   useEffect(() => {
     if (list?.items) {
@@ -82,8 +84,8 @@ export default function TodoListScreen() {
     });
   };
 
-  const handlePress = () => {
-    newTodoSheetRef.current?.present();
+  const handleFABPress = () => {
+    todoSheetRef.current?.present();
   };
 
   const renderHeaderTitle = useCallback(() => {
@@ -103,6 +105,12 @@ export default function TodoListScreen() {
       </View>
     );
   }, [completedTodos, totalTodos, list?.title]);
+
+  const handleEditTodo = (todo: TodoItem) => {
+    setEditingTodo(todo);
+    todoSheetRef.current?.present();
+    console.log('Editing todo:', todo);
+  };
 
   return (
     <>
@@ -156,7 +164,9 @@ export default function TodoListScreen() {
                 </View>
               </View>
             </Pressable>
-            {expandedSections.has('My To-Dos') && <TodoSectionList todos={assignedToMe} />}
+            {expandedSections.has('My To-Dos') && (
+              <TodoSectionList todos={assignedToMe} onEditTodo={handleEditTodo} />
+            )}
 
             {/* Partner To-Dos Section */}
             <Pressable onPress={() => handleToggle(partnerProfile?.nickname ?? 'Partner To-Dos')}>
@@ -189,7 +199,7 @@ export default function TodoListScreen() {
               </View>
             </Pressable>
             {expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos') && (
-              <TodoSectionList todos={assignedToPartner} />
+              <TodoSectionList todos={assignedToPartner} onEditTodo={handleEditTodo} />
             )}
 
             {/* Our To-Dos Section */}
@@ -216,14 +226,18 @@ export default function TodoListScreen() {
                 </View>
               </View>
             </Pressable>
-            {expandedSections.has('Our To-Dos') && <TodoSectionList todos={assignedToBoth} />}
+            {expandedSections.has('Our To-Dos') && (
+              <TodoSectionList todos={assignedToBoth} onEditTodo={handleEditTodo} />
+            )}
           </View>
         </ScrollView>
 
-        <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
+        <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
         {list && (
-          <NewTodoBottomSheet
-            ref={newTodoSheetRef}
+          <TodoBottomSheet
+            ref={todoSheetRef}
+            toUpdate={editingTodo}
+            onDismiss={() => setEditingTodo(null)}
             defaultAssignedTo={list.assignedTo}
             onCreate={(newTodo) => {
               if (list.items) {
