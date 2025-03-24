@@ -9,6 +9,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Notifications from 'expo-notifications';
 import { useAccount } from 'jazz-react-native';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -25,8 +26,16 @@ import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
 import * as TodoRepo from '~/src/repositories/todoRepository';
-import { TodoItem, useCouple } from '~/src/schema.jazz';
+import { TodoItem } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 // Due Date Section Component
 type DueDateSectionProps = {
@@ -172,11 +181,22 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
 type TodoListBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
   defaultAssignedTo?: OwnerAssignment;
+  toUpdate: TodoItem | null;
+  onDismiss?: () => void;
 };
 
-const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
-  const [title, setTitle] = useState('');
-  useDebounce(() => onChange(title), 300);
+interface InputFieldProps {
+  onChange: (value: string) => void;
+  initialValue?: string;
+}
+
+const InputField = ({ onChange, initialValue }: InputFieldProps) => {
+  const [title, setTitle] = useState(initialValue ?? '');
+  const debouncedTitle = useDebounce(title, 300);
+
+  useEffect(() => {
+    onChange(debouncedTitle);
+  }, [debouncedTitle, onChange]);
 
   return (
     <BottomSheetTextInput
@@ -192,12 +212,35 @@ const InputField = ({ onChange }: { onChange: (value: string) => void }) => {
   );
 };
 
-const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
-  const { onCreate, defaultAssignedTo } = props;
+async function scheduleNotification(
+  minutesBefore: number,
+  dueDate: Date,
+  title: string,
+  body: string,
+  previousID: string | null
+) {
+  if (previousID) await cancelNotification(previousID);
+  const trigger = {
+    type: 'date',
+    channelId: 'default',
+    date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
+  };
+  const notification = await Notifications.scheduleNotificationAsync({
+    content: { title, body },
+    trigger,
+  });
+  return notification;
+}
+
+async function cancelNotification(notificationID: string) {
+  await Notifications.cancelScheduledNotificationAsync(notificationID);
+}
+
+const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
+  const { onCreate, defaultAssignedTo, toUpdate, onDismiss } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
-  const couple = useCouple();
   const { me } = useAccount();
 
   // Active screen state
@@ -209,45 +252,64 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
   useEffect(() => {
+    if (toUpdate) {
+      setTitle(toUpdate.title);
+      setAssignedTo(toUpdate.assignedTo);
+      setHideFromPartner(toUpdate.isHidden);
+      setHasDueDate(toUpdate.dueDate !== null);
+      if (toUpdate.dueDate) setDueDate(toUpdate.dueDate);
+      setHasDueDate(toUpdate.dueDate !== null);
+      setAlertNotificationID(toUpdate.alertNotificationID ?? null);
+      setAlertOption(toUpdate.alertOptionMinutes ?? null);
+      setSecondAlertNotificationID(toUpdate.secondAlertNotificationID ?? null);
+      setSecondAlertOption(toUpdate.secondAlertOptionMinutes ?? null);
+      // setRepeatMode(toUpdate.repeatMode);
+      // setPhotoUri(toUpdate.photoUri);
+    }
+  }, [toUpdate]);
+
+  useEffect(() => {
     setAssignedTo(defaultAssignedTo ?? 'me');
     setShowHideFromPartner(defaultAssignedTo === 'me');
   }, [defaultAssignedTo]);
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(toUpdate?.title ?? '');
 
   // Due date state
-  const [hasDueDate, setHasDueDate] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(
-    new Date(new Date().setMinutes(new Date().getMinutes() + 1))
-  );
+  const [hasDueDate, setHasDueDate] = useState(toUpdate?.dueDate !== null);
+  const [dueDate, setDueDate] = useState<Date>(toUpdate?.dueDate ?? new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   // Alert state
-  const [hasAlert, setHasAlert] = useState(false);
-  const [alertOption, setAlertOption] = useState('None');
+  const [alertNotificationID, setAlertNotificationID] = useState<string | null>(
+    toUpdate?.alertNotificationID ?? null
+  );
+  const [alertOption, setAlertOption] = useState<number | null>(null);
 
   // Second alert state
-  const [hasSecondAlert, setHasSecondAlert] = useState(false);
-  const [secondAlertOption, setSecondAlertOption] = useState('None');
+  const [secondAlertNotificationID, setSecondAlertNotificationID] = useState<string | null>(
+    toUpdate?.secondAlertNotificationID ?? null
+  );
+  const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
 
   // Repeat state
-  const [repeatMode, setRepeatMode] = useState('Never');
+  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
 
   // Photo state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
 
   // Alert and repeat options
-  const alertOptions = [
-    'None',
-    '5 minutes before',
-    '15 minutes before',
-    '30 minutes before',
-    '1 hour before',
-    '2 hours before',
-    'On date',
-  ];
-  const repeatOptions = ['Never', 'Daily', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
+  const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
+  const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
+
+  const getAlertDisplayText = (minutes: number | null) => {
+    if (minutes === null) return 'None';
+    if (minutes === 0) return 'On date';
+    if (minutes === 60) return '1 hour before';
+    if (minutes === 120) return '2 hours before';
+    return `${minutes} minutes before`;
+  };
 
   const handleAssignedToChange = useCallback((newAssignedTo: OwnerAssignment) => {
     setAssignedTo(newAssignedTo);
@@ -265,18 +327,61 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
 
   // Handlers
   const handleSubmit = () => {
-    if (!onCreate || !couple) return;
+    if (!onCreate) return;
+    let alertID: string | null = null;
+    let secondAlertID: string | null = null;
 
-    const newTodo = TodoRepo.createTodo({
-      me,
-      title,
-      dueDate: hasDueDate ? dueDate : null,
-      completed: false,
-      deleted: false,
-      isHidden: hideFromPartner,
-      assignedTo,
-    });
-    onCreate(newTodo);
+    if (alertOption) {
+      scheduleNotification(
+        alertOption,
+        dueDate,
+        `Reminder for ${title}`,
+        `${title} is due in ${alertOption} minutes`,
+        alertNotificationID
+      ).then((id) => {
+        alertID = id;
+      });
+    }
+
+    if (secondAlertOption) {
+      scheduleNotification(
+        secondAlertOption,
+        dueDate,
+        `Reminder for ${title}`,
+        `${title} is due in ${secondAlertOption} minutes`,
+        secondAlertNotificationID
+      ).then((id) => {
+        secondAlertID = id;
+      });
+    }
+
+    if (toUpdate) {
+      toUpdate.title = title.trim();
+      toUpdate.dueDate = hasDueDate ? dueDate : undefined;
+      toUpdate.assignedTo = assignedTo;
+      toUpdate.isHidden = hideFromPartner;
+      toUpdate.alertNotificationID = alertID ?? undefined;
+      toUpdate.alertOptionMinutes = alertOption ?? undefined;
+      toUpdate.secondAlertNotificationID = secondAlertID ?? undefined;
+      toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
+      toUpdate.recurringUnit = repeatMode ?? undefined;
+    } else {
+      const newTodo = TodoRepo.createTodo({
+        me,
+        title,
+        dueDate: hasDueDate ? dueDate : null,
+        completed: false,
+        deleted: false,
+        isHidden: hideFromPartner,
+        assignedTo,
+        alertNotificationID: alertID ?? null,
+        alertOptionMinutes: alertOption,
+        secondAlertNotificationID: secondAlertID ?? null,
+        secondAlertOptionMinutes: secondAlertOption,
+        recurringUnit: repeatMode ?? undefined,
+      });
+      onCreate(newTodo);
+    }
 
     if (ref && 'current' in ref) {
       ref.current?.dismiss();
@@ -288,21 +393,32 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
     setHideFromPartner(false);
     setHasDueDate(false);
     setActiveScreen('todo');
+    onDismiss?.();
   }, []);
 
-  const selectAlertOption = (option: string) => {
-    setAlertOption(option);
-    setHasAlert(option !== 'None');
-    setActiveScreen('todo');
+  const selectAlertOption = (minutes: number) => {
+    scheduleNotification(
+      minutes,
+      dueDate,
+      `Reminder for ${title}`,
+      `${title} is due in ${minutes} minutes`,
+      alertNotificationID
+    ).then((id) => {
+      console.log('scheduled alert notification', id);
+      setAlertNotificationID(id);
+      setAlertOption(minutes);
+      setActiveScreen('todo');
+    });
   };
 
-  const selectSecondAlertOption = (option: string) => {
-    setSecondAlertOption(option);
-    setHasSecondAlert(option !== 'None');
-    setActiveScreen('todo');
+  const selectSecondAlertOption = (minutes: number) => {
+    throw new Error('Not implemented');
+    // setSecondAlertOption(minutes);
+    // setSecondAlertNotificationID(minutes !== null ? 'uuidv4() ' : null);
+    // setActiveScreen('todo');
   };
 
-  const selectRepeatOption = (option: string) => {
+  const selectRepeatOption = (option: TodoItem['recurringUnit']) => {
     setRepeatMode(option);
     setActiveScreen('todo');
   };
@@ -335,13 +451,13 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
                 ...styles.footerContainer,
                 backgroundColor: title.trim() === '' ? '#A1A1AA' : '#8E51FF',
               }}>
-              <Text style={styles.footerText}>Create Todo</Text>
+              <Text style={styles.footerText}>{toUpdate ? 'Update Todo' : 'Create Todo'}</Text>
             </View>
           </Pressable>
         </BottomSheetFooter>
       );
     },
-    [activeScreen, handleSubmit]
+    [activeScreen, handleSubmit, toUpdate?.title]
   );
 
   return (
@@ -355,7 +471,7 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
       <BottomSheetView style={{ ...styles.sheetContainer, height: screenHeight }}>
         {activeScreen === 'todo' && (
           <>
-            <InputField onChange={setTitle} />
+            <InputField onChange={setTitle} initialValue={title} />
             <View style={{ marginTop: 16 }}>
               <OwnerDropdown
                 onAssignedToChange={handleAssignedToChange}
@@ -390,20 +506,20 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
               <>
                 <OptionSection
                   label="Alert"
-                  value={alertOption}
+                  value={getAlertDisplayText(alertOption)}
                   onPress={() => setActiveScreen('alert')}
                 />
 
                 <OptionSection
                   label="Second Alert"
-                  value={secondAlertOption}
+                  value={getAlertDisplayText(secondAlertOption)}
                   onPress={() => setActiveScreen('secondAlert')}
                 />
               </>
             )}
             <OptionSection
               label="Repeat"
-              value={repeatMode}
+              value={repeatMode ? repeatMode : 'Never'}
               onPress={() => setActiveScreen('repeat')}
             />
             <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
@@ -413,9 +529,13 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
         {activeScreen === 'alert' && (
           <OptionList
             title="Select Alert Time"
-            options={alertOptions}
-            selectedOption={alertOption}
-            onSelect={selectAlertOption}
+            options={alertMinutesOptions.map(getAlertDisplayText)}
+            selectedOption={getAlertDisplayText(alertOption)}
+            onSelect={(option) => {
+              const minutes =
+                alertMinutesOptions[alertMinutesOptions.map(getAlertDisplayText).indexOf(option)];
+              selectAlertOption(minutes);
+            }}
             onBack={() => setActiveScreen('todo')}
           />
         )}
@@ -423,9 +543,13 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
         {activeScreen === 'secondAlert' && (
           <OptionList
             title="Select Second Alert Time"
-            options={alertOptions}
-            selectedOption={secondAlertOption}
-            onSelect={selectSecondAlertOption}
+            options={alertMinutesOptions.map(getAlertDisplayText)}
+            selectedOption={getAlertDisplayText(secondAlertOption)}
+            onSelect={(option) => {
+              const minutes =
+                alertMinutesOptions[alertMinutesOptions.map(getAlertDisplayText).indexOf(option)];
+              selectSecondAlertOption(minutes);
+            }}
             onBack={() => setActiveScreen('todo')}
           />
         )}
@@ -434,8 +558,11 @@ const NewTodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps
           <OptionList
             title="Repeat"
             options={repeatOptions}
-            selectedOption={repeatMode}
-            onSelect={selectRepeatOption}
+            selectedOption={repeatMode ? repeatMode : 'Never'}
+            onSelect={(option) => {
+              const selectedOption = repeatOptions[repeatOptions.indexOf(option)];
+              selectRepeatOption(selectedOption as TodoItem['recurringUnit']);
+            }}
             onBack={() => setActiveScreen('todo')}
           />
         )}
@@ -527,4 +654,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewTodoBottomSheet;
+export default TodoBottomSheet;

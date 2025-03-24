@@ -42,6 +42,10 @@ export class TodoItem extends CoMap {
   creatorAccID = co.string;
   assignedTo = co.literal('me', 'partner', 'us');
   recurringUnit = co.optional.literal('daily', 'weekly', 'biweekly', 'monthly', 'yearly');
+  alertNotificationID = co.optional.string;
+  alertOptionMinutes = co.optional.number;
+  secondAlertNotificationID = co.optional.string;
+  secondAlertOptionMinutes = co.optional.number;
 }
 
 export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}
@@ -299,6 +303,10 @@ export class CoupleAccount extends Account {
           isHidden: false,
           creatorAccID: this.id,
           assignedTo: 'me',
+          alertNotificationID: null,
+          alertOptionMinutes: null,
+          secondAlertNotificationID: null,
+          secondAlertOptionMinutes: null,
         },
         privateGroup
       )

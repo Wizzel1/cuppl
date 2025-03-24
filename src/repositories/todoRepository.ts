@@ -7,7 +7,12 @@ function createTodo(args: {
   completed: boolean;
   deleted: boolean;
   isHidden: boolean;
-  assignedTo: 'me' | 'partner' | 'us';
+  assignedTo: TodoItem['assignedTo'];
+  alertNotificationID: string | null;
+  alertOptionMinutes: number | null;
+  secondAlertNotificationID: string | null;
+  secondAlertOptionMinutes: number | null;
+  recurringUnit: TodoItem['recurringUnit'];
 }) {
   const couple = args.me.root?.couple;
   if (!couple) throw new Error('No couple found');
@@ -23,6 +28,11 @@ function createTodo(args: {
       deleted: false,
       isHidden: args.isHidden,
       dueDate: args.dueDate ? args.dueDate : null,
+      alertNotificationID: args.alertNotificationID,
+      alertOptionMinutes: args.alertOptionMinutes,
+      secondAlertNotificationID: args.secondAlertNotificationID,
+      secondAlertOptionMinutes: args.secondAlertOptionMinutes,
+      recurringUnit: args.recurringUnit,
     },
     { owner: args.isHidden ? args.me : coupleGroup }
   );
