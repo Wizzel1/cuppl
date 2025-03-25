@@ -47,6 +47,10 @@ export class TodoItem extends CoMap {
   secondAlertNotificationID = co.optional.string;
   secondAlertOptionMinutes = co.optional.number;
 
+  get isOverDue() {
+    return this.dueDate && new Date(this.dueDate) < new Date();
+  }
+
   async scheduleNotifications() {
     if (!this.dueDate) return;
     if (this.alertOptionMinutes) {

@@ -147,9 +147,9 @@ export default function TodoSectionList({
         completed.push(todo);
         continue;
       }
-      if (todo.dueDate && new Date(todo.dueDate) < new Date()) {
+      if (todo.isOverDue) {
         overdue.push(todo);
-      } else if (todo.dueDate && new Date(todo.dueDate) > new Date()) {
+      } else if (todo.dueDate) {
         dueNext.push(todo);
       } else {
         withoutDueDate.push(todo);

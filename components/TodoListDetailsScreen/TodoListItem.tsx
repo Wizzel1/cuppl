@@ -46,30 +46,29 @@ interface TodoListItemProps {
   onEdit?: () => void;
 }
 
-const DueDateText = ({ dueDate, completed }: { dueDate: Date; completed: boolean }) => {
-  const isOverdue = dueDate && new Date(dueDate) < new Date();
+const DueDateText = ({ item }: { item: TodoItem }) => {
   return (
     <Text
       style={[
         styles.dateText,
-        isOverdue && !completed && styles.overdueText,
-        completed && styles.completedText,
+        item.isOverDue && !item.completed && styles.overdueText,
+        item.completed && styles.completedText,
       ]}>
-      {dueDate
+      {item.dueDate
         ? (() => {
             const today = new Date();
             const isToday =
-              dueDate.getDate() === today.getDate() &&
-              dueDate.getMonth() === today.getMonth() &&
-              dueDate.getFullYear() === today.getFullYear();
+              item.dueDate?.getDate() === today.getDate() &&
+              item.dueDate?.getMonth() === today.getMonth() &&
+              item.dueDate?.getFullYear() === today.getFullYear();
 
             if (isToday) {
-              return `Today, ${dueDate.toLocaleTimeString('en-US', {
+              return `Today, ${item.dueDate?.toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
               })}`;
             } else {
-              return dueDate.toLocaleDateString('en-US', {
+              return item.dueDate?.toLocaleDateString('en-US', {
                 weekday: 'short',
                 month: 'short',
                 day: 'numeric',
@@ -135,9 +134,7 @@ const TodoListItem = ({
                   {item?.title}
                 </Text>
                 <View style={styles.metaContainer}>
-                  {item?.dueDate && (
-                    <DueDateText dueDate={item?.dueDate} completed={item?.completed} />
-                  )}
+                  {item?.dueDate && <DueDateText item={item} />}
                   {item?.recurringUnit && (
                     <View style={styles.recurringContainer}>
                       <FontAwesome name="repeat" size={16} color="#71717B" />
