@@ -90,7 +90,6 @@ const DueDateSection = ({
   </View>
 );
 
-// Option Section Component (used for Alert, Second Alert, Repeat)
 type OptionSectionProps = {
   label: string;
   value: string;
@@ -108,7 +107,6 @@ const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
   </View>
 );
 
-// Photo Section Component
 type PhotoSectionProps = {
   photoUri: string | null;
   onPress: () => void;
@@ -129,7 +127,6 @@ const PhotoSection = ({ photoUri, onPress }: PhotoSectionProps) => (
   </View>
 );
 
-// OptionList Component for displaying option selections
 type OptionListProps = {
   title: string;
   options: string[];
@@ -177,7 +174,6 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
   </View>
 );
 
-// Main TodoListBottomSheet Component
 type TodoListBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
   defaultAssignedTo?: OwnerAssignment;
@@ -219,7 +215,6 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   }, []);
   const { me } = useAccount();
 
-  // Active screen state
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
@@ -350,12 +345,12 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   };
 
   const screenHeight = useMemo(() => {
-    let height = 300;
+    let height = 250;
     if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
       height = 500;
     }
     if (showHideFromPartner) height += 50;
-    if (hasDueDate) height += 150;
+    if (hasDueDate) height += 200;
     return height;
   }, [activeScreen, showHideFromPartner, hasDueDate]);
 
@@ -435,13 +430,14 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
                   value={getAlertDisplayText(secondAlertOption)}
                   onPress={() => setActiveScreen('secondAlert')}
                 />
+                <OptionSection
+                  label="Repeat"
+                  value={repeatMode ? repeatMode : 'Never'}
+                  onPress={() => setActiveScreen('repeat')}
+                />
               </>
             )}
-            <OptionSection
-              label="Repeat"
-              value={repeatMode ? repeatMode : 'Never'}
-              onPress={() => setActiveScreen('repeat')}
-            />
+
             <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
           </>
         )}

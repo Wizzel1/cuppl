@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown, LinearTransition } from 'react-native-reanimated';
 import * as DropdownMenu from 'zeego/dropdown-menu';
@@ -16,10 +16,12 @@ function TodoDueSection({
   title,
   todos,
   onEditTodo,
+  onToggleTodo,
 }: {
   title: string;
   todos: TodoItem[];
   onEditTodo: (todo: TodoItem) => void;
+  onToggleTodo: (todo: TodoItem) => void;
 }) {
   if (todos.length === 0) return null;
 
@@ -111,11 +113,14 @@ function TodoDueSection({
           <TodoListItem
             item={item}
             index={index}
-            onDelete={() => {
-              item.deleted = true;
+            onDelete={async () => {
+              await item.cancelAndDelete();
             }}
             onEdit={() => {
               onEditTodo(item);
+            }}
+            onToggle={() => {
+              onToggleTodo(item);
             }}
           />
         </Animated.View>
@@ -127,21 +132,16 @@ function TodoDueSection({
 export default function TodoSectionList({
   todos,
   onEditTodo,
+  onToggleTodo,
 }: {
   todos: TodoItem[];
   onEditTodo: (todo: TodoItem) => void;
+  onToggleTodo: (todo: TodoItem) => void;
 }) {
-  const [overdue, setOverdue] = useState<TodoItem[]>([]);
-  const [dueNext, setDueNext] = useState<TodoItem[]>([]);
-  const [withoutDueDate, setWithoutDueDate] = useState<TodoItem[]>([]);
-  const [recurring, setRecurring] = useState<TodoItem[]>([]);
-  const [completed, setCompleted] = useState<TodoItem[]>([]);
-
-  useEffect(() => {
+  const { overdue, dueNext, withoutDueDate, completed } = useMemo(() => {
     const overdue: TodoItem[] = [];
     const dueNext: TodoItem[] = [];
     const withoutDueDate: TodoItem[] = [];
-    const recurring: TodoItem[] = [];
     const completed: TodoItem[] = [];
 
     for (const todo of todos) {
@@ -149,32 +149,44 @@ export default function TodoSectionList({
         completed.push(todo);
         continue;
       }
-      if (todo.dueDate && new Date(todo.dueDate) < new Date()) {
+      if (todo.isOverDue) {
         overdue.push(todo);
-      } else if (todo.dueDate && new Date(todo.dueDate) > new Date()) {
+      } else if (todo.dueDate) {
         dueNext.push(todo);
       } else {
         withoutDueDate.push(todo);
       }
-      if (todo.recurringUnit) {
-        recurring.push(todo);
-      }
     }
 
-    setRecurring(recurring);
-    setOverdue(overdue);
-    setDueNext(dueNext);
-    setWithoutDueDate(withoutDueDate);
-    setCompleted(completed);
+    return { overdue, dueNext, withoutDueDate, completed };
   }, [todos]);
 
   return (
     <>
-      <TodoDueSection title="Overdue" todos={overdue} onEditTodo={onEditTodo} />
-      <TodoDueSection title="Due Next" todos={dueNext} onEditTodo={onEditTodo} />
-      <TodoDueSection title="Without Due Date" todos={withoutDueDate} onEditTodo={onEditTodo} />
-      <TodoDueSection title="Recurring" todos={recurring} onEditTodo={onEditTodo} />
-      <TodoDueSection title="Completed" todos={completed} onEditTodo={onEditTodo} />
+      <TodoDueSection
+        title="Overdue"
+        todos={overdue}
+        onEditTodo={onEditTodo}
+        onToggleTodo={onToggleTodo}
+      />
+      <TodoDueSection
+        title="Due Next"
+        todos={dueNext}
+        onEditTodo={onEditTodo}
+        onToggleTodo={onToggleTodo}
+      />
+      <TodoDueSection
+        title="Without Due Date"
+        todos={withoutDueDate}
+        onEditTodo={onEditTodo}
+        onToggleTodo={onToggleTodo}
+      />
+      <TodoDueSection
+        title="Completed"
+        todos={completed}
+        onEditTodo={onEditTodo}
+        onToggleTodo={onToggleTodo}
+      />
     </>
   );
 }
