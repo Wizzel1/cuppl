@@ -44,6 +44,7 @@ interface TodoListItemProps {
   disableSwipe?: boolean;
   onDelete?: () => void;
   onEdit?: () => void;
+  onToggle?: () => void;
 }
 
 const DueDateText = ({ item }: { item: TodoItem }) => {
@@ -88,16 +89,15 @@ const TodoListItem = ({
   disableSwipe = false,
   onDelete,
   onEdit,
+  onToggle,
 }: TodoListItemProps) => {
   const alertCount = item?.alertNotificationID ? (item?.secondAlertNotificationID ? 2 : 1) : 0;
-  const [isOpen, setIsOpen] = useState(false);
+  const [swipeMenuOpen, setSwipeMenuOpen] = useState(false);
 
   const handlePress = () => {
-    if (isOpen) {
-      setIsOpen(false);
-    } else {
-      item!.completed = !item!.completed;
-    }
+    if (swipeMenuOpen) {
+      setSwipeMenuOpen(false);
+    } else if (onToggle) onToggle();
   };
 
   return (
@@ -107,16 +107,16 @@ const TodoListItem = ({
         friction={1.8}
         enableTrackpadTwoFingerGesture
         rightThreshold={40}
-        onSwipeableOpen={() => setIsOpen(true)}
+        onSwipeableOpen={() => setSwipeMenuOpen(true)}
         renderRightActions={(progress, drag, swipeable) =>
           RightAction(progress, drag, {
             onDelete: () => {
-              setIsOpen(false);
+              setSwipeMenuOpen(false);
               swipeable.close();
               onDelete?.();
             },
             onEdit: () => {
-              setIsOpen(false);
+              setSwipeMenuOpen(false);
               swipeable.close();
               onEdit?.();
             },
@@ -125,7 +125,7 @@ const TodoListItem = ({
         <View key={(item?.id as string) + index}>
           <Pressable
             style={styles.itemContainer}
-            onPress={(ev) => (isOpen ? setIsOpen(false) : handlePress())}>
+            onPress={(ev) => (swipeMenuOpen ? setSwipeMenuOpen(false) : handlePress())}>
             <View style={styles.rowContainer}>
               <View style={styles.contentContainer}>
                 <Text

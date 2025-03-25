@@ -112,6 +112,19 @@ export default function TodoListScreen() {
     console.log('Editing todo:', todo);
   };
 
+  const handleToggleTodo = (todo: TodoItem) => {
+    todo.completed = !todo.completed;
+    if (todo.completed) {
+      const nextTodo = todo.tryCreateNextTodo();
+      if (nextTodo) {
+        list?.items?.push(nextTodo);
+        nextTodo.scheduleNotifications();
+      }
+    } else {
+      todo.tryCreateNextTodo();
+    }
+  };
+
   return (
     <>
       <Stack.Screen
@@ -165,7 +178,11 @@ export default function TodoListScreen() {
               </View>
             </Pressable>
             {expandedSections.has('My To-Dos') && (
-              <TodoSectionList todos={assignedToMe} onEditTodo={handleEditTodo} />
+              <TodoSectionList
+                todos={assignedToMe}
+                onEditTodo={handleEditTodo}
+                onToggleTodo={handleToggleTodo}
+              />
             )}
 
             {/* Partner To-Dos Section */}
@@ -199,7 +216,11 @@ export default function TodoListScreen() {
               </View>
             </Pressable>
             {expandedSections.has(partnerProfile?.nickname ?? 'Partner To-Dos') && (
-              <TodoSectionList todos={assignedToPartner} onEditTodo={handleEditTodo} />
+              <TodoSectionList
+                todos={assignedToPartner}
+                onEditTodo={handleEditTodo}
+                onToggleTodo={handleToggleTodo}
+              />
             )}
 
             {/* Our To-Dos Section */}
@@ -227,7 +248,11 @@ export default function TodoListScreen() {
               </View>
             </Pressable>
             {expandedSections.has('Our To-Dos') && (
-              <TodoSectionList todos={assignedToBoth} onEditTodo={handleEditTodo} />
+              <TodoSectionList
+                todos={assignedToBoth}
+                onEditTodo={handleEditTodo}
+                onToggleTodo={handleToggleTodo}
+              />
             )}
           </View>
         </ScrollView>
