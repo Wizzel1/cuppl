@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { memo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -46,6 +46,11 @@ interface TodoListItemProps {
   onEdit?: () => void;
 }
 
+const DueDate = ({ dueDate }: { dueDate: string }) => {
+  const isOverdue = dueDate && new Date(dueDate) < new Date();
+  return <Text style={styles.dateText}>{dueDate}</Text>;
+};
+
 const TodoListItem = ({
   item,
   index,
@@ -54,7 +59,8 @@ const TodoListItem = ({
   onEdit,
 }: TodoListItemProps) => {
   const isOverdue = item?.dueDate && new Date(item.dueDate) < new Date();
-
+  const isRecurring = item?.recurringUnit;
+  const alertCount = item?.alertNotificationID ? (item?.secondAlertNotificationID ? 2 : 1) : 0;
   const [isOpen, setIsOpen] = useState(false);
 
   const handlePress = () => {
@@ -132,14 +138,24 @@ const TodoListItem = ({
                       : ''}
                   </Text>
                   {item?.recurringUnit && (
-                    <Text style={[styles.recurringText, item?.completed && styles.completedText]}>
-                      {item?.recurringUnit}
-                    </Text>
+                    <View style={styles.recurringContainer}>
+                      <FontAwesome name="repeat" size={16} color="#71717B" />
+                      <Text style={[styles.recurringText, item?.completed && styles.completedText]}>
+                        {item.recurringUnit}
+                      </Text>
+                    </View>
+                  )}
+                  {alertCount > 0 && (
+                    <View style={styles.alertContainer}>
+                      <MaterialCommunityIcons name="bell" size={16} color="#71717B" />
+                      <Text style={styles.alertText}>{alertCount}</Text>
+                    </View>
                   )}
                 </View>
               </View>
+
               {item?.isHidden && (
-                <MaterialCommunityIcons name="eye-off" size={20} color="#A1A1AA" />
+                <MaterialCommunityIcons name="eye-off" size={20} color="#71717B" />
               )}
             </View>
           </Pressable>
@@ -188,6 +204,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#71717B',
   },
+  recurringContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   rightActionContainer: {
     flexDirection: 'row',
     gap: 8,
@@ -203,6 +224,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  alertContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  alertText: {
+    fontSize: 14,
+    color: '#71717B',
   },
 });
 
