@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications';
+import { SchedulableTriggerInputTypes } from 'expo-notifications';
 import { useAccount, useCoState } from 'jazz-react-native';
 import {
   Account,
@@ -149,14 +150,12 @@ async function scheduleNotification(
   body: string
 ) {
   try {
-    const trigger = {
-      type: 'date',
-      channelId: 'default',
-      date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
-    };
     return Notifications.scheduleNotificationAsync({
       content: { title, body },
-      trigger,
+      trigger: {
+        type: SchedulableTriggerInputTypes.DATE,
+        date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
+      },
     });
   } catch (error) {
     console.log(error);
