@@ -134,14 +134,12 @@ export default function TodoSectionList({
   const [overdue, setOverdue] = useState<TodoItem[]>([]);
   const [dueNext, setDueNext] = useState<TodoItem[]>([]);
   const [withoutDueDate, setWithoutDueDate] = useState<TodoItem[]>([]);
-  const [recurring, setRecurring] = useState<TodoItem[]>([]);
   const [completed, setCompleted] = useState<TodoItem[]>([]);
 
   useEffect(() => {
     const overdue: TodoItem[] = [];
     const dueNext: TodoItem[] = [];
     const withoutDueDate: TodoItem[] = [];
-    const recurring: TodoItem[] = [];
     const completed: TodoItem[] = [];
 
     for (const todo of todos) {
@@ -156,12 +154,8 @@ export default function TodoSectionList({
       } else {
         withoutDueDate.push(todo);
       }
-      if (todo.recurringUnit) {
-        recurring.push(todo);
-      }
     }
 
-    setRecurring(recurring);
     setOverdue(overdue);
     setDueNext(dueNext);
     setWithoutDueDate(withoutDueDate);
@@ -173,7 +167,6 @@ export default function TodoSectionList({
       <TodoDueSection title="Overdue" todos={overdue} onEditTodo={onEditTodo} />
       <TodoDueSection title="Due Next" todos={dueNext} onEditTodo={onEditTodo} />
       <TodoDueSection title="Without Due Date" todos={withoutDueDate} onEditTodo={onEditTodo} />
-      <TodoDueSection title="Recurring" todos={recurring} onEditTodo={onEditTodo} />
       <TodoDueSection title="Completed" todos={completed} onEditTodo={onEditTodo} />
     </>
   );
