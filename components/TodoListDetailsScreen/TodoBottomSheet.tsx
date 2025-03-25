@@ -90,7 +90,6 @@ const DueDateSection = ({
   </View>
 );
 
-// Option Section Component (used for Alert, Second Alert, Repeat)
 type OptionSectionProps = {
   label: string;
   value: string;
@@ -108,7 +107,6 @@ const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
   </View>
 );
 
-// Photo Section Component
 type PhotoSectionProps = {
   photoUri: string | null;
   onPress: () => void;
@@ -129,7 +127,6 @@ const PhotoSection = ({ photoUri, onPress }: PhotoSectionProps) => (
   </View>
 );
 
-// OptionList Component for displaying option selections
 type OptionListProps = {
   title: string;
   options: string[];
@@ -177,7 +174,6 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
   </View>
 );
 
-// Main TodoListBottomSheet Component
 type TodoListBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
   defaultAssignedTo?: OwnerAssignment;
@@ -219,7 +215,6 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   }, []);
   const { me } = useAccount();
 
-  // Active screen state
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );

@@ -15,7 +15,7 @@ import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
 export default function TodoListScreen() {
   const { todoListId } = useLocalSearchParams<{ todoListId: string }>();
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
-  const list = useCoState(TodoList, todoListId as ID<TodoList>);
+  const list = useCoState(TodoList, todoListId as ID<TodoList>, { items: [] });
   const { partnerProfile, myProfile } = usePartnerProfiles();
   const todoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
@@ -96,19 +96,24 @@ export default function TodoListScreen() {
   const handleEditTodo = (todo: TodoItem) => {
     setEditingTodo(todo);
     todoSheetRef.current?.present();
-    console.log('Editing todo:', todo);
   };
 
-  const handleToggleTodo = useCallback((todo: TodoItem) => {
+  const handleToggleTodo = useCallback(async (todo: TodoItem) => {
     todo.completed = !todo.completed;
     if (todo.completed) {
       const nextTodo = todo.tryCreateNextTodo();
       if (nextTodo) {
         list?.items?.push(nextTodo);
-        nextTodo.scheduleNotifications();
+        todo.nextTodoID = nextTodo.id;
+        await nextTodo.scheduleNotifications();
       }
     } else {
-      todo.tryCreateNextTodo();
+      const nextTodo = list?.items?.find((t) => t?.id === todo.nextTodoID);
+      await todo.scheduleNotifications();
+      if (nextTodo) {
+        console.log('nextTodo', nextTodo);
+        await nextTodo.cancelAndDelete();
+      }
     }
   }, []);
 
@@ -161,7 +166,7 @@ export default function TodoListScreen() {
               <TodoSectionList
                 todos={assignedToMe}
                 onEditTodo={handleEditTodo}
-                onToggleTodo={handleToggleTodo}
+                onToggleTodo={async (todo) => await handleToggleTodo(todo)}
               />
             )}
 
@@ -192,7 +197,7 @@ export default function TodoListScreen() {
               <TodoSectionList
                 todos={assignedToPartner}
                 onEditTodo={handleEditTodo}
-                onToggleTodo={handleToggleTodo}
+                onToggleTodo={async (todo) => await handleToggleTodo(todo)}
               />
             )}
 
@@ -217,7 +222,7 @@ export default function TodoListScreen() {
               <TodoSectionList
                 todos={assignedToBoth}
                 onEditTodo={handleEditTodo}
-                onToggleTodo={handleToggleTodo}
+                onToggleTodo={async (todo) => await handleToggleTodo(todo)}
               />
             )}
           </View>

@@ -40,6 +40,7 @@ export class TodoItem extends CoMap {
   photo = co.optional.ref(ImageDefinition);
   isHidden = co.boolean;
   creatorAccID = co.string;
+  nextTodoID = co.optional.string;
   assignedTo = co.literal('me', 'partner', 'us');
   recurringUnit = co.optional.literal('daily', 'weekly', 'biweekly', 'monthly', 'yearly');
   alertNotificationID = co.optional.string;
