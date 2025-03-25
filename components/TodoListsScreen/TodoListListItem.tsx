@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProgressiveImg, useCoState } from 'jazz-react-native';
 import { ID, ImageDefinition } from 'jazz-tools';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -58,8 +58,7 @@ function TodoListListItem({
   disableSwipe?: boolean;
 }) {
   const list = useCoState(TodoList, listId as ID<TodoList>, { items: [{}] });
-  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
-  const [emoji, setEmoji] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { total, completed } = useMemo(() => {
     let total = 0;
@@ -74,13 +73,6 @@ function TodoListListItem({
 
     return { total, completed };
   }, [list?.items]);
-
-  useEffect(() => {
-    setBackgroundColor(list?.backgroundColor ?? null);
-    setEmoji(list?.emoji ?? null);
-  }, [list?.backgroundColor, list?.emoji]);
-
-  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <GestureHandlerRootView>
@@ -107,9 +99,9 @@ function TodoListListItem({
         <TouchableOpacity onPress={isOpen ? () => setIsOpen(false) : onPress}>
           <View style={styles.container}>
             <View style={styles.contentWrapper}>
-              {backgroundColor && emoji ? (
-                <View style={[styles.avatarContainer, { backgroundColor }]}>
-                  <Text style={styles.emojiText}>{emoji}</Text>
+              {list?.backgroundColor && list?.emoji ? (
+                <View style={[styles.avatarContainer, { backgroundColor: list.backgroundColor }]}>
+                  <Text style={styles.emojiText}>{list.emoji}</Text>
                 </View>
               ) : (
                 <ProgressiveImg image={avatar} maxWidth={400}>
