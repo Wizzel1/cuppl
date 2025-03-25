@@ -82,11 +82,11 @@ export default function TodoListScreen() {
     const titleRemaining = titleLength - titleSubstring.length;
 
     return (
-      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: '600' }}>
+      <View style={styles.headerTitleContainer}>
+        <Text style={styles.headerTitle}>
           {titleSubstring} {titleRemaining ? '...' : ''}
         </Text>
-        <Text style={{ fontSize: 12, color: '#71717B' }}>
+        <Text style={styles.headerSubtitle}>
           {completedTodos} / {totalTodos} completed
         </Text>
       </View>
@@ -127,7 +127,7 @@ export default function TodoListScreen() {
           ),
         }}
       />
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={styles.container}>
         <ScrollView>
           <View style={styles.progressContainer}>
             <View style={styles.progressTrack}>
@@ -140,20 +140,13 @@ export default function TodoListScreen() {
             </View>
           </View>
 
-          <View style={{ paddingTop: 16, paddingBottom: 80 }}>
+          <View style={styles.contentContainer}>
             {/* My To-Dos Section */}
             <Pressable onPress={() => handleToggle('My To-Dos')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingVertical: 16,
-                  paddingHorizontal: 24,
-                }}>
+              <View style={styles.sectionContainer}>
                 <Text style={styles.sectionHeader}>My To-Dos</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 14, color: '#71717B' }}>
+                <View style={styles.sectionMetaContainer}>
+                  <Text style={styles.sectionMetaText}>
                     {assignedToMe.filter((todo) => todo?.completed).length} / {assignedToMe.length}
                   </Text>
                   <Ionicons
@@ -174,19 +167,12 @@ export default function TodoListScreen() {
 
             {/* Partner To-Dos Section */}
             <Pressable onPress={() => handleToggle(partnerProfile?.nickname ?? 'Partner To-Dos')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingVertical: 16,
-                  paddingHorizontal: 24,
-                }}>
+              <View style={styles.sectionContainer}>
                 <Text style={styles.sectionHeader}>
                   {partnerProfile?.nickname ?? 'Partner To-Dos'}
                 </Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 14, color: '#71717B' }}>
+                <View style={styles.sectionMetaContainer}>
+                  <Text style={styles.sectionMetaText}>
                     {assignedToPartner.filter((todo) => todo?.completed).length} /{' '}
                     {assignedToPartner.length}
                   </Text>
@@ -212,17 +198,10 @@ export default function TodoListScreen() {
 
             {/* Our To-Dos Section */}
             <Pressable onPress={() => handleToggle('Our To-Dos')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingVertical: 16,
-                  paddingHorizontal: 24,
-                }}>
+              <View style={styles.sectionContainer}>
                 <Text style={styles.sectionHeader}>Our To-Dos</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 14, color: '#71717B' }}>
+                <View style={styles.sectionMetaContainer}>
+                  <Text style={styles.sectionMetaText}>
                     {assignedToBoth.filter((todo) => todo?.completed).length} /{' '}
                     {assignedToBoth.length}
                   </Text>
@@ -291,5 +270,41 @@ const styles = StyleSheet.create({
     color: '#71717B',
     marginTop: 8,
     textAlign: 'right',
+  },
+  contentContainer: {
+    paddingTop: 16,
+    paddingBottom: 80,
+  },
+  sectionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  sectionMetaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  sectionMetaText: {
+    fontSize: 14,
+    color: '#71717B',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  headerTitleContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    color: '#71717B',
   },
 });
