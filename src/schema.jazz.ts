@@ -138,6 +138,7 @@ function getNextDueDate(recurringUnit: TodoItem['recurringUnit'], dueDate: Date 
   console.log('nextDueDate', nextDueDate.toDateString());
   return nextDueDate;
 }
+
 async function cancelNotification(notificationID: string) {
   console.log('cancelling notification', notificationID);
   await Notifications.cancelScheduledNotificationAsync(notificationID);
