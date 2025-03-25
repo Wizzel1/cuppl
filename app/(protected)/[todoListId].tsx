@@ -98,7 +98,7 @@ export default function TodoListScreen() {
     todoSheetRef.current?.present();
   };
 
-  const handleToggleTodo = useCallback(async (todo: TodoItem) => {
+  const handleToggleTodo = async (todo: TodoItem) => {
     todo.completed = !todo.completed;
     if (todo.completed) {
       const nextTodo = todo.tryCreateNextTodo();
@@ -115,7 +115,7 @@ export default function TodoListScreen() {
         await nextTodo.cancelAndDelete();
       }
     }
-  }, []);
+  };
 
   return (
     <>
