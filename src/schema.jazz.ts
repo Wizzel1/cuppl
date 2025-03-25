@@ -51,6 +51,15 @@ export class TodoItem extends CoMap {
     return this.dueDate && new Date(this.dueDate) < new Date();
   }
 
+  async cancelAndDelete() {
+    const promises = [];
+    if (this.alertNotificationID) promises.push(cancelNotification(this.alertNotificationID));
+    if (this.secondAlertNotificationID)
+      promises.push(cancelNotification(this.secondAlertNotificationID));
+    await Promise.all(promises);
+    this.deleted = true;
+  }
+
   async scheduleNotifications() {
     if (!this.dueDate) return;
     if (this.alertOptionMinutes) {
@@ -74,8 +83,52 @@ export class TodoItem extends CoMap {
       this.secondAlertNotificationID = id;
     }
   }
+
+  tryCreateNextTodo() {
+    if (!this.recurringUnit) return;
+    const nextTodo = TodoItem.create({
+      title: this.title,
+      dueDate: getNextDueDateForRecurringTodo(this.recurringUnit, this.dueDate),
+      completed: false,
+      deleted: false,
+      isHidden: this.isHidden,
+      creatorAccID: this.creatorAccID,
+      assignedTo: this.assignedTo,
+      recurringUnit: this.recurringUnit,
+      alertOptionMinutes: this.alertOptionMinutes,
+      secondAlertOptionMinutes: this.secondAlertOptionMinutes,
+    });
+    return nextTodo;
+  }
 }
 
+function getNextDueDateForRecurringTodo(
+  recurringUnit: TodoItem['recurringUnit'],
+  dueDate: Date | undefined
+) {
+  if (!recurringUnit || !dueDate) return;
+  const nextDueDate = new Date(dueDate);
+  switch (recurringUnit) {
+    case 'daily':
+      nextDueDate.setDate(nextDueDate.getDate() + 1);
+      break;
+    case 'weekly':
+      nextDueDate.setDate(nextDueDate.getDate() + 7);
+      break;
+    case 'biweekly':
+      nextDueDate.setDate(nextDueDate.getDate() + 14);
+      break;
+    case 'monthly':
+      nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+      break;
+    case 'yearly':
+      nextDueDate.setFullYear(nextDueDate.getFullYear() + 1);
+      break;
+    default:
+      return;
+  }
+  return nextDueDate;
+}
 async function cancelNotification(notificationID: string) {
   await Notifications.cancelScheduledNotificationAsync(notificationID);
 }
