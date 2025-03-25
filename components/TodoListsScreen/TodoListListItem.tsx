@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProgressiveImg, useCoState } from 'jazz-react-native';
 import { ID, ImageDefinition } from 'jazz-tools';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -57,30 +57,28 @@ function TodoListListItem({
   onEdit?: () => void;
   disableSwipe?: boolean;
 }) {
-  const list = useCoState(TodoList, listId as ID<TodoList>);
-  const [totalTodos, setTotalTodos] = useState(0);
-  const [completedTodos, setCompletedTodos] = useState(0);
+  const list = useCoState(TodoList, listId as ID<TodoList>, { items: [{}] });
   const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
   const [emoji, setEmoji] = useState<string | null>(null);
 
-  useEffect(() => {
-    const todos = list?.items;
-    if (!todos) return;
-
+  const { total, completed } = useMemo(() => {
     let total = 0;
     let completed = 0;
 
-    for (const todo of todos) {
-      if (todo?.deleted) continue;
+    if (!list) return { total, completed };
+    for (const todo of list.items) {
+      if (todo.deleted) continue;
       total++;
-      if (todo?.completed) completed++;
+      if (todo.completed) completed++;
     }
 
-    setTotalTodos(total);
-    setCompletedTodos(completed);
+    return { total, completed };
+  }, [list?.items]);
+
+  useEffect(() => {
     setBackgroundColor(list?.backgroundColor ?? null);
     setEmoji(list?.emoji ?? null);
-  }, [list?.items, list?.backgroundColor, list?.emoji, list?.title, list?.isHidden]);
+  }, [list?.backgroundColor, list?.emoji]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -126,7 +124,7 @@ function TodoListListItem({
                   {title}
                 </Text>
                 <Text style={styles.subtitleText}>
-                  {completedTodos} / {totalTodos}
+                  {completed} / {total}
                 </Text>
               </View>
               {list?.isHidden && (
