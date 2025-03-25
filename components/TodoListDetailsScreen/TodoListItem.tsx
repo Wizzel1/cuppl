@@ -46,9 +46,41 @@ interface TodoListItemProps {
   onEdit?: () => void;
 }
 
-const DueDate = ({ dueDate }: { dueDate: string }) => {
+const DueDateText = ({ dueDate, completed }: { dueDate: Date; completed: boolean }) => {
   const isOverdue = dueDate && new Date(dueDate) < new Date();
-  return <Text style={styles.dateText}>{dueDate}</Text>;
+  return (
+    <Text
+      style={[
+        styles.dateText,
+        isOverdue && !completed && styles.overdueText,
+        completed && styles.completedText,
+      ]}>
+      {dueDate
+        ? (() => {
+            const today = new Date();
+            const isToday =
+              dueDate.getDate() === today.getDate() &&
+              dueDate.getMonth() === today.getMonth() &&
+              dueDate.getFullYear() === today.getFullYear();
+
+            if (isToday) {
+              return `Today, ${dueDate.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+              })}`;
+            } else {
+              return dueDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+              });
+            }
+          })()
+        : ''}
+    </Text>
+  );
 };
 
 const TodoListItem = ({
@@ -58,8 +90,6 @@ const TodoListItem = ({
   onDelete,
   onEdit,
 }: TodoListItemProps) => {
-  const isOverdue = item?.dueDate && new Date(item.dueDate) < new Date();
-  const isRecurring = item?.recurringUnit;
   const alertCount = item?.alertNotificationID ? (item?.secondAlertNotificationID ? 2 : 1) : 0;
   const [isOpen, setIsOpen] = useState(false);
 
@@ -105,38 +135,9 @@ const TodoListItem = ({
                   {item?.title}
                 </Text>
                 <View style={styles.metaContainer}>
-                  <Text
-                    style={[
-                      styles.dateText,
-                      isOverdue && !item?.completed && styles.overdueText,
-                      item?.completed && styles.completedText,
-                    ]}>
-                    {item?.dueDate
-                      ? (() => {
-                          const dueDate = new Date(item.dueDate);
-                          const today = new Date();
-                          const isToday =
-                            dueDate.getDate() === today.getDate() &&
-                            dueDate.getMonth() === today.getMonth() &&
-                            dueDate.getFullYear() === today.getFullYear();
-
-                          if (isToday) {
-                            return `Today, ${dueDate.toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                            })}`;
-                          } else {
-                            return dueDate.toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: '2-digit',
-                            });
-                          }
-                        })()
-                      : ''}
-                  </Text>
+                  {item?.dueDate && (
+                    <DueDateText dueDate={item?.dueDate} completed={item?.completed} />
+                  )}
                   {item?.recurringUnit && (
                     <View style={styles.recurringContainer}>
                       <FontAwesome name="repeat" size={16} color="#71717B" />
