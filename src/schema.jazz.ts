@@ -53,18 +53,22 @@ export class TodoItem extends CoMap {
   }
 
   async cancelAndDelete() {
-    const promises = [];
-    if (this.alertNotificationID) promises.push(cancelNotification(this.alertNotificationID));
-    if (this.secondAlertNotificationID)
-      promises.push(cancelNotification(this.secondAlertNotificationID));
-    await Promise.all(promises);
+    await this.cancelNotifications();
     this.deleted = true;
+  }
+
+  async cancelNotifications() {
+    if (this.alertNotificationID !== undefined) {
+      await cancelNotification(this.alertNotificationID);
+    }
+    if (this.secondAlertNotificationID !== undefined) {
+      await cancelNotification(this.secondAlertNotificationID);
+    }
   }
 
   async scheduleNotifications() {
     if (!this.dueDate) return;
     if (this.alertOptionMinutes !== undefined) {
-      if (this.alertNotificationID) await cancelNotification(this.alertNotificationID);
       const id = await scheduleNotification(
         this.alertOptionMinutes,
         this.dueDate,
@@ -72,9 +76,9 @@ export class TodoItem extends CoMap {
         `${this.title} is due in ${this.alertOptionMinutes} minutes`
       );
       this.alertNotificationID = id;
+      console.log('scheduled alert notification', id);
     }
     if (this.secondAlertOptionMinutes !== undefined) {
-      if (this.secondAlertNotificationID) await cancelNotification(this.secondAlertNotificationID);
       const id = await scheduleNotification(
         this.secondAlertOptionMinutes,
         this.dueDate,
@@ -82,14 +86,18 @@ export class TodoItem extends CoMap {
         `${this.title} is due in ${this.secondAlertOptionMinutes} minutes`
       );
       this.secondAlertNotificationID = id;
+      console.log('scheduled second alert notification', id);
     }
   }
 
   tryCreateNextTodo() {
-    if (!this.recurringUnit) return;
+    if (!this.recurringUnit) {
+      console.log('no recurring unit');
+      return;
+    }
     const nextTodo = TodoItem.create({
       title: this.title,
-      dueDate: getNextDueDateForRecurringTodo(this.recurringUnit, this.dueDate),
+      dueDate: getNextDueDate(this.recurringUnit, this.dueDate),
       completed: false,
       deleted: false,
       isHidden: this.isHidden,
@@ -99,14 +107,12 @@ export class TodoItem extends CoMap {
       alertOptionMinutes: this.alertOptionMinutes,
       secondAlertOptionMinutes: this.secondAlertOptionMinutes,
     });
+    console.log('nextTodo', nextTodo);
     return nextTodo;
   }
 }
 
-function getNextDueDateForRecurringTodo(
-  recurringUnit: TodoItem['recurringUnit'],
-  dueDate: Date | undefined
-) {
+function getNextDueDate(recurringUnit: TodoItem['recurringUnit'], dueDate: Date | undefined) {
   if (!recurringUnit || !dueDate) return;
   const nextDueDate = new Date(dueDate);
   switch (recurringUnit) {
@@ -128,9 +134,11 @@ function getNextDueDateForRecurringTodo(
     default:
       return;
   }
+  console.log('nextDueDate', nextDueDate.toDateString());
   return nextDueDate;
 }
 async function cancelNotification(notificationID: string) {
+  console.log('cancelling notification', notificationID);
   await Notifications.cancelScheduledNotificationAsync(notificationID);
 }
 
@@ -140,16 +148,20 @@ async function scheduleNotification(
   title: string,
   body: string
 ) {
-  const trigger = {
-    type: 'date',
-    channelId: 'default',
-    date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
-  };
-  const notification = await Notifications.scheduleNotificationAsync({
-    content: { title, body },
-    trigger,
-  });
-  return notification;
+  try {
+    const trigger = {
+      type: 'date',
+      channelId: 'default',
+      date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
+    };
+    const notification = await Notifications.scheduleNotificationAsync({
+      content: { title, body },
+      trigger,
+    });
+    return notification;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}

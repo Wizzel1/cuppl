@@ -101,6 +101,7 @@ export default function TodoListScreen() {
   const handleToggleTodo = async (todo: TodoItem) => {
     todo.completed = !todo.completed;
     if (todo.completed) {
+      await todo.cancelNotifications();
       const nextTodo = todo.tryCreateNextTodo();
       if (nextTodo) {
         list?.items?.push(nextTodo);
@@ -109,10 +110,9 @@ export default function TodoListScreen() {
       }
     } else {
       const nextTodo = list?.items?.find((t) => t?.id === todo.nextTodoID);
-      await todo.scheduleNotifications();
       if (nextTodo) {
-        console.log('nextTodo', nextTodo);
         await nextTodo.cancelAndDelete();
+        await todo.scheduleNotifications();
       }
     }
   };
