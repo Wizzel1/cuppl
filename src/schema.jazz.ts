@@ -148,12 +148,6 @@ export class UserProfile extends Profile {
     return { errors };
   }
 }
-
-/**
- * Main account class for the Couple app.
- * Contains only the profile and root properties.
- * Handles data initialization and migrations.
- */
 export class CoupleAccount extends Account {
   profile = co.ref(UserProfile);
   root = co.ref(CoupleAccountRoot);
