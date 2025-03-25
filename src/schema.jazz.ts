@@ -154,11 +154,10 @@ async function scheduleNotification(
       channelId: 'default',
       date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
     };
-    const notification = await Notifications.scheduleNotificationAsync({
+    return Notifications.scheduleNotificationAsync({
       content: { title, body },
       trigger,
     });
-    return notification;
   } catch (error) {
     console.log(error);
   }
