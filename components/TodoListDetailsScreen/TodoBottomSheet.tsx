@@ -350,12 +350,12 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   };
 
   const screenHeight = useMemo(() => {
-    let height = 300;
+    let height = 250;
     if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
       height = 500;
     }
     if (showHideFromPartner) height += 50;
-    if (hasDueDate) height += 150;
+    if (hasDueDate) height += 200;
     return height;
   }, [activeScreen, showHideFromPartner, hasDueDate]);
 
@@ -435,13 +435,14 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
                   value={getAlertDisplayText(secondAlertOption)}
                   onPress={() => setActiveScreen('secondAlert')}
                 />
+                <OptionSection
+                  label="Repeat"
+                  value={repeatMode ? repeatMode : 'Never'}
+                  onPress={() => setActiveScreen('repeat')}
+                />
               </>
             )}
-            <OptionSection
-              label="Repeat"
-              value={repeatMode ? repeatMode : 'Never'}
-              onPress={() => setActiveScreen('repeat')}
-            />
+
             <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
           </>
         )}
