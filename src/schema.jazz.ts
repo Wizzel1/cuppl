@@ -1,3 +1,4 @@
+import * as Notifications from 'expo-notifications';
 import { useAccount, useCoState } from 'jazz-react-native';
 import {
   Account,
@@ -32,7 +33,6 @@ export class PartnerProfile extends CoMap {
 
 export class TodoItem extends CoMap {
   title = co.string;
-  description = co.optional.string;
   completed = co.boolean;
   dueDate = co.optional.Date;
   notes = co.optional.string;
@@ -46,6 +46,52 @@ export class TodoItem extends CoMap {
   alertOptionMinutes = co.optional.number;
   secondAlertNotificationID = co.optional.string;
   secondAlertOptionMinutes = co.optional.number;
+
+  async scheduleNotifications() {
+    if (!this.dueDate) return;
+    if (this.alertOptionMinutes) {
+      if (this.alertNotificationID) await cancelNotification(this.alertNotificationID);
+      const id = await scheduleNotification(
+        this.alertOptionMinutes,
+        this.dueDate,
+        this.title,
+        `${this.title} is due in ${this.alertOptionMinutes} minutes`
+      );
+      this.alertNotificationID = id;
+    }
+    if (this.secondAlertOptionMinutes) {
+      if (this.secondAlertNotificationID) await cancelNotification(this.secondAlertNotificationID);
+      const id = await scheduleNotification(
+        this.secondAlertOptionMinutes,
+        this.dueDate,
+        this.title,
+        `${this.title} is due in ${this.secondAlertOptionMinutes} minutes`
+      );
+      this.secondAlertNotificationID = id;
+    }
+  }
+}
+
+async function cancelNotification(notificationID: string) {
+  await Notifications.cancelScheduledNotificationAsync(notificationID);
+}
+
+async function scheduleNotification(
+  minutesBefore: number,
+  dueDate: Date,
+  title: string,
+  body: string
+) {
+  const trigger = {
+    type: 'date',
+    channelId: 'default',
+    date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
+  };
+  const notification = await Notifications.scheduleNotificationAsync({
+    content: { title, body },
+    trigger,
+  });
+  return notification;
 }
 
 export class TodoItems extends CoList.Of(co.ref(TodoItem)) {}

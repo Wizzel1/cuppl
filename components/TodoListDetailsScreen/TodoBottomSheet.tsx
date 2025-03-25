@@ -212,30 +212,6 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
   );
 };
 
-async function scheduleNotification(
-  minutesBefore: number,
-  dueDate: Date,
-  title: string,
-  body: string,
-  previousID: string | null
-) {
-  if (previousID) await cancelNotification(previousID);
-  const trigger = {
-    type: 'date',
-    channelId: 'default',
-    date: new Date(dueDate.getTime() - minutesBefore * 60 * 1000),
-  };
-  const notification = await Notifications.scheduleNotificationAsync({
-    content: { title, body },
-    trigger,
-  });
-  return notification;
-}
-
-async function cancelNotification(notificationID: string) {
-  await Notifications.cancelScheduledNotificationAsync(notificationID);
-}
-
 const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
   const { onCreate, defaultAssignedTo, toUpdate, onDismiss } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
@@ -259,9 +235,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       setHasDueDate(toUpdate.dueDate !== null);
       if (toUpdate.dueDate) setDueDate(toUpdate.dueDate);
       setHasDueDate(toUpdate.dueDate !== null);
-      setAlertNotificationID(toUpdate.alertNotificationID ?? null);
       setAlertOption(toUpdate.alertOptionMinutes ?? null);
-      setSecondAlertNotificationID(toUpdate.secondAlertNotificationID ?? null);
       setSecondAlertOption(toUpdate.secondAlertOptionMinutes ?? null);
       // setRepeatMode(toUpdate.repeatMode);
       // setPhotoUri(toUpdate.photoUri);
@@ -275,31 +249,17 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
 
   const [title, setTitle] = useState(toUpdate?.title ?? '');
 
-  // Due date state
   const [hasDueDate, setHasDueDate] = useState(toUpdate?.dueDate !== null);
   const [dueDate, setDueDate] = useState<Date>(toUpdate?.dueDate ?? new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Alert state
-  const [alertNotificationID, setAlertNotificationID] = useState<string | null>(
-    toUpdate?.alertNotificationID ?? null
-  );
   const [alertOption, setAlertOption] = useState<number | null>(null);
-
-  // Second alert state
-  const [secondAlertNotificationID, setSecondAlertNotificationID] = useState<string | null>(
-    toUpdate?.secondAlertNotificationID ?? null
-  );
   const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
-
-  // Repeat state
   const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
 
-  // Photo state
   const [photoUri, setPhotoUri] = useState<string | null>(null);
 
-  // Alert and repeat options
   const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
   const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
 
@@ -325,46 +285,18 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
     }
   }, []);
 
-  // Handlers
   const handleSubmit = () => {
     if (!onCreate) return;
-    let alertID: string | null = null;
-    let secondAlertID: string | null = null;
-
-    if (alertOption) {
-      scheduleNotification(
-        alertOption,
-        dueDate,
-        `Reminder for ${title}`,
-        `${title} is due in ${alertOption} minutes`,
-        alertNotificationID
-      ).then((id) => {
-        alertID = id;
-      });
-    }
-
-    if (secondAlertOption) {
-      scheduleNotification(
-        secondAlertOption,
-        dueDate,
-        `Reminder for ${title}`,
-        `${title} is due in ${secondAlertOption} minutes`,
-        secondAlertNotificationID
-      ).then((id) => {
-        secondAlertID = id;
-      });
-    }
 
     if (toUpdate) {
       toUpdate.title = title.trim();
       toUpdate.dueDate = hasDueDate ? dueDate : undefined;
       toUpdate.assignedTo = assignedTo;
       toUpdate.isHidden = hideFromPartner;
-      toUpdate.alertNotificationID = alertID ?? undefined;
-      toUpdate.alertOptionMinutes = alertOption ?? undefined;
-      toUpdate.secondAlertNotificationID = secondAlertID ?? undefined;
-      toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.recurringUnit = repeatMode ?? undefined;
+      toUpdate.alertOptionMinutes = alertOption ?? undefined;
+      toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
+      toUpdate.scheduleNotifications();
     } else {
       const newTodo = TodoRepo.createTodo({
         me,
@@ -374,13 +306,13 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
         deleted: false,
         isHidden: hideFromPartner,
         assignedTo,
-        alertNotificationID: alertID ?? null,
-        alertOptionMinutes: alertOption,
-        secondAlertNotificationID: secondAlertID ?? null,
-        secondAlertOptionMinutes: secondAlertOption,
         recurringUnit: repeatMode ?? undefined,
+        alertOptionMinutes: alertOption ?? undefined,
+        secondAlertOptionMinutes: secondAlertOption ?? undefined,
       });
-      onCreate(newTodo);
+      newTodo.scheduleNotifications().then(() => {
+        onCreate(newTodo);
+      });
     }
 
     if (ref && 'current' in ref) {
@@ -397,25 +329,13 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   }, []);
 
   const selectAlertOption = (minutes: number) => {
-    scheduleNotification(
-      minutes,
-      dueDate,
-      `Reminder for ${title}`,
-      `${title} is due in ${minutes} minutes`,
-      alertNotificationID
-    ).then((id) => {
-      console.log('scheduled alert notification', id);
-      setAlertNotificationID(id);
-      setAlertOption(minutes);
-      setActiveScreen('todo');
-    });
+    setAlertOption(minutes);
+    setActiveScreen('todo');
   };
 
   const selectSecondAlertOption = (minutes: number) => {
-    throw new Error('Not implemented');
-    // setSecondAlertOption(minutes);
-    // setSecondAlertNotificationID(minutes !== null ? 'uuidv4() ' : null);
-    // setActiveScreen('todo');
+    setSecondAlertOption(minutes);
+    setActiveScreen('todo');
   };
 
   const selectRepeatOption = (option: TodoItem['recurringUnit']) => {

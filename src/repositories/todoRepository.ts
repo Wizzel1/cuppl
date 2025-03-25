@@ -8,11 +8,9 @@ function createTodo(args: {
   deleted: boolean;
   isHidden: boolean;
   assignedTo: TodoItem['assignedTo'];
-  alertNotificationID: string | null;
-  alertOptionMinutes: number | null;
-  secondAlertNotificationID: string | null;
-  secondAlertOptionMinutes: number | null;
   recurringUnit: TodoItem['recurringUnit'];
+  alertOptionMinutes: number | null | undefined;
+  secondAlertOptionMinutes: number | null | undefined;
 }) {
   const couple = args.me.root?.couple;
   if (!couple) throw new Error('No couple found');
@@ -28,11 +26,9 @@ function createTodo(args: {
       deleted: false,
       isHidden: args.isHidden,
       dueDate: args.dueDate ? args.dueDate : null,
-      alertNotificationID: args.alertNotificationID,
-      alertOptionMinutes: args.alertOptionMinutes,
-      secondAlertNotificationID: args.secondAlertNotificationID,
-      secondAlertOptionMinutes: args.secondAlertOptionMinutes,
       recurringUnit: args.recurringUnit,
+      alertOptionMinutes: args.alertOptionMinutes,
+      secondAlertOptionMinutes: args.secondAlertOptionMinutes,
     },
     { owner: args.isHidden ? args.me : coupleGroup }
   );
