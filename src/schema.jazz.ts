@@ -63,7 +63,7 @@ export class TodoItem extends CoMap {
 
   async scheduleNotifications() {
     if (!this.dueDate) return;
-    if (this.alertOptionMinutes) {
+    if (this.alertOptionMinutes !== undefined) {
       if (this.alertNotificationID) await cancelNotification(this.alertNotificationID);
       const id = await scheduleNotification(
         this.alertOptionMinutes,
@@ -73,7 +73,7 @@ export class TodoItem extends CoMap {
       );
       this.alertNotificationID = id;
     }
-    if (this.secondAlertOptionMinutes) {
+    if (this.secondAlertOptionMinutes !== undefined) {
       if (this.secondAlertNotificationID) await cancelNotification(this.secondAlertNotificationID);
       const id = await scheduleNotification(
         this.secondAlertOptionMinutes,
