@@ -3,7 +3,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -20,32 +20,25 @@ export default function TodoListScreen() {
   const todoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const [completedTodos, setCompletedTodos] = useState(0);
-  const [totalTodos, setTotalTodos] = useState(0);
-
-  const [assignedToMe, setAssignedToMe] = useState<TodoItem[]>([]);
-  const [assignedToPartner, setAssignedToPartner] = useState<TodoItem[]>([]);
-  const [assignedToBoth, setAssignedToBoth] = useState<TodoItem[]>([]);
-
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
-  useEffect(() => {
-    if (list?.items) {
+  const { assignedToMe, assignedToPartner, assignedToBoth, completedTodos, totalTodos } =
+    useMemo(() => {
       const assignedToMe: TodoItem[] = [];
       const assignedToPartner: TodoItem[] = [];
       const assignedToBoth: TodoItem[] = [];
-      let completed = 0;
-      let total = 0;
+      let completedTodos = 0;
+      let totalTodos = 0;
 
       const myAccID = myProfile?.accountId;
       const partnerAccID = partnerProfile?.accountId;
 
-      for (const item of list.items) {
+      for (const item of list?.items ?? []) {
         if (item?.deleted) continue;
         if (item?.completed) {
-          completed++;
+          completedTodos++;
         }
-        total++;
+        totalTodos++;
         if (item?.assignedTo === 'me') {
           if (item.creatorAccID === myAccID) {
             assignedToMe.push(item);
@@ -62,14 +55,8 @@ export default function TodoListScreen() {
           assignedToBoth.push(item);
         }
       }
-
-      setAssignedToMe(assignedToMe);
-      setAssignedToPartner(assignedToPartner);
-      setAssignedToBoth(assignedToBoth);
-      setCompletedTodos(completed);
-      setTotalTodos(total);
-    }
-  }, [list?.items]);
+      return { assignedToMe, assignedToPartner, assignedToBoth, completedTodos, totalTodos };
+    }, [list?.items]);
 
   const handleToggle = (title: string) => {
     setExpandedSections((expandedSections) => {
@@ -112,7 +99,7 @@ export default function TodoListScreen() {
     console.log('Editing todo:', todo);
   };
 
-  const handleToggleTodo = (todo: TodoItem) => {
+  const handleToggleTodo = useCallback((todo: TodoItem) => {
     todo.completed = !todo.completed;
     if (todo.completed) {
       const nextTodo = todo.tryCreateNextTodo();
@@ -123,7 +110,7 @@ export default function TodoListScreen() {
     } else {
       todo.tryCreateNextTodo();
     }
-  };
+  }, []);
 
   return (
     <>
