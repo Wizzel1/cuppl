@@ -56,7 +56,7 @@
     "react-native-web": "~0.19.10",
     "readable-stream": "^4.7.0",
     "rn-emoji-keyboard": "^1.7.0",
-    "zeego": "^3.0.5"
+    "zeego": "^3.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
