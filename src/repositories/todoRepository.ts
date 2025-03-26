@@ -1,3 +1,5 @@
+import { ImageDefinition } from 'jazz-tools';
+
 import { CoupleAccount, TodoItem } from '../schema.jazz';
 
 function createTodo(args: {
@@ -11,6 +13,7 @@ function createTodo(args: {
   recurringUnit: TodoItem['recurringUnit'];
   alertOptionMinutes: number | null | undefined;
   secondAlertOptionMinutes: number | null | undefined;
+  photo: ImageDefinition | null;
 }) {
   const couple = args.me.root?.couple;
   if (!couple) throw new Error('No couple found');
