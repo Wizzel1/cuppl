@@ -11,9 +11,9 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import * as Notifications from 'expo-notifications';
-import { ProgressiveImg, useAccount } from 'jazz-react-native';
+import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
-import { ImageDefinition } from 'jazz-tools';
+import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
@@ -28,7 +28,6 @@ import {
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
-import * as TodoRepo from '~/src/repositories/todoRepository';
 import { TodoItem, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
@@ -222,7 +221,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   }, []);
   const { me } = useAccount();
   const couple = useCouple();
-
+  const photo = useCoState(ImageDefinition, toUpdate?.photo?.id as ID<ImageDefinition>);
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
@@ -262,10 +261,10 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       setHasDueDate(toUpdate.dueDate !== null);
       setAlertOption(toUpdate.alertOptionMinutes ?? null);
       setSecondAlertOption(toUpdate.secondAlertOptionMinutes ?? null);
-      setImageDefinition(toUpdate.photo ?? null);
+      setImageDefinition(photo ?? null);
       // setRepeatMode(toUpdate.repeatMode);
     }
-  }, [toUpdate]);
+  }, [toUpdate, photo?.id]);
 
   useEffect(() => {
     setAssignedTo(defaultAssignedTo ?? 'me');
@@ -322,19 +321,22 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       toUpdate.photo = imageDefinition;
       toUpdate.scheduleNotifications();
     } else {
-      const newTodo = TodoRepo.createTodo({
-        me,
-        title,
-        dueDate: hasDueDate ? dueDate : null,
-        completed: false,
-        deleted: false,
-        isHidden: hideFromPartner,
-        assignedTo,
-        recurringUnit: repeatMode ?? undefined,
-        alertOptionMinutes: alertOption ?? undefined,
-        secondAlertOptionMinutes: secondAlertOption ?? undefined,
-        photo: imageDefinition,
-      });
+      const newTodo = TodoItem.create(
+        {
+          title,
+          creatorAccID: me.id,
+          dueDate: hasDueDate ? dueDate : null,
+          completed: false,
+          deleted: false,
+          isHidden: hideFromPartner,
+          assignedTo,
+          recurringUnit: repeatMode ?? undefined,
+          alertOptionMinutes: alertOption ?? undefined,
+          secondAlertOptionMinutes: secondAlertOption ?? undefined,
+          photo: imageDefinition,
+        },
+        { owner: hideFromPartner ? me : couple!._owner }
+      );
       newTodo.scheduleNotifications().then(() => {
         onCreate(newTodo);
       });
