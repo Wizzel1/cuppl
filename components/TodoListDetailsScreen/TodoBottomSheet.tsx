@@ -9,8 +9,11 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import * as Notifications from 'expo-notifications';
-import { useAccount } from 'jazz-react-native';
+import { ProgressiveImg, useAccount } from 'jazz-react-native';
+import { createImage } from 'jazz-react-native-media-images';
+import { ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
@@ -26,7 +29,7 @@ import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
 import * as TodoRepo from '~/src/repositories/todoRepository';
-import { TodoItem } from '~/src/schema.jazz';
+import { TodoItem, useCouple } from '~/src/schema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 Notifications.setNotificationHandler({
@@ -108,17 +111,21 @@ const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
 );
 
 type PhotoSectionProps = {
-  photoUri: string | null;
+  image: ImageDefinition | null;
   onPress: () => void;
 };
 
-const PhotoSection = ({ photoUri, onPress }: PhotoSectionProps) => (
+const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
   <View style={styles.sectionContainer}>
     <View style={styles.rowBetween}>
       <Text style={styles.sectionLabel}>Photo</Text>
       <Pressable style={styles.photoButton} onPress={onPress}>
-        {photoUri ? (
-          <Image source={{ uri: photoUri }} style={styles.photoImage} />
+        {image ? (
+          <ProgressiveImg image={image} maxWidth={1024}>
+            {({ src, res, originalSize }) => (
+              <Image source={{ uri: src }} style={styles.photoImage} />
+            )}
+          </ProgressiveImg>
         ) : (
           <Ionicons name="image-outline" size={20} color="#71717B" />
         )}
@@ -214,13 +221,36 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
   }, []);
   const { me } = useAccount();
+  const couple = useCouple();
 
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
+  const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
   const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
   const [showHideFromPartner, setShowHideFromPartner] = useState(true);
   const [hideFromPartner, setHideFromPartner] = useState(false);
+
+  const handleImageUpload = async () => {
+    try {
+      if (!couple) return;
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        base64: true, // Important: We need base64 data
+        quality: 0.8,
+      });
+      if (!result.canceled && result.assets[0].base64) {
+        const base64Uri = `data:image/jpeg;base64,${result.assets[0].base64}`;
+        const image = await createImage(base64Uri, {
+          owner: couple._owner, // Set appropriate owner
+          maxSize: 2048, // Optional: limit maximum image size
+        });
+        setImageDefinition(image);
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+    }
+  };
 
   useEffect(() => {
     if (toUpdate) {
@@ -232,8 +262,8 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       setHasDueDate(toUpdate.dueDate !== null);
       setAlertOption(toUpdate.alertOptionMinutes ?? null);
       setSecondAlertOption(toUpdate.secondAlertOptionMinutes ?? null);
+      setImageDefinition(toUpdate.photo ?? null);
       // setRepeatMode(toUpdate.repeatMode);
-      // setPhotoUri(toUpdate.photoUri);
     }
   }, [toUpdate]);
 
@@ -252,8 +282,6 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   const [alertOption, setAlertOption] = useState<number | null>(null);
   const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
   const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
-
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
 
   const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
   const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
@@ -291,6 +319,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       toUpdate.recurringUnit = repeatMode ?? undefined;
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
+      toUpdate.photo = imageDefinition;
       toUpdate.scheduleNotifications();
     } else {
       const newTodo = TodoRepo.createTodo({
@@ -304,6 +333,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
         recurringUnit: repeatMode ?? undefined,
         alertOptionMinutes: alertOption ?? undefined,
         secondAlertOptionMinutes: secondAlertOption ?? undefined,
+        photo: imageDefinition,
       });
       newTodo.scheduleNotifications().then(() => {
         onCreate(newTodo);
@@ -338,14 +368,8 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
     setActiveScreen('todo');
   };
 
-  const handleSelectPhoto = () => {
-    // In a real app, this would integrate with image picker
-    // For this mockup, we'll just set a placeholder image
-    setPhotoUri('https://via.placeholder.com/150');
-  };
-
   const screenHeight = useMemo(() => {
-    let height = 250;
+    let height = 280;
     if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
       height = 500;
     }
@@ -438,7 +462,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
               </>
             )}
 
-            <PhotoSection photoUri={photoUri} onPress={handleSelectPhoto} />
+            <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
           </>
         )}
 
@@ -556,8 +580,8 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     backgroundColor: '#F4F4F5',
-    width: 40,
-    height: 40,
+    width: 70,
+    height: 70,
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
