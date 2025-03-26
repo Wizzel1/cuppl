@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { ID } from 'jazz-tools';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -12,13 +12,7 @@ import { DefaultTodoList, TodoList, useCouple, usePartnerProfiles } from '~/src/
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const [myDefaultListId, setMyDefaultListId] = useState<string | null>(null);
-  const [partnerDefaultListId, setPartnerDefaultListId] = useState<string | null>(null);
-  const [sharedDefaultListId, setSharedDefaultListId] = useState<string | null>(null);
 
-  const [myLists, setMyLists] = useState<TodoList[]>([]);
-  const [partnerLists, setPartnerLists] = useState<TodoList[]>([]);
-  const [sharedLists, setSharedLists] = useState<TodoList[]>([]);
   const [toUpdate, setToUpdate] = useState<TodoList | null>(null);
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
@@ -53,47 +47,70 @@ export default function Todos() {
   //     { owner: couple._owner }
   //   );
   // }, []);
+  const { myDefaultListId, partnerDefaultListId, sharedDefaultListId } = useMemo(() => {
+    const empty = { myDefaultListId: null, partnerDefaultListId: null, sharedDefaultListId: null };
+    if (!couple) return empty;
+    if (!myProfile?.accountId || !partnerProfile?.accountId) return empty;
+    const myAccountId = myProfile.accountId;
 
-  useEffect(() => {
-    if (!couple?.todoLists) return;
-    if (!myProfile?.accountId || !partnerProfile?.accountId) return;
+    if (myAccountId === couple.partnerA?.accountId) {
+      return {
+        myDefaultListId: couple.partnerATodos?.id ?? null,
+        partnerDefaultListId: couple.partnerBTodos?.id ?? null,
+        sharedDefaultListId: couple.ourTodos?.id ?? null,
+      };
+    } else {
+      return {
+        myDefaultListId: couple.partnerBTodos?.id ?? null,
+        partnerDefaultListId: couple.partnerATodos?.id ?? null,
+        sharedDefaultListId: couple.ourTodos?.id ?? null,
+      };
+    }
+  }, [
+    couple?.partnerA?.id,
+    couple?.partnerB?.id,
+    couple?.ourTodos,
+    couple?.partnerATodos,
+    couple?.partnerBTodos,
+    myProfile?.accountId,
+    partnerProfile?.accountId,
+  ]);
+
+  const { myLists, partnerLists, sharedLists } = useMemo(() => {
+    const empty = { myLists: [], partnerLists: [], sharedLists: [] };
+    if (!couple?.todoLists) return empty;
+    if (!myProfile?.accountId || !partnerProfile?.accountId) return empty;
     const myAccountId = myProfile.accountId;
     const partnerAccountId = partnerProfile.accountId;
 
-    const myListsArray: TodoList[] = [];
-    const partnerListsArray: TodoList[] = [];
-    const sharedListsArray: TodoList[] = [];
-
-    if (myAccountId === couple.partnerA?.accountId) {
-      setMyDefaultListId(couple.partnerATodos?.id ?? null);
-      setPartnerDefaultListId(couple.partnerBTodos?.id ?? null);
-    } else {
-      setMyDefaultListId(couple.partnerBTodos?.id ?? null);
-      setPartnerDefaultListId(couple.partnerATodos?.id ?? null);
-    }
-    setSharedDefaultListId(couple.ourTodos?.id ?? null);
+    const myLists: TodoList[] = [];
+    const partnerLists: TodoList[] = [];
+    const sharedLists: TodoList[] = [];
 
     for (const list of couple.todoLists) {
-      if (!list) return;
+      if (!list) continue;
       if (list.deleted) continue;
       switch (list.assignedTo) {
         case 'me':
-          if (list.creatorAccID === myAccountId) myListsArray.push(list);
-          if (list.creatorAccID === partnerAccountId) partnerListsArray.push(list);
+          if (list.creatorAccID === myAccountId) myLists.push(list);
+          if (list.creatorAccID === partnerAccountId) partnerLists.push(list);
           break;
         case 'partner':
-          if (list.creatorAccID === myAccountId) partnerListsArray.push(list);
-          if (list.creatorAccID === partnerAccountId) myListsArray.push(list);
+          if (list.creatorAccID === myAccountId) partnerLists.push(list);
+          if (list.creatorAccID === partnerAccountId) myLists.push(list);
           break;
         case 'us':
-          sharedListsArray.push(list);
+          sharedLists.push(list);
           break;
       }
     }
-    setMyLists(myListsArray);
-    setPartnerLists(partnerListsArray);
-    setSharedLists(sharedListsArray);
-  }, [couple, myProfile?.accountId, partnerProfile?.accountId]);
+
+    return {
+      myLists,
+      partnerLists,
+      sharedLists,
+    };
+  }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
 
   const onItemPress = useCallback((listId: string) => {
     router.push({
