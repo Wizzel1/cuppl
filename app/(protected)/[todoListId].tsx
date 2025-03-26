@@ -32,7 +32,6 @@ export default function TodoListScreen() {
 
       const myAccID = myProfile?.accountId;
       const partnerAccID = partnerProfile?.accountId;
-
       for (const item of list?.items ?? []) {
         if (item?.deleted) continue;
         if (item?.completed) {
