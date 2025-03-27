@@ -117,6 +117,28 @@ export class TodoList extends CoMap {
   creatorAccID = co.string;
   assignedTo = co.literal('me', 'partner', 'us');
   deleted = co.boolean;
+
+  get liveItems() {
+    const items = [];
+    for (const item of this.items ?? []) {
+      if (item?.deleted === undefined) continue;
+      if (item?.deleted) continue;
+      items.push(item);
+    }
+    return items;
+  }
+
+  get completedItems() {
+    const items = [];
+    for (const item of this.items ?? []) {
+      if (item?.deleted) continue;
+      if (item?.completed === undefined) continue;
+      if (item?.completed) {
+        items.push(item);
+      }
+    }
+    return items;
+  }
 }
 
 export class TodoLists extends CoList.Of(co.ref(TodoList)) {}
