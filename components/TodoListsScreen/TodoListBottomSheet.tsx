@@ -38,7 +38,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
 
   return (
     <BottomSheetTextInput
-      placeholder="New Todo"
+      placeholder="New Todo List"
       style={{
         fontSize: 24,
         fontWeight: '600',
