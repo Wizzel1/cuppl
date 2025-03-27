@@ -1,6 +1,6 @@
 import { co, CoMap } from 'jazz-tools';
 
-class Test extends CoMap {
+class ShoppingItem extends CoMap {
   name = co.string;
   age = co.number;
 }
