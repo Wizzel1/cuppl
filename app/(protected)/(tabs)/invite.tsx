@@ -3,7 +3,7 @@ import { useAcceptInvite, useAccount } from 'jazz-react-native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Button, Linking, StyleSheet, Text, View } from 'react-native';
 
-import { Couple } from '~/src/schema.jazz';
+import { Couple } from '~/src/schemas/schema.jazz';
 
 export default function HandleInviteScreen() {
   const router = useRouter();

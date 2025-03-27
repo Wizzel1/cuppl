@@ -6,7 +6,7 @@ import * as DropdownMenu from 'zeego/dropdown-menu';
 
 import TodoListItem from './TodoListItem';
 
-import { TodoItem } from '~/src/schema.jazz';
+import { TodoItem } from '~/src/schemas/todoSchema';
 
 const _entering = FadeInDown.damping(50).stiffness(200);
 const _exiting = FadeOutDown.springify(200).damping(50).stiffness(100);

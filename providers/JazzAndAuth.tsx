@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/clerk-expo';
 import { JazzProviderWithClerk } from 'jazz-react-native-auth-clerk';
 import { PropsWithChildren } from 'react';
 
-import { CoupleAccount } from '~/src/schema.jazz';
+import { CoupleAccount } from '~/src/schemas/schema.jazz';
 
 export function JazzAndAuth({ children }: PropsWithChildren) {
   const clerk = useClerk();

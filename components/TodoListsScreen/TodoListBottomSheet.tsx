@@ -16,7 +16,8 @@ import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
-import { TodoList, useCouple } from '~/src/schema.jazz';
+import { useCouple } from '~/src/schemas/schema.jazz';
+import { TodoList } from '~/src/schemas/todoSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
 interface TodoListBottomSheetProps {

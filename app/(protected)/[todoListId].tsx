@@ -10,7 +10,8 @@ import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoBottomSheet from '~/components/TodoListDetailsScreen/TodoBottomSheet';
 import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
 import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
-import { TodoItem, TodoList, usePartnerProfiles } from '~/src/schema.jazz';
+import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { TodoItem, TodoList } from '~/src/schemas/todoSchema';
 
 export default function TodoListScreen() {
   const { todoListId } = useLocalSearchParams<{ todoListId: string }>();

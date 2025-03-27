@@ -6,7 +6,7 @@ import { Dimensions, Image, Pressable, StatusBar, StyleSheet, Text, View } from 
 import EmojiPicker, { type EmojiType } from 'rn-emoji-keyboard';
 
 import PartnerAvatar from '~/components/PartnerAvatar';
-import { PartnerProfile, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import { PartnerProfile, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 
 export default function Index() {
   const couple = useCouple();
