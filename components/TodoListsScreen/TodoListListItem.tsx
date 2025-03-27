@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProgressiveImg, useCoState } from 'jazz-react-native';
 import { ID, ImageDefinition } from 'jazz-tools';
-import { memo, useMemo, useState } from 'react';
+import { memo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -58,21 +58,9 @@ function TodoListListItem({
   disableSwipe?: boolean;
 }) {
   const list = useCoState(TodoList, listId as ID<TodoList>, { items: [{}] });
+  const completedItemsCount = list?.completedItems.length ?? 0;
+  const totalItemsCount = list?.liveItems.length ?? 0;
   const [isOpen, setIsOpen] = useState(false);
-
-  const { total, completed } = useMemo(() => {
-    let total = 0;
-    let completed = 0;
-
-    if (!list) return { total, completed };
-    for (const todo of list.items) {
-      if (todo.deleted) continue;
-      total++;
-      if (todo.completed) completed++;
-    }
-
-    return { total, completed };
-  }, [list?.items]);
 
   return (
     <GestureHandlerRootView>
@@ -116,7 +104,7 @@ function TodoListListItem({
                   {title}
                 </Text>
                 <Text style={styles.subtitleText}>
-                  {completed} / {total}
+                  {completedItemsCount} / {totalItemsCount}
                 </Text>
               </View>
               {list?.isHidden && (

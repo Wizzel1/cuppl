@@ -20,43 +20,39 @@ export default function TodoListScreen() {
   const { partnerProfile, myProfile } = usePartnerProfiles();
   const todoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
+  const completedItemsCount = list?.completedItems.length ?? 0;
+  const totalItemsCount = list?.liveItems.length ?? 0;
 
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
-  const { assignedToMe, assignedToPartner, assignedToBoth, completedTodos, totalTodos } =
-    useMemo(() => {
-      const assignedToMe: TodoItem[] = [];
-      const assignedToPartner: TodoItem[] = [];
-      const assignedToBoth: TodoItem[] = [];
-      let completedTodos = 0;
-      let totalTodos = 0;
+  const { assignedToMe, assignedToPartner, assignedToBoth } = useMemo(() => {
+    const assignedToMe: TodoItem[] = [];
+    const assignedToPartner: TodoItem[] = [];
+    const assignedToBoth: TodoItem[] = [];
 
-      const myAccID = myProfile?.accountId;
-      const partnerAccID = partnerProfile?.accountId;
-      for (const item of list?.items ?? []) {
-        if (item?.deleted) continue;
-        if (item?.completed) {
-          completedTodos++;
+    const myAccID = myProfile?.accountId;
+    const partnerAccID = partnerProfile?.accountId;
+    for (const item of list?.items ?? []) {
+      if (item?.deleted) continue;
+
+      if (item?.assignedTo === 'me') {
+        if (item.creatorAccID === myAccID) {
+          assignedToMe.push(item);
+        } else {
+          assignedToPartner.push(item);
         }
-        totalTodos++;
-        if (item?.assignedTo === 'me') {
-          if (item.creatorAccID === myAccID) {
-            assignedToMe.push(item);
-          } else {
-            assignedToPartner.push(item);
-          }
-        } else if (item?.assignedTo === 'partner') {
-          if (item.creatorAccID === partnerAccID) {
-            assignedToMe.push(item);
-          } else {
-            assignedToPartner.push(item);
-          }
-        } else if (item?.assignedTo === 'us') {
-          assignedToBoth.push(item);
+      } else if (item?.assignedTo === 'partner') {
+        if (item.creatorAccID === partnerAccID) {
+          assignedToMe.push(item);
+        } else {
+          assignedToPartner.push(item);
         }
+      } else if (item?.assignedTo === 'us') {
+        assignedToBoth.push(item);
       }
-      return { assignedToMe, assignedToPartner, assignedToBoth, completedTodos, totalTodos };
-    }, [list?.items]);
+    }
+    return { assignedToMe, assignedToPartner, assignedToBoth };
+  }, [list?.items]);
 
   const handleToggle = (title: string) => {
     setExpandedSections((expandedSections) => {
@@ -87,11 +83,11 @@ export default function TodoListScreen() {
           {titleSubstring} {titleRemaining ? '...' : ''}
         </Text>
         <Text style={styles.headerSubtitle}>
-          {completedTodos} / {totalTodos} completed
+          {completedItemsCount} / {totalItemsCount} completed
         </Text>
       </View>
     );
-  }, [completedTodos, totalTodos, list?.title]);
+  }, [list?.title, completedItemsCount, totalItemsCount]);
 
   const handleEditTodo = (todo: TodoItem) => {
     setEditingTodo(todo);
@@ -139,7 +135,9 @@ export default function TodoListScreen() {
               <View
                 style={[
                   styles.progressBar,
-                  { width: `${totalTodos > 0 ? (completedTodos / totalTodos) * 100 : 0}%` },
+                  {
+                    width: `${totalItemsCount > 0 ? (completedItemsCount / totalItemsCount) * 100 : 0}%`,
+                  },
                 ]}
               />
             </View>

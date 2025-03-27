@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     paddingVertical: 12,
     paddingHorizontal: 24,
+    height: 48,
   },
   rowContainer: {
     flexDirection: 'row',
