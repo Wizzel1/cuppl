@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProgressiveImg, useCoState } from 'jazz-react-native';
 import { ID, ImageDefinition } from 'jazz-tools';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -57,7 +57,18 @@ function TodoListListItem({
   onEdit?: () => void;
   disableSwipe?: boolean;
 }) {
-  const list = useCoState(TodoList, listId as ID<TodoList>, { items: [{}] });
+  const list = useCoState(TodoList, listId as ID<TodoList>);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!list?.id) return;
+    if (isLoaded) return;
+    setIsLoaded(false);
+    list?.ensureLoaded({ items: [{}] }).then(() => {
+      setIsLoaded(true);
+    });
+  }, [list?.id]);
+
   const completedItemsCount = list?.completedItems.length ?? 0;
   const totalItemsCount = list?.liveItems.length ?? 0;
   const [isOpen, setIsOpen] = useState(false);
@@ -103,9 +114,13 @@ function TodoListListItem({
                 <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleText}>
                   {title}
                 </Text>
-                <Text style={styles.subtitleText}>
-                  {completedItemsCount} / {totalItemsCount}
-                </Text>
+                {isLoaded ? (
+                  <Text style={styles.subtitleText}>
+                    {completedItemsCount} / {totalItemsCount}
+                  </Text>
+                ) : (
+                  <Text style={styles.subtitleText}>Syncing with partner...</Text>
+                )}
               </View>
               {list?.isHidden && (
                 <MaterialCommunityIcons name="eye-off" size={20} color="#A1A1AA" />
