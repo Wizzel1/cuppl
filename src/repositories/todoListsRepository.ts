@@ -1,4 +1,5 @@
-import { CoupleAccount, TodoItems, TodoList } from '../schemas/schema.jazz';
+import { CoupleAccount } from '../schemas/schema.jazz';
+import { TodoItems, TodoList } from '../schemas/todoSchema';
 
 function createTodoList(args: {
   me: CoupleAccount;
