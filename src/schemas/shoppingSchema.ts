@@ -34,3 +34,5 @@ export class ShoppingList extends CoMap {
     return items;
   }
 }
+
+export class ShoppingLists extends CoList.Of(co.ref(ShoppingList)) {}
