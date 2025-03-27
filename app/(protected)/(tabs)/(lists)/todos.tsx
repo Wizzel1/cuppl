@@ -7,7 +7,8 @@ import { SectionList, StyleSheet, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
 import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
-import { DefaultTodoList, TodoList, useCouple, usePartnerProfiles } from '~/src/schema.jazz';
+import { useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { DefaultTodoList, TodoList } from '~/src/schemas/todoSchema';
 
 export default function Todos() {
   const { myProfile, partnerProfile } = usePartnerProfiles();

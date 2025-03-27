@@ -28,7 +28,8 @@ import {
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
-import { TodoItem, useCouple } from '~/src/schema.jazz';
+import { useCouple } from '~/src/schemas/schema.jazz';
+import { TodoItem } from '~/src/schemas/todoSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
 Notifications.setNotificationHandler({

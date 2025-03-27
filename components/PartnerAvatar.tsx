@@ -4,7 +4,7 @@ import { createImage } from 'jazz-react-native-media-images';
 import { useCallback } from 'react';
 import { Image, Pressable, View } from 'react-native';
 
-import { PartnerProfile } from '~/src/schema.jazz';
+import { PartnerProfile } from '~/src/schemas/schema.jazz';
 
 export default function PartnerAvatar({ partner }: { partner?: PartnerProfile | null }) {
   const handleAvatarPress = useCallback(async () => {
