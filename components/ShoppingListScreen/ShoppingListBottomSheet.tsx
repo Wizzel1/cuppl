@@ -139,13 +139,7 @@ export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingList
         <View style={{ flex: 1 }}>
           <EmojiKeyboard
             styles={{
-              category: {
-                container: {
-                  backgroundColor: 'red',
-                },
-              },
               container: {
-                backgroundColor: 'red',
                 shadowColor: 'transparent',
                 paddingVertical: 0,
                 paddingHorizontal: 0,

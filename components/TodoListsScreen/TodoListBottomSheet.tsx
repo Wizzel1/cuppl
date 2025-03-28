@@ -128,13 +128,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
         <View style={{ flex: 1 }}>
           <EmojiKeyboard
             styles={{
-              category: {
-                container: {
-                  backgroundColor: 'red',
-                },
-              },
               container: {
-                backgroundColor: 'red',
                 shadowColor: 'transparent',
                 paddingVertical: 0,
                 paddingHorizontal: 0,
