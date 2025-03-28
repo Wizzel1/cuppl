@@ -18,11 +18,12 @@ import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
 import { useCouple } from '~/src/schemas/schema.jazz';
+import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema';
 import { TodoList } from '~/src/schemas/todoSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
-interface TodoListBottomSheetProps {
-  toUpdate: TodoList | null;
+interface ShoppingListBottomSheetProps {
+  toUpdate: ShoppingList | null;
   onDismiss?: () => void;
 }
 interface InputFieldProps {
@@ -39,7 +40,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
 
   return (
     <BottomSheetTextInput
-      placeholder="New Todo List"
+      placeholder="New Shopping List"
       style={{
         fontSize: 24,
         fontWeight: '600',
@@ -52,7 +53,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
   );
 };
 
-export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>(
+export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingListBottomSheetProps>(
   (props, ref) => {
     const { toUpdate, onDismiss } = props;
     const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
@@ -101,14 +102,24 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
           backgroundColor,
         });
       } else {
-        TodoListsRepo.createTodoList({
-          me,
-          title,
-          isHidden: hideFromPartner,
-          assignedTo,
-          emoji,
-          backgroundColor,
-        });
+        const list = ShoppingList.create(
+          {
+            title,
+            emoji,
+            backgroundColor,
+            assignedTo,
+            isHidden: hideFromPartner,
+            items: ShoppingItems.create([], { owner: couple._owner }),
+            creatorAccID: me.id,
+            deleted: false,
+          },
+          { owner: hideFromPartner ? me : couple._owner }
+        );
+        if (couple.shoppingLists) {
+          couple.shoppingLists.push(list);
+        } else {
+          throw new Error('No shopping lists found');
+        }
       }
 
       if (ref && 'current' in ref) {
@@ -184,7 +195,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       setTitle('');
       setEmoji('🖊');
       setHideFromPartner(false);
-      setBackgroundColor('#FFFFFF');
+      setBackgroundColor('#F7E987');
       onDismiss?.();
     }, []);
 

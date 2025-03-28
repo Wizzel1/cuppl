@@ -9,7 +9,7 @@ import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimat
 
 import AvatarListItem from '../AvatarListItem';
 
-import { TodoList } from '~/src/schemas/todoSchema';
+import { ShoppingList } from '~/src/schemas/shoppingSchema';
 
 type RightActionProps = {
   onDelete: () => void;
@@ -42,7 +42,7 @@ function RightAction(
   );
 }
 
-function TodoListListItem({
+function ShoppingListListItem({
   avatar,
   title,
   listId,
@@ -59,7 +59,7 @@ function TodoListListItem({
   onEdit?: () => void;
   disableSwipe?: boolean;
 }) {
-  const list = useCoState(TodoList, listId as ID<TodoList>);
+  const list = useCoState(ShoppingList, listId as ID<ShoppingList>);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -131,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(TodoListListItem);
+export default memo(ShoppingListListItem);

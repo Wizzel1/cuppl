@@ -10,7 +10,7 @@ import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
 import { useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { DefaultTodoList, TodoList } from '~/src/schemas/todoSchema';
 
-export default function Todos() {
+export default function TodoLists() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -174,6 +174,7 @@ export default function Todos() {
             {section.title}
           </Text>
         )}
+        keyExtractor={(item) => item.id}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         renderItem={({ item }) => {
           if (!item) return null;

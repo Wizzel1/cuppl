@@ -1,6 +1,7 @@
 import { ImageDefinition } from 'jazz-tools';
 
-import { CoupleAccount, TodoItem } from '../schemas/schema.jazz';
+import { CoupleAccount } from '../schemas/schema.jazz';
+import { TodoItem } from '../schemas/todoSchema';
 
 function createTodo(args: {
   me: CoupleAccount;
