@@ -18,7 +18,6 @@ export default function TodoLists() {
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
   };
-
   const couple = useCouple();
   const router = useRouter();
 
@@ -115,10 +114,8 @@ export default function TodoLists() {
 
   const onItemPress = useCallback((listId: string) => {
     router.push({
-      pathname: '/(protected)/[todoListId]',
-      params: {
-        todoListId: listId,
-      },
+      pathname: '/(protected)/(todoList)/[id]',
+      params: { id: listId },
     });
   }, []);
 

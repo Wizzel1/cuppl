@@ -1,5 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useMemo, useRef, useState } from 'react';
+import { router } from 'expo-router';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -23,6 +24,13 @@ export default function ShoppingLists() {
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
   };
+
+  const onItemPress = useCallback((listId: string) => {
+    router.push({
+      pathname: '/(protected)/(shoppingList)/[id]',
+      params: { id: listId },
+    });
+  }, []);
 
   const { myLists, partnerLists, sharedLists } = useMemo(() => {
     const empty = { myLists: [], partnerLists: [], sharedLists: [] };
@@ -89,7 +97,7 @@ export default function ShoppingLists() {
             <ShoppingListListItem
               key={item.id}
               title={item.title}
-              onPress={() => {}}
+              onPress={() => onItemPress(item.id)}
               listId={item.id}
               onDelete={() => {}}
               onEdit={() => {
