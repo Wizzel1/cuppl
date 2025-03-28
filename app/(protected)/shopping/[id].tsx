@@ -92,7 +92,15 @@ export default function ShoppingListScreen() {
             data: items,
           }))}
           keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => <ShoppingListItem item={item} index={index} />}
+          renderItem={({ item, index }) => (
+            <ShoppingListItem
+              item={item}
+              index={index}
+              onToggle={() => {
+                item.completed = !item.completed;
+              }}
+            />
+          )}
           renderSectionHeader={({ section }) => (
             <Text style={styles.sectionHeader}>{section.title}</Text>
           )}
