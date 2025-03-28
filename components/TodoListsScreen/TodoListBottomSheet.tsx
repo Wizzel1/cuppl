@@ -12,6 +12,7 @@ import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
+import BottomSheetColorPicker from '../BottomSheetColorPicker';
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
@@ -122,81 +123,6 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       return 200;
     };
 
-    const colors = [
-      '#F7E987',
-      '#FFD4D4',
-      '#FFEEB3',
-      '#FFFAC0',
-      '#FBFFA3',
-      '#E3FCBF',
-      '#D0F5BE',
-      '#C8FFE0',
-      '#B8F1F1',
-      '#D0F5FF',
-      '#D9F8FF',
-      '#D6E5FA',
-      '#E5DBFF',
-      '#F1E4FF',
-      '#F9ECFF',
-      '#FFE9F9',
-      '#FFDDF3',
-      '#FFD6E5',
-    ];
-
-    const ColorPickerScreen = () => {
-      return (
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 16,
-            }}>
-            <Pressable onPress={() => setActiveScreen('todo')}>
-              <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
-            </Pressable>
-            <Text style={{ fontSize: 18, fontWeight: '600' }}>Choose Color</Text>
-            <View style={{ width: 40 }} />
-          </View>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {colors.map((color) => (
-              <Pressable
-                key={color}
-                onPress={() => {
-                  setBackgroundColor(color);
-                  setActiveScreen('todo');
-                }}
-                style={{ marginBottom: 16 }}>
-                <View
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 30,
-                    backgroundColor: color,
-                    borderWidth: 1,
-                    borderColor: '#E4E4E7',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  {color === backgroundColor && (
-                    <View
-                      style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 10,
-                        backgroundColor: '#8E51FF',
-                      }}
-                    />
-                  )}
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      );
-    };
-
     const EmojiPickerScreen = () => {
       return (
         <View style={{ flex: 1 }}>
@@ -258,7 +184,7 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       setTitle('');
       setEmoji('🖊');
       setHideFromPartner(false);
-      setBackgroundColor(colors[0]);
+      setBackgroundColor('#FFFFFF');
       onDismiss?.();
     }, []);
 
@@ -335,7 +261,13 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
               )}
             </>
           )}
-          {activeScreen === 'color' && <ColorPickerScreen />}
+          {activeScreen === 'color' && (
+            <BottomSheetColorPicker
+              backgroundColor={backgroundColor}
+              setBackgroundColor={setBackgroundColor}
+              onBackPress={() => setActiveScreen('todo')}
+            />
+          )}
           {activeScreen === 'emoji' && <EmojiPickerScreen />}
         </BottomSheetView>
       </BottomSheetModal>
