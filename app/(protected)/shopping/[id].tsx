@@ -4,10 +4,11 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
 import { useCallback, useMemo, useRef } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import ShoppingItemBottomSheet from '~/components/ShoppingListDetailsScreen/ShoppingItemBottomSheet';
+import ShoppingListItem from '~/components/ShoppingListDetailsScreen/ShoppingListItem';
 import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListScreen() {
@@ -28,16 +29,18 @@ export default function ShoppingListScreen() {
     const categoryMap = new Map<string, ShoppingItem[]>();
     for (const item of list?.items ?? []) {
       const category = item.category;
-      if (!categoryMap.has(category)) {
-        categoryMap.set(category, []);
+
+      if (item.completed) {
+        categoryMap.set('Completed', [...(categoryMap.get('Completed') ?? []), item]);
+      } else {
+        categoryMap.set(category, [...(categoryMap.get(category) ?? []), item]);
       }
-      categoryMap.get(category)?.push(item);
     }
     return categoryMap;
   }, [list?.items]);
 
   const renderHeaderTitle = useCallback(() => {
-    const title = list?.title ?? 'To-Do List';
+    const title = list?.title ?? 'Shopping List';
     const titleLength = title.length;
     const titleSubstring = title.substring(0, 24);
     const titleRemaining = titleLength - titleSubstring.length;
@@ -69,7 +72,16 @@ export default function ShoppingListScreen() {
         }}
       />
       <View style={styles.container}>
-        <FlatList data={list?.items} renderItem={({ item }) => <Text>{item.name}</Text>} />
+        <SectionList
+          sections={Array.from(categoryMap.entries()).map(([category, items]) => ({
+            title: category,
+            data: items,
+          }))}
+          renderItem={({ item, index }) => <ShoppingListItem item={item} index={index} />}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+          )}
+        />
         <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
         <ShoppingItemBottomSheet
           ref={shoppingItemSheetRef}
