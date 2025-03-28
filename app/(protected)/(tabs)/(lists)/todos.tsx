@@ -181,7 +181,9 @@ export default function TodoLists() {
               title={item.title}
               onPress={() => onItemPress(item.id)}
               listId={item.id}
-              onDelete={() => {}}
+              onDelete={() => {
+                item.deleted = true;
+              }}
               onEdit={() => {
                 setToUpdate(item);
                 bottomSheetModalRef.current?.present();

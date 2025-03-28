@@ -99,7 +99,9 @@ export default function ShoppingLists() {
               title={item.title}
               onPress={() => onItemPress(item.id)}
               listId={item.id}
-              onDelete={() => {}}
+              onDelete={() => {
+                item.deleted = true;
+              }}
               onEdit={() => {
                 setToUpdate(item);
                 bottomSheetModalRef.current?.present();
