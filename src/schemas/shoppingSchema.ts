@@ -10,6 +10,7 @@ class ShoppingItem extends CoMap {
   deleted = co.boolean;
   photo = co.optional.ref(ImageDefinition);
   notes = co.optional.string;
+  completed = co.boolean;
 }
 
 export class ShoppingItems extends CoList.Of(co.ref(ShoppingItem)) {}
@@ -30,6 +31,14 @@ export class ShoppingList extends CoMap {
       if (item?.deleted) continue;
       if (item?.deleted === undefined) continue;
       items.push(item);
+    }
+    return items;
+  }
+
+  get completedItems() {
+    const items: ShoppingItem[] = [];
+    for (const item of this.items ?? []) {
+      if (item?.completed) items.push(item);
     }
     return items;
   }
