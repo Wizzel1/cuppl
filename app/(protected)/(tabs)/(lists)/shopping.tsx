@@ -1,5 +1,5 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { SectionList, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -18,6 +18,7 @@ export default function ShoppingLists() {
   //   console.log('couple', couple);
   //   couple.shoppingLists = ShoppingLists.create([], { owner: couple._owner });
   // }, [couple?.id]);
+  const [toUpdate, setToUpdate] = useState<ShoppingList | null>(null);
 
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
@@ -92,14 +93,18 @@ export default function ShoppingLists() {
               listId={item.id}
               onDelete={() => {}}
               onEdit={() => {
-                // setToUpdate(item);
+                setToUpdate(item);
                 bottomSheetModalRef.current?.present();
               }}
             />
           );
         }}
       />
-      <ShoppingListBottomSheet ref={bottomSheetModalRef} toUpdate={null} onDismiss={() => {}} />
+      <ShoppingListBottomSheet
+        ref={bottomSheetModalRef}
+        toUpdate={toUpdate}
+        onDismiss={() => setToUpdate(null)}
+      />
       <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
     </View>
   );
