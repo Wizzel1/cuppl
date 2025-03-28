@@ -67,9 +67,9 @@ export default function TodoListScreen() {
     });
   };
 
-  const handleFABPress = () => {
+  const handleFABPress = useCallback(() => {
     todoSheetRef.current?.present();
-  };
+  }, []);
 
   const renderHeaderTitle = useCallback(() => {
     const title = list?.title ?? 'To-Do List';

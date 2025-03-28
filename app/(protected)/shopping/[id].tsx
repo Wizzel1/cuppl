@@ -6,7 +6,7 @@ import { ID } from 'jazz-tools';
 import { useCallback, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import FloatingActionButton from '~/components/FloatingActionButton';
 import { ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListScreen() {
@@ -16,13 +16,12 @@ export default function ShoppingListScreen() {
   });
   const completedItemsCount = list?.completedItems.length ?? 0;
   const totalItemsCount = list?.liveItems.length ?? 0;
-  const todoSheetRef = useRef<BottomSheetModal>(null);
-  const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
+  const shoppingItemSheetRef = useRef<BottomSheetModal>(null);
+  const shoppingListSheetRef = useRef<BottomSheetModal>(null);
 
-  const { partnerProfile, myProfile } = usePartnerProfiles();
-  const handleFABPress = () => {
-    todoSheetRef.current?.present();
-  };
+  const handleFABPress = useCallback(() => {
+    shoppingItemSheetRef.current?.present();
+  }, []);
   const renderHeaderTitle = useCallback(() => {
     const title = list?.title ?? 'To-Do List';
     const titleLength = title.length;
@@ -48,13 +47,16 @@ export default function ShoppingListScreen() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                todoListBottomSheetRef.current?.present();
+                shoppingListSheetRef.current?.present();
               }}>
               <Ionicons name="pencil" size={24} color="black" />
             </Pressable>
           ),
         }}
       />
+      <View style={styles.container}>
+        <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
+      </View>
     </>
   );
 }
