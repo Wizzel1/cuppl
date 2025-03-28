@@ -203,9 +203,8 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         toUpdate.name = title.trim();
         toUpdate.isHidden = hideFromPartner;
         toUpdate.photo = imageDefinition;
-        // toUpdate.scheduleNotifications();
       } else {
-        const newTodo = ShoppingItem.create(
+        const newItem = ShoppingItem.create(
           {
             name: title.trim(),
             creatorAccID: me.id,
@@ -218,9 +217,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
           },
           { owner: hideFromPartner ? me : couple!._owner }
         );
-        // newTodo.scheduleNotifications().then(() => {
-        //   onCreate(newTodo);
-        // });
+        onCreate(newItem);
       }
 
       if (ref && 'current' in ref) {

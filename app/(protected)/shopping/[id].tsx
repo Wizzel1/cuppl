@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
 import { useCallback, useMemo, useRef } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import ShoppingItemBottomSheet from '~/components/ShoppingListDetailsScreen/ShoppingItemBottomSheet';
@@ -69,8 +69,17 @@ export default function ShoppingListScreen() {
         }}
       />
       <View style={styles.container}>
+        <FlatList data={list?.items} renderItem={({ item }) => <Text>{item.name}</Text>} />
         <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
-        <ShoppingItemBottomSheet ref={shoppingItemSheetRef} toUpdate={null} />
+        <ShoppingItemBottomSheet
+          ref={shoppingItemSheetRef}
+          toUpdate={null}
+          onCreate={(newItem) => {
+            if (list) {
+              list.items.push(newItem);
+            }
+          }}
+        />
       </View>
     </>
   );
