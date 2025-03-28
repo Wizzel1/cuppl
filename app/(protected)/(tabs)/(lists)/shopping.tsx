@@ -8,7 +8,7 @@ import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListLi
 import { useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ShoppingList } from '~/src/schemas/shoppingSchema';
 
-export default function Shopping() {
+export default function ShoppingLists() {
   const couple = useCouple();
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
