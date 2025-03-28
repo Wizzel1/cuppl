@@ -1,16 +1,26 @@
-import { useMemo } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useMemo, useRef } from 'react';
 import { SectionList, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
+import { ShoppingListBottomSheet } from '~/components/ShoppingListScreen/ShoppingListBottomSheet';
+import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListListItem';
 import { useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function Shopping() {
   const couple = useCouple();
   const { myProfile, partnerProfile } = usePartnerProfiles();
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // useEffect(() => {
+  //   if (!couple) return;
+  //   console.log('couple', couple);
+  //   couple.shoppingLists = ShoppingLists.create([], { owner: couple._owner });
+  // }, [couple?.id]);
 
   const handlePress = () => {
-    console.log('handlePress');
+    bottomSheetModalRef.current?.present();
   };
 
   const { myLists, partnerLists, sharedLists } = useMemo(() => {
@@ -47,7 +57,7 @@ export default function Shopping() {
       partnerLists,
       sharedLists,
     };
-  }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
+  }, [couple?.shoppingLists, myProfile?.accountId, partnerProfile?.accountId]);
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <SectionList
@@ -70,26 +80,26 @@ export default function Shopping() {
             {section.title}
           </Text>
         )}
+        keyExtractor={(item) => item.id}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         renderItem={({ item }) => {
           if (!item) return null;
           return (
-            <Text>{item.title}</Text>
-            // <TodoListListItem
-            //   key={item.id}
-            //   title={item.title}
-            //   onPress={() => onItemPress(item.id)}
-            //   listId={item.id}
-            //   onDelete={() => {}}
-            //   onEdit={() => {
-            //     setToUpdate(item);
-            //     bottomSheetModalRef.current?.present();
-            //   }}
-            // />
+            <ShoppingListListItem
+              key={item.id}
+              title={item.title}
+              onPress={() => {}}
+              listId={item.id}
+              onDelete={() => {}}
+              onEdit={() => {
+                // setToUpdate(item);
+                bottomSheetModalRef.current?.present();
+              }}
+            />
           );
         }}
       />
-
+      <ShoppingListBottomSheet ref={bottomSheetModalRef} toUpdate={null} onDismiss={() => {}} />
       <FloatingActionButton onPress={handlePress} icon="add" color="#27272A" />
     </View>
   );
