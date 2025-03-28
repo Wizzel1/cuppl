@@ -99,7 +99,14 @@ export default function ShoppingListScreen() {
 
 const styles = StyleSheet.create({
   sectionHeader: {
-    fontSize: 18,
+    width: '100%',
+    backgroundColor: '#F4F4F5',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 5.5,
+    fontSize: 14,
     fontWeight: '600',
   },
   progressContainer: {
