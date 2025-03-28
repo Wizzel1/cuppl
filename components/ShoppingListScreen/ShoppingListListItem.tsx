@@ -1,11 +1,13 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { ProgressiveImg, useCoState } from 'jazz-react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useCoState } from 'jazz-react-native';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { memo, useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
+
+import AvatarListItem from '../AvatarListItem';
 
 import { ShoppingList } from '~/src/schemas/shoppingSchema';
 
@@ -95,98 +97,22 @@ function ShoppingListListItem({
             },
           })
         }>
-        <TouchableOpacity onPress={isOpen ? () => setIsOpen(false) : onPress}>
-          <View style={styles.container}>
-            <View style={styles.contentWrapper}>
-              {list?.backgroundColor && list?.emoji ? (
-                <View style={[styles.avatarContainer, { backgroundColor: list.backgroundColor }]}>
-                  <Text style={styles.emojiText}>{list.emoji}</Text>
-                </View>
-              ) : (
-                <ProgressiveImg image={avatar} maxWidth={400}>
-                  {({ src, originalSize, res }) => (
-                    <Image source={{ uri: src }} style={styles.avatarImage} />
-                  )}
-                </ProgressiveImg>
-              )}
-
-              <View style={styles.textContainer}>
-                <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleText}>
-                  {title}
-                </Text>
-                {isLoaded ? (
-                  <Text style={styles.subtitleText}>
-                    {completedItemsCount} / {totalItemsCount}
-                  </Text>
-                ) : (
-                  <Text style={styles.subtitleText}>Syncing with partner...</Text>
-                )}
-              </View>
-              {list?.isHidden && (
-                <MaterialCommunityIcons name="eye-off" size={20} color="#A1A1AA" />
-              )}
-            </View>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={24}
-              color="black"
-              style={styles.chevron}
-            />
-          </View>
-        </TouchableOpacity>
+        <AvatarListItem
+          onPress={isOpen ? () => setIsOpen(false) : onPress}
+          title={title}
+          avatar={avatar ?? null}
+          isLoaded={isLoaded}
+          isHidden={list?.isHidden}
+          backgroundColor={list?.backgroundColor}
+          emoji={list?.emoji}
+          subtitle={`${completedItemsCount} / ${totalItemsCount}`}
+        />
       </Swipeable>
     </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  contentWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emojiText: {
-    fontSize: 20,
-  },
-  avatarImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    resizeMode: 'cover',
-  },
-  textContainer: {
-    flex: 1,
-  },
-  titleText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#18181B',
-  },
-  subtitleText: {
-    fontSize: 14,
-    color: '#71717B',
-  },
-  chevron: {
-    paddingLeft: 18,
-  },
-  rightAction: { width: 75, height: 75, backgroundColor: 'purple' },
-  separator: {
-    width: '100%',
-    borderTopWidth: 1,
-  },
   rightActionContainer: {
     flexDirection: 'row',
     gap: 8,
