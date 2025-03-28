@@ -72,11 +72,26 @@ export default function ShoppingListScreen() {
         }}
       />
       <View style={styles.container}>
+        <View style={styles.progressContainer}>
+          <View style={styles.progressTrack}>
+            <View
+              style={[
+                styles.progressBar,
+                {
+                  width: `${totalItemsCount > 0 ? (completedItemsCount / totalItemsCount) * 100 : 0}%`,
+                },
+              ]}
+            />
+          </View>
+        </View>
+
         <SectionList
+          style={styles.contentContainer}
           sections={Array.from(categoryMap.entries()).map(([category, items]) => ({
             title: category,
             data: items,
           }))}
+          keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => <ShoppingListItem item={item} index={index} />}
           renderSectionHeader={({ section }) => (
             <Text style={styles.sectionHeader}>{section.title}</Text>
@@ -112,7 +127,7 @@ const styles = StyleSheet.create({
   progressContainer: {
     paddingHorizontal: 24,
     paddingTop: 16,
-    paddingBottom: 8,
+    paddingBottom: 24,
   },
   progressTrack: {
     height: 8,
@@ -132,7 +147,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   contentContainer: {
-    paddingTop: 16,
     paddingBottom: 80,
   },
   sectionContainer: {
