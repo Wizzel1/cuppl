@@ -114,7 +114,7 @@ export default function TodoLists() {
 
   const onItemPress = useCallback((listId: string) => {
     router.push({
-      pathname: '/(protected)/(todoList)/[id]',
+      pathname: '/(protected)/todo/[id]',
       params: { id: listId },
     });
   }, []);

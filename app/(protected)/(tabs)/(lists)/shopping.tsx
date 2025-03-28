@@ -27,7 +27,7 @@ export default function ShoppingLists() {
 
   const onItemPress = useCallback((listId: string) => {
     router.push({
-      pathname: '/(protected)/(shoppingList)/[id]',
+      pathname: '/(protected)/shopping/[id]',
       params: { id: listId },
     });
   }, []);
