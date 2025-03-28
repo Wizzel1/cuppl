@@ -7,7 +7,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import TodoBottomSheet from '~/components/TodoListDetailsScreen/TodoBottomSheet';
+import ShoppingItemBottomSheet from '~/components/ShoppingListDetailsScreen/ShoppingItemBottomSheet';
 import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListScreen() {
@@ -22,7 +22,7 @@ export default function ShoppingListScreen() {
 
   const handleFABPress = useCallback(() => {
     shoppingItemSheetRef.current?.present();
-  }, []);
+  }, [shoppingItemSheetRef.current]);
 
   const categoryMap = useMemo(() => {
     const categoryMap = new Map<string, ShoppingItem[]>();
@@ -70,8 +70,8 @@ export default function ShoppingListScreen() {
       />
       <View style={styles.container}>
         <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
+        <ShoppingItemBottomSheet ref={shoppingItemSheetRef} toUpdate={null} />
       </View>
-      <TodoBottomSheet ref={shoppingItemSheetRef} toUpdate={null} />
     </>
   );
 }
