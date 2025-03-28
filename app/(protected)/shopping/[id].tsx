@@ -3,11 +3,12 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import { ShoppingList } from '~/src/schemas/shoppingSchema';
+import TodoBottomSheet from '~/components/TodoListDetailsScreen/TodoBottomSheet';
+import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -22,6 +23,19 @@ export default function ShoppingListScreen() {
   const handleFABPress = useCallback(() => {
     shoppingItemSheetRef.current?.present();
   }, []);
+
+  const categoryMap = useMemo(() => {
+    const categoryMap = new Map<string, ShoppingItem[]>();
+    for (const item of list?.items ?? []) {
+      const category = item.category;
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+      categoryMap.get(category)?.push(item);
+    }
+    return categoryMap;
+  }, [list?.items]);
+
   const renderHeaderTitle = useCallback(() => {
     const title = list?.title ?? 'To-Do List';
     const titleLength = title.length;
@@ -57,6 +71,7 @@ export default function ShoppingListScreen() {
       <View style={styles.container}>
         <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
       </View>
+      <TodoBottomSheet ref={shoppingItemSheetRef} toUpdate={null} />
     </>
   );
 }
