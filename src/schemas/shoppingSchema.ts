@@ -1,6 +1,6 @@
 import { co, CoList, CoMap, ImageDefinition } from 'jazz-tools';
 
-class ShoppingItem extends CoMap {
+export class ShoppingItem extends CoMap {
   name = co.string;
   quantity = co.optional.number;
   unit = co.literal('kg', 'g', 'l', 'ml', 'pcs');
