@@ -3,7 +3,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -19,6 +19,9 @@ export default function ShoppingListScreen() {
   });
   const completedItemsCount = list?.completedItems.length ?? 0;
   const totalItemsCount = list?.liveItems.length ?? 0;
+
+  const [editingItem, setEditingItem] = useState<ShoppingItem | null>(null);
+
   const shoppingItemSheetRef = useRef<BottomSheetModal>(null);
   const shoppingListSheetRef = useRef<BottomSheetModal>(null);
 
@@ -39,6 +42,11 @@ export default function ShoppingListScreen() {
     }
     return categoryMap;
   }, [list?.items]);
+
+  const handleEditItem = (item: ShoppingItem) => {
+    setEditingItem(item);
+    shoppingItemSheetRef.current?.present();
+  };
 
   const renderHeaderTitle = useCallback(() => {
     const title = list?.title ?? 'Shopping List';
@@ -97,6 +105,7 @@ export default function ShoppingListScreen() {
             <ShoppingListItem
               item={item}
               index={index}
+              onEdit={() => handleEditItem(item)}
               onToggle={() => {
                 item.completed = !item.completed;
               }}
@@ -110,7 +119,8 @@ export default function ShoppingListScreen() {
         {list && (
           <ShoppingItemBottomSheet
             ref={shoppingItemSheetRef}
-            toUpdate={null}
+            toUpdate={editingItem}
+            onDismiss={() => setEditingItem(null)}
             onCreate={(newItem) => {
               console.log('New item created:', newItem);
               list.items.push(newItem);
