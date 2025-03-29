@@ -39,12 +39,24 @@ type OptionSectionProps = {
 const OptionSection = ({ label, value, onPress }: OptionSectionProps) => {
   const [selectedLanguage, setSelectedLanguage] = useState();
   return (
-    <Picker
-      selectedValue={selectedLanguage}
-      onValueChange={(itemValue, itemIndex) => setSelectedLanguage(itemValue)}>
-      <Picker.Item label="Java" value="java" />
-      <Picker.Item label="JavaScript" value="js" />
-    </Picker>
+    <View style={{ width: '100%', height: 50, flexDirection: 'row', alignItems: 'center' }}>
+      <Picker
+        style={{ flex: 1 }}
+        selectedValue={selectedLanguage}
+        onValueChange={(itemValue, itemIndex) => setSelectedLanguage(itemValue)}>
+        <Picker.Item label="Java" value="java" />
+        <Picker.Item label="JavaScript" value="js" />
+        <Picker.Item label="Python" value="py" />
+      </Picker>
+      <Picker
+        style={{ flex: 1 }}
+        selectedValue={selectedLanguage}
+        onValueChange={(itemValue, itemIndex) => setSelectedLanguage(itemValue)}>
+        <Picker.Item label="Java" value="java" />
+        <Picker.Item label="JavaScript" value="js" />
+        <Picker.Item label="Python" value="py" />
+      </Picker>
+    </View>
   );
 };
 
