@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { memo } from 'react';
 import { Animated, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 
 interface SimpleFloatingActionButtonProps {
@@ -80,4 +80,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SimpleFloatingActionButton;
+export default memo(SimpleFloatingActionButton);

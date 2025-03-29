@@ -16,7 +16,6 @@ import BottomSheetColorPicker from '../BottomSheetColorPicker';
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 
-import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema';
 import { TodoList } from '~/src/schemas/todoSchema';
@@ -92,15 +91,11 @@ export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingList
         if (hideFromPartner !== toUpdate.isHidden) {
           throw new Error('Ownership transfer required');
         }
-        TodoListsRepo.updateTodoList({
-          me,
-          id: toUpdate.id,
-          title,
-          isHidden: hideFromPartner,
-          assignedTo,
-          emoji,
-          backgroundColor,
-        });
+        toUpdate.title = title;
+        toUpdate.emoji = emoji;
+        toUpdate.backgroundColor = backgroundColor;
+        toUpdate.assignedTo = assignedTo;
+        toUpdate.isHidden = hideFromPartner;
       } else {
         const list = ShoppingList.create(
           {

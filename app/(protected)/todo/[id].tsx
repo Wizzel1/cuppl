@@ -14,9 +14,9 @@ import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { TodoItem, TodoList } from '~/src/schemas/todoSchema';
 
 export default function TodoListScreen() {
-  const { todoListId } = useLocalSearchParams<{ todoListId: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
-  const list = useCoState(TodoList, todoListId as ID<TodoList>, { items: [{}] });
+  const list = useCoState(TodoList, id as ID<TodoList>, { items: [{}] });
   const { partnerProfile, myProfile } = usePartnerProfiles();
   const todoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);
@@ -67,9 +67,9 @@ export default function TodoListScreen() {
     });
   };
 
-  const handleFABPress = () => {
+  const handleFABPress = useCallback(() => {
     todoSheetRef.current?.present();
-  };
+  }, []);
 
   const renderHeaderTitle = useCallback(() => {
     const title = list?.title ?? 'To-Do List';
@@ -234,10 +234,8 @@ export default function TodoListScreen() {
             onDismiss={() => setEditingTodo(null)}
             defaultAssignedTo={list.assignedTo}
             onCreate={(newTodo) => {
-              if (list.items) {
-                console.log('New todo created:', newTodo);
-                list.items.push(newTodo);
-              }
+              console.log('New todo created:', newTodo);
+              list.items.push(newTodo);
             }}
           />
         )}
