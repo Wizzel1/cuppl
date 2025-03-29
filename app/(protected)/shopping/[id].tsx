@@ -9,6 +9,7 @@ import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import ShoppingItemBottomSheet from '~/components/ShoppingListDetailsScreen/ShoppingItemBottomSheet';
 import ShoppingListItem from '~/components/ShoppingListDetailsScreen/ShoppingListItem';
+import { ShoppingListBottomSheet } from '~/components/ShoppingListScreen/ShoppingListBottomSheet';
 import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListScreen() {
@@ -115,6 +116,7 @@ export default function ShoppingListScreen() {
             }
           }}
         />
+        {list && <ShoppingListBottomSheet ref={shoppingListSheetRef} toUpdate={list} />}
       </View>
     </>
   );
