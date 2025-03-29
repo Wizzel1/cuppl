@@ -31,9 +31,8 @@ export default function ShoppingListScreen() {
 
   const categoryMap = useMemo(() => {
     const categoryMap = new Map<string, ShoppingItem[]>();
-    for (const item of list?.completedItems ?? []) {
+    for (const item of list?.liveItems ?? []) {
       const category = item.category;
-
       if (item.completed) {
         categoryMap.set('Completed', [...(categoryMap.get('Completed') ?? []), item]);
       } else {
