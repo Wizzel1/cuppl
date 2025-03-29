@@ -8,6 +8,7 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
@@ -35,16 +36,17 @@ type OptionSectionProps = {
   onPress: () => void;
 };
 
-const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>{label}</Text>
-      <Pressable style={styles.optionButton} onPress={onPress}>
-        <Text style={styles.optionText}>{value}</Text>
-      </Pressable>
-    </View>
-  </View>
-);
+const OptionSection = ({ label, value, onPress }: OptionSectionProps) => {
+  const [selectedLanguage, setSelectedLanguage] = useState();
+  return (
+    <Picker
+      selectedValue={selectedLanguage}
+      onValueChange={(itemValue, itemIndex) => setSelectedLanguage(itemValue)}>
+      <Picker.Item label="Java" value="java" />
+      <Picker.Item label="JavaScript" value="js" />
+    </Picker>
+  );
+};
 
 type PhotoSectionProps = {
   image: ImageDefinition | null;
@@ -312,6 +314,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                   justifyContent: 'space-between',
                 }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Quantity</Text>
+                <OptionSection label="Quantity" value="" onPress={() => {}} />
                 <View
                   style={{
                     paddingVertical: 9,
