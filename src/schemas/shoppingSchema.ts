@@ -16,6 +16,7 @@ export class ShoppingItem extends CoMap {
 export class ShoppingItems extends CoList.Of(co.ref(ShoppingItem)) {}
 export class ShoppingList extends CoMap {
   title = co.string;
+  notes = co.optional.string;
   emoji = co.optional.string;
   backgroundColor = co.optional.string;
   items = co.ref(ShoppingItems);
