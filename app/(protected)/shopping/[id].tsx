@@ -107,15 +107,16 @@ export default function ShoppingListScreen() {
           )}
         />
         <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
-        <ShoppingItemBottomSheet
-          ref={shoppingItemSheetRef}
-          toUpdate={null}
-          onCreate={(newItem) => {
-            if (list) {
+        {list && (
+          <ShoppingItemBottomSheet
+            ref={shoppingItemSheetRef}
+            toUpdate={null}
+            onCreate={(newItem) => {
+              console.log('New item created:', newItem);
               list.items.push(newItem);
-            }
-          }}
-        />
+            }}
+          />
+        )}
         {list && <ShoppingListBottomSheet ref={shoppingListSheetRef} toUpdate={list} />}
       </View>
     </>

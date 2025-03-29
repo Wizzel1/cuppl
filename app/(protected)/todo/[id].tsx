@@ -234,10 +234,8 @@ export default function TodoListScreen() {
             onDismiss={() => setEditingTodo(null)}
             defaultAssignedTo={list.assignedTo}
             onCreate={(newTodo) => {
-              if (list.items) {
-                console.log('New todo created:', newTodo);
-                list.items.push(newTodo);
-              }
+              console.log('New todo created:', newTodo);
+              list.items.push(newTodo);
             }}
           />
         )}
