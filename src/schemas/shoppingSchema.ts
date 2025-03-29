@@ -25,20 +25,23 @@ export class ShoppingList extends CoMap {
   deleted = co.boolean;
 
   get liveItems() {
-    const items: ShoppingItem[] = [];
-
+    const items = [];
     for (const item of this.items ?? []) {
-      if (item?.deleted) continue;
       if (item?.deleted === undefined) continue;
+      if (item?.deleted) continue;
       items.push(item);
     }
     return items;
   }
 
   get completedItems() {
-    const items: ShoppingItem[] = [];
+    const items = [];
     for (const item of this.items ?? []) {
-      if (item?.completed) items.push(item);
+      if (item?.deleted) continue;
+      if (item?.completed === undefined) continue;
+      if (item?.completed) {
+        items.push(item);
+      }
     }
     return items;
   }
