@@ -95,25 +95,10 @@ export default function ShoppingListItem({
                   style={[styles.titleText, item?.completed && styles.completedText]}>
                   {item?.name}
                 </Text>
-                {/* <View style={styles.metaContainer}>
-                  {item?.dueDate && <DueDateText item={item} />}
-                  {item?.recurringUnit && (
-                    <View style={styles.recurringContainer}>
-                      <FontAwesome name="repeat" size={16} color="#71717B" />
-                      <Text style={[styles.recurringText, item?.completed && styles.completedText]}>
-                        {item.recurringUnit}
-                      </Text>
-                    </View>
-                  )}
-                  {alertCount > 0 && (
-                    <View style={styles.alertContainer}>
-                      <MaterialCommunityIcons name="bell" size={16} color="#71717B" />
-                      <Text style={styles.alertText}>{alertCount}</Text>
-                    </View>
-                  )}
-                </View> */}
+                <Text style={styles.recurringText}>
+                  {item.quantity} {item.unit}
+                </Text>
               </View>
-
               {item?.isHidden && (
                 <MaterialCommunityIcons name="eye-off" size={20} color="#71717B" />
               )}
@@ -138,8 +123,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   contentContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   titleText: {
     fontSize: 16,
