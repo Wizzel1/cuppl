@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import * as DropdownMenu from 'zeego/dropdown-menu';
 
 export type OwnerAssignment = 'me' | 'partner' | 'us';
@@ -33,25 +33,12 @@ function OwnerDropdown({ onAssignedToChange, selectedAssignedTo }: OwnerDropdown
   }, [assignedTo]);
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-      <Text style={{ fontSize: 16, color: '#27272A' }}>Owner</Text>
+    <View style={styles.container}>
+      <Text style={styles.ownerText}>Owner</Text>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
-          <View
-            style={{
-              paddingVertical: 9,
-              paddingHorizontal: 20,
-              borderRadius: 20,
-              width: 120,
-              backgroundColor: '#F4F4F5',
-              alignItems: 'center',
-            }}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#8E51FF' }}>{owner}</Text>
+          <View style={styles.dropdownTrigger}>
+            <Text style={styles.selectedOwnerText}>{owner}</Text>
           </View>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
@@ -84,5 +71,30 @@ function OwnerDropdown({ onAssignedToChange, selectedAssignedTo }: OwnerDropdown
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  ownerText: {
+    fontSize: 16,
+    color: '#27272A',
+  },
+  dropdownTrigger: {
+    paddingVertical: 9,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    width: 120,
+    backgroundColor: '#F4F4F5',
+    alignItems: 'center',
+  },
+  selectedOwnerText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#8E51FF',
+  },
+});
 
 export default memo(OwnerDropdown);
