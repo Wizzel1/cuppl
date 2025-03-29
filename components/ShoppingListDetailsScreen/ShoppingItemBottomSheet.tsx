@@ -190,7 +190,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
       if (toUpdate) {
         setTitle(toUpdate.name);
         setHideFromPartner(toUpdate.isHidden);
-        setImageDefinition(photo ?? null);
+        setImageDefinition(toUpdate.photo ?? null);
       }
     }, [toUpdate]);
 
