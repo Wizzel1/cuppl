@@ -9,9 +9,9 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg, useAccount } from 'jazz-react-native';
+import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
-import { ImageDefinition } from 'jazz-tools';
+import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
@@ -186,11 +186,19 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     const { me } = useAccount();
     const couple = useCouple();
 
+    const photo = useCoState(ImageDefinition, toUpdate?.photo?.id as ID<ImageDefinition>);
+    const [title, setTitle] = useState(toUpdate?.name ?? '');
+    const [notes, setNotes] = useState(toUpdate?.notes ?? '');
+    const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
+    const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden ?? false);
+
     const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
       'todo'
     );
-    const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
-    const [hideFromPartner, setHideFromPartner] = useState(false);
+
+    useEffect(() => {
+      if (photo?.id) setImageDefinition(photo);
+    }, [photo?.id]);
 
     const handleImageUpload = async () => {
       try {
@@ -213,26 +221,14 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
       }
     };
 
-    useEffect(() => {
-      if (toUpdate) {
-        setTitle(toUpdate.name);
-        setNotes(toUpdate.notes ?? '');
-        setHideFromPartner(toUpdate.isHidden);
-        setImageDefinition(toUpdate.photo ?? null);
-      }
-    }, [toUpdate]);
-
-    const [title, setTitle] = useState('');
-    const [notes, setNotes] = useState('');
-
     const handleSubmit = () => {
       if (!onCreate) return;
 
       if (toUpdate) {
         toUpdate.name = title.trim();
+        toUpdate.notes = notes.trim();
         toUpdate.isHidden = hideFromPartner;
         toUpdate.photo = imageDefinition;
-        toUpdate.notes = notes;
       } else {
         const newItem = ShoppingItem.create(
           {
@@ -243,6 +239,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
             photo: imageDefinition,
             unit: 'kg',
             category: 'food',
+            quantity: 1,
             deleted: false,
             completed: false,
           },
@@ -258,7 +255,9 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
 
     const handleDismiss = useCallback(() => {
       setTitle('');
+      setNotes('');
       setHideFromPartner(false);
+      setImageDefinition(null);
       setActiveScreen('todo');
       onDismiss?.();
     }, []);
@@ -304,8 +303,32 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
           {activeScreen === 'todo' && (
             <>
               <InputField onChange={setTitle} initialValue={title} />
-              <View style={{ marginTop: 16 }}>
+              <View
+                style={{
+                  marginTop: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Quantity</Text>
+                <View
+                  style={{
+                    paddingVertical: 9,
+                    paddingHorizontal: 20,
+                    borderRadius: 20,
+                    width: 120,
+                    backgroundColor: '#F4F4F5',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: '#8E51FF',
+                    }}>
+                    {toUpdate?.quantity} {toUpdate?.unit}
+                  </Text>
+                </View>
               </View>
               <View style={{ marginTop: 16 }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Category</Text>
