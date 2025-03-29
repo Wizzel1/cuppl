@@ -31,7 +31,7 @@ export default function ShoppingListScreen() {
 
   const categoryMap = useMemo(() => {
     const categoryMap = new Map<string, ShoppingItem[]>();
-    for (const item of list?.items ?? []) {
+    for (const item of list?.completedItems ?? []) {
       const category = item.category;
 
       if (item.completed) {
@@ -106,6 +106,9 @@ export default function ShoppingListScreen() {
               item={item}
               index={index}
               onEdit={() => handleEditItem(item)}
+              onDelete={() => {
+                item.deleted = true;
+              }}
               onToggle={() => {
                 item.completed = !item.completed;
               }}
