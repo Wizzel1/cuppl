@@ -227,9 +227,11 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
     'todo'
   );
   const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
+  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>(
+    toUpdate?.assignedTo ?? 'me'
+  );
   const [showHideFromPartner, setShowHideFromPartner] = useState(true);
-  const [hideFromPartner, setHideFromPartner] = useState(false);
+  const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden ?? false);
 
   const handleImageUpload = async () => {
     try {
@@ -254,16 +256,9 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
 
   useEffect(() => {
     if (toUpdate) {
-      setTitle(toUpdate.title);
-      setAssignedTo(toUpdate.assignedTo);
-      setHideFromPartner(toUpdate.isHidden);
-      setHasDueDate(toUpdate.dueDate !== null);
       if (toUpdate.dueDate) setDueDate(toUpdate.dueDate);
       setHasDueDate(toUpdate.dueDate !== null);
-      setAlertOption(toUpdate.alertOptionMinutes ?? null);
-      setSecondAlertOption(toUpdate.secondAlertOptionMinutes ?? null);
       setImageDefinition(photo ?? null);
-      // setRepeatMode(toUpdate.repeatMode);
     }
   }, [toUpdate, photo?.id]);
 
@@ -279,9 +274,15 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const [alertOption, setAlertOption] = useState<number | null>(null);
-  const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
-  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
+  const [alertOption, setAlertOption] = useState<number | null>(
+    toUpdate?.alertOptionMinutes ?? null
+  );
+  const [secondAlertOption, setSecondAlertOption] = useState<number | null>(
+    toUpdate?.secondAlertOptionMinutes ?? null
+  );
+  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(
+    toUpdate?.recurringUnit ?? null
+  );
 
   const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
   const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
