@@ -96,11 +96,11 @@ export default function ShoppingListItem({
                   {item?.name}
                 </Text>
               </View>
-              {item?.notes && <MaterialCommunityIcons name="note" size={20} color="#71717B" />}
+              {item?.notes && <MaterialCommunityIcons name="text-box" size={20} color="#71717B" />}
+              {item?.photo && <MaterialCommunityIcons name="image" size={20} color="#71717B" />}
               {item?.isHidden && (
                 <MaterialCommunityIcons name="eye-off" size={20} color="#71717B" />
               )}
-              {item?.photo && <MaterialCommunityIcons name="image" size={20} color="#71717B" />}
               <Text style={styles.recurringText}>
                 {item.quantity} {item.unit}
               </Text>

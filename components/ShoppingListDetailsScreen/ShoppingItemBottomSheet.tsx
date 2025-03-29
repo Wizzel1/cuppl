@@ -9,9 +9,9 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
+import { ProgressiveImg, useAccount } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
-import { ID, ImageDefinition } from 'jazz-tools';
+import { ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Image,
@@ -150,6 +150,33 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
   );
 };
 
+const NotesInputField = ({ onChange, initialValue }: InputFieldProps) => {
+  const [notes, setNotes] = useState(initialValue ?? '');
+  const debouncedNotes = useDebounce(notes, 300);
+
+  useEffect(() => {
+    onChange(debouncedNotes);
+  }, [debouncedNotes, onChange]);
+
+  return (
+    <BottomSheetTextInput
+      placeholder="Notes"
+      multiline
+      style={{
+        fontSize: 16,
+        marginTop: 16,
+        height: 100,
+        color: '#27272A',
+        borderWidth: 1,
+        borderColor: '#E4E4E7',
+        borderRadius: 8,
+        padding: 12,
+      }}
+      value={notes}
+      onChangeText={setNotes}
+    />
+  );
+};
 const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetProps>(
   (props, ref) => {
     const { onCreate, toUpdate, onDismiss } = props;
@@ -158,7 +185,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     }, []);
     const { me } = useAccount();
     const couple = useCouple();
-    const photo = useCoState(ImageDefinition, toUpdate?.photo?.id as ID<ImageDefinition>);
+
     const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
       'todo'
     );
@@ -189,12 +216,14 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     useEffect(() => {
       if (toUpdate) {
         setTitle(toUpdate.name);
+        setNotes(toUpdate.notes ?? '');
         setHideFromPartner(toUpdate.isHidden);
         setImageDefinition(toUpdate.photo ?? null);
       }
     }, [toUpdate]);
 
-    const [title, setTitle] = useState(toUpdate?.name ?? '');
+    const [title, setTitle] = useState('');
+    const [notes, setNotes] = useState('');
 
     const handleSubmit = () => {
       if (!onCreate) return;
@@ -203,10 +232,12 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         toUpdate.name = title.trim();
         toUpdate.isHidden = hideFromPartner;
         toUpdate.photo = imageDefinition;
+        toUpdate.notes = notes;
       } else {
         const newItem = ShoppingItem.create(
           {
             name: title.trim(),
+            notes: notes.trim(),
             creatorAccID: me.id,
             isHidden: hideFromPartner,
             photo: imageDefinition,
@@ -233,7 +264,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     }, []);
 
     const screenHeight = useMemo(() => {
-      let height = 300;
+      let height = 450;
       if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
         height = 500;
       }
@@ -291,6 +322,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
               </View>
 
               <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
+              <NotesInputField onChange={setNotes} initialValue={notes} />
             </>
           )}
         </BottomSheetView>
