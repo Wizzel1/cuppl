@@ -95,13 +95,15 @@ export default function ShoppingListItem({
                   style={[styles.titleText, item?.completed && styles.completedText]}>
                   {item?.name}
                 </Text>
-                <Text style={styles.recurringText}>
-                  {item.quantity} {item.unit}
-                </Text>
               </View>
+              {item?.notes && <MaterialCommunityIcons name="note" size={20} color="#71717B" />}
               {item?.isHidden && (
                 <MaterialCommunityIcons name="eye-off" size={20} color="#71717B" />
               )}
+              {item?.photo && <MaterialCommunityIcons name="image" size={20} color="#71717B" />}
+              <Text style={styles.recurringText}>
+                {item.quantity} {item.unit}
+              </Text>
             </View>
           </Pressable>
           {/* {index < todos.length - 1 && <View style={{ height: 8 }} />} */}
