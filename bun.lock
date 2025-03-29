@@ -30,10 +30,10 @@
         "expo-status-bar": "~2.0.1",
         "expo-system-ui": "~4.0.8",
         "expo-web-browser": "~14.0.2",
-        "jazz-react-native": "^0.12.1",
-        "jazz-react-native-auth-clerk": "^0.12.1",
-        "jazz-react-native-media-images": "^0.12.1",
-        "jazz-tools": "^0.12.1",
+        "jazz-react-native": "^0.11.8",
+        "jazz-react-native-auth-clerk": "^0.11.8",
+        "jazz-react-native-media-images": "^0.11.8",
+        "jazz-tools": "^0.11.8",
         "react": "18.3.1",
         "react-dom": "18.3.1",
         "react-native": "0.76.7",
@@ -870,15 +870,15 @@
 
     "clsx": ["clsx@1.2.1", "", {}, "sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg=="],
 
-    "cojson": ["cojson@0.12.1", "", { "dependencies": { "@noble/ciphers": "^0.1.3", "@noble/curves": "^1.3.0", "@noble/hashes": "^1.4.0", "@opentelemetry/api": "^1.9.0", "@scure/base": "1.2.1", "jazz-crypto-rs": "0.0.6", "neverthrow": "^7.0.1", "queueueue": "^4.1.2" } }, "sha512-Z4xzh2x/V/0Lcq5jQOKvAALc8hTpraUuvd7opzR1ojrMa+BTO/22GyHsMFLOGuopNJduiJ6WGnHizwinAZOpKw=="],
+    "cojson": ["cojson@0.11.8", "", { "dependencies": { "@noble/ciphers": "^0.1.3", "@noble/curves": "^1.3.0", "@noble/hashes": "^1.4.0", "@opentelemetry/api": "^1.9.0", "@scure/base": "1.2.1", "jazz-crypto-rs": "0.0.6", "neverthrow": "^7.0.1", "queueueue": "^4.1.2" } }, "sha512-ySV57J+6akFRjGfEjHeCDOYMQCxs2o+cTplbtzNXf413FyqbVk8rMrwvS6jQFIR0nIgdmX3r37BQOZg2IDP9Tg=="],
 
-    "cojson-storage": ["cojson-storage@0.12.1", "", { "dependencies": { "cojson": "0.12.1" } }, "sha512-ZjXR7f4i5YFaVivwgkL35S6qqTetd/aW7ce2CvEezBWlHssEslUg/XyONdMIUwlKznaDFoRiy0voI9EsoftAQA=="],
+    "cojson-storage": ["cojson-storage@0.11.8", "", { "dependencies": { "cojson": "0.11.8" } }, "sha512-72GW7Enut8iwiEhdRHdcDzRrCvqCM5YpXfxJiXFrhiBRsFiG0Lc5d4P8b2GUIimnfKEd/+4Zv+RzNmjeqbxTWQ=="],
 
-    "cojson-storage-indexeddb": ["cojson-storage-indexeddb@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "cojson-storage": "0.12.1" } }, "sha512-OXHdE0idcXRJoKBkOeigAS/en0i9Yw/1iDyhvpjU0VkhgL6J+JYddtfrCwg/bcGfO7CiBr/Ov/Gp6rGyJlu7rg=="],
+    "cojson-storage-indexeddb": ["cojson-storage-indexeddb@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "cojson-storage": "0.11.8" } }, "sha512-HrsWXdrsqiPPV16qMjRf+GAnchv4HpinuC6rPXFqr73fM8RHxemptDaigoRo3hDJT1kTQJgQD3Mla7SiWPLVMA=="],
 
-    "cojson-storage-rn-sqlite": ["cojson-storage-rn-sqlite@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "cojson-storage": "0.12.1" } }, "sha512-O52X+8boFcCgihfxTwL2yFsRUthYjm3jtWbAWDKAKfRmhKc9qW24OUPi3SdKpFIvoGMDqfn3+LvnmCDrApcnlQ=="],
+    "cojson-storage-rn-sqlite": ["cojson-storage-rn-sqlite@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "cojson-storage": "0.11.8" } }, "sha512-SqbFSB6D1QAqqrlIW97KwRFhyyHHld0WLHcttiKs0q+Idyn6nNawXL1APjaRuVjueXC6ICLa5cblqCr/hNRSfg=="],
 
-    "cojson-transport-ws": ["cojson-transport-ws@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "typescript": "~5.6.2" } }, "sha512-bYD5eUWuwVt8q0/EzW6LT0tYeKL5uZ1HTDwN+Q0Lw71BmGEs5Iz0BKm2bVUxYJCTIA6ctoPYszx+kyIhnWBlRQ=="],
+    "cojson-transport-ws": ["cojson-transport-ws@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "typescript": "~5.6.2" } }, "sha512-I31CAdvOO1y5pPiy1Gvvbzx1NU2uKKEZf4Q8xNVciRAbXF7cNrkigz9bAx5IHhBUTOxE3QzLdW3PhsRCPxU4kQ=="],
 
     "color": ["color@4.2.3", "", { "dependencies": { "color-convert": "^2.0.1", "color-string": "^1.9.0" } }, "sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A=="],
 
@@ -1392,21 +1392,21 @@
 
     "jackspeak": ["jackspeak@3.4.3", "", { "dependencies": { "@isaacs/cliui": "^8.0.2" }, "optionalDependencies": { "@pkgjs/parseargs": "^0.11.0" } }, "sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw=="],
 
-    "jazz-auth-clerk": ["jazz-auth-clerk@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "jazz-browser": "0.12.1", "jazz-tools": "0.12.1" } }, "sha512-tyFxNf5H/x9J3M1b3ZOiA7JSWmalHE2gH37RDtNlOtjjH+q2kbJ4vCdQBTfBX3OZ5jaQAuIJ3Fl2nD5/WsvqnQ=="],
+    "jazz-auth-clerk": ["jazz-auth-clerk@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "jazz-browser": "0.11.8", "jazz-tools": "0.11.8" } }, "sha512-NQ26+GE5mUI3+naHNgl1YRigb58e3I/laJo5IJBb0+yuGhoyvuHWwi5rCBgTHK6OJiorDCyC7reJ1Vfx89Zugg=="],
 
-    "jazz-browser": ["jazz-browser@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "cojson-storage-indexeddb": "0.12.1", "cojson-transport-ws": "0.12.1", "jazz-tools": "0.12.1" } }, "sha512-VMLBakW4P5p9tgtF9cfbZbSSSopsHzFd+9kr2Z40gbK3/cxUMckEfemO1jCZvX3GrCVprFBcq+al7KhCvOkckQ=="],
+    "jazz-browser": ["jazz-browser@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "cojson-storage-indexeddb": "0.11.8", "cojson-transport-ws": "0.11.8", "jazz-tools": "0.11.8" } }, "sha512-Vsb+CQA5v7ByhjEovbGxKF7+0OGzOXsEKh7tg7UzPJMi+rpiefqB0aV6p1Qpui7IBl2rjJ+jtwzaT6XBt6yWTA=="],
 
     "jazz-crypto-rs": ["jazz-crypto-rs@0.0.6", "", {}, "sha512-+hJM9hPzMjK7Jk9++sUs5mKXlFiCTMDZ2wjO8WsfNpY7RZ+kiYSwkCrKvvvDRHSXPlzoyFQFxrSrXqN0/Fr6Yw=="],
 
-    "jazz-react-core": ["jazz-react-core@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "jazz-tools": "0.12.1" }, "peerDependencies": { "react": "^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-JG4wrtm0pycBHgq/ZFvgjnqTx2mMSiPCeYdJuOuOcxeI7ymCUQLsjj/zdquZW5SDGS3Helh4s1PDmEJw5YBCnw=="],
+    "jazz-react-core": ["jazz-react-core@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "jazz-tools": "0.11.8" }, "peerDependencies": { "react": "^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-L4+sN1/OjdYRco1Ea+6lULtaIRpr+7GqpBDUYwPNDEF0qtqY1sd/KhTRkYe/f1zQKjnGKc4tm66x0Q0LXXWhEQ=="],
 
-    "jazz-react-native": ["jazz-react-native@0.12.1", "", { "dependencies": { "@scure/base": "1.2.1", "cojson": "0.12.1", "cojson-storage-rn-sqlite": "0.12.1", "cojson-transport-ws": "0.12.1", "jazz-react-core": "0.12.1", "jazz-react-native-media-images": "0.12.1", "jazz-tools": "0.12.1", "react-native-nitro-modules": "0.21.0", "react-native-quick-crypto": "1.0.0-beta.12" }, "peerDependencies": { "@react-native-community/netinfo": "*", "expo-secure-store": "*", "react-native": "*" } }, "sha512-diVyhqSQ6BZanfxX7FG9dn+LElfUPyPIp/CUpTdP5n1UA7wqQ/9BaBiA/ApOs4/1ax03Lx9lhQSjEQVZ9uy/rg=="],
+    "jazz-react-native": ["jazz-react-native@0.11.8", "", { "dependencies": { "@scure/base": "1.2.1", "cojson": "0.11.8", "cojson-storage-rn-sqlite": "0.11.8", "cojson-transport-ws": "0.11.8", "jazz-react-core": "0.11.8", "jazz-react-native-media-images": "0.11.8", "jazz-tools": "0.11.8", "react-native-nitro-modules": "0.21.0", "react-native-quick-crypto": "1.0.0-beta.12" }, "peerDependencies": { "@react-native-community/netinfo": "*", "expo-secure-store": "*", "react-native": "*" } }, "sha512-PrGpmeUnrcyK/3v9XJtCS7IwuKiv03DzL3r4Csz7DB2Kc4d28/7kk8LaFTLvb+59wEUEecgiROCKv4mGs5/Xog=="],
 
-    "jazz-react-native-auth-clerk": ["jazz-react-native-auth-clerk@0.12.1", "", { "dependencies": { "cojson": "0.12.1", "jazz-auth-clerk": "0.12.1", "jazz-react-native": "0.12.1", "jazz-tools": "0.12.1" } }, "sha512-IDjkleTyhe/oiEKQe3fPtQ5P2qjqycQyuHMM77gknmWiQlzBL1DLXGcYR38bJB1BXYoVgIKYfgpTzDMe+pkodA=="],
+    "jazz-react-native-auth-clerk": ["jazz-react-native-auth-clerk@0.11.8", "", { "dependencies": { "cojson": "0.11.8", "jazz-auth-clerk": "0.11.8", "jazz-react-native": "0.11.8", "jazz-tools": "0.11.8" } }, "sha512-drEA/a7RXB3cUeWE33FqdhH1nTVYOcTxo3qyQd+YUBaxLWAbgNtM1QtLdvqtsjNavL0UJ/WHE4OVvBAuhK//oQ=="],
 
-    "jazz-react-native-media-images": ["jazz-react-native-media-images@0.12.1", "", { "dependencies": { "jazz-tools": "0.12.1" }, "peerDependencies": { "@bam.tech/react-native-image-resizer": "*", "expo-file-system": "*", "react-native": "*" } }, "sha512-GSeH9smRJuU/tvrmvRP8LervYbQdQ9epQ5nMBgGe9sz5DgPC573vuTHp/36yZFY3uqSDbiYdWE9npRz2EWxGnw=="],
+    "jazz-react-native-media-images": ["jazz-react-native-media-images@0.11.8", "", { "dependencies": { "jazz-tools": "0.11.8" }, "peerDependencies": { "@bam.tech/react-native-image-resizer": "*", "expo-file-system": "*", "react-native": "*" } }, "sha512-hffBxe49kU3wpf9ue5GxZrymAV5wYlapy3zm9wqiBSjFV9ILQSI3bR58waJjy92ibv2JGCKmeoyYi9iTJI0BMA=="],
 
-    "jazz-tools": ["jazz-tools@0.12.1", "", { "dependencies": { "@scure/bip39": "^1.3.0", "cojson": "0.12.1", "fast-myers-diff": "^3.2.0" } }, "sha512-IbabQ94VE78k4LXvAJrm4jqc6p9WqJ4Pse45XAovKQng2OqVb7MEApXSkWb2pplJaqfpXrl7aron9BW6PyO76w=="],
+    "jazz-tools": ["jazz-tools@0.11.8", "", { "dependencies": { "@scure/bip39": "^1.3.0", "cojson": "0.11.8", "fast-myers-diff": "^3.2.0" } }, "sha512-okNhKckAg23sDz4/POnlr4uedbP+OdhyLJiH0hr/u4isdT5G9PCd5d5VRuJ4mfpIJ2R7d8AYuIFdSNa8gTaDmw=="],
 
     "jest-environment-node": ["jest-environment-node@29.7.0", "", { "dependencies": { "@jest/environment": "^29.7.0", "@jest/fake-timers": "^29.7.0", "@jest/types": "^29.6.3", "@types/node": "*", "jest-mock": "^29.7.0", "jest-util": "^29.7.0" } }, "sha512-DOSwCRqXirTOyheM+4d5YZOrWcdu0LNZ87ewUoywbcb2XR4wKgqiG8vNeYwhjFMbEkfju7wx2GYH0P2gevGvFw=="],
 
