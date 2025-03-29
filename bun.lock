@@ -15,6 +15,7 @@
         "@react-native-community/datetimepicker": "8.2.0",
         "@react-native-community/netinfo": "11.4.1",
         "@react-native-menu/menu": "1.2.2",
+        "@react-native-picker/picker": "2.9.0",
         "@react-navigation/material-top-tabs": "^7.2.3",
         "@react-navigation/native": "^7.0.19",
         "expo": "^52.0.41",
@@ -561,6 +562,8 @@
     "@react-native-community/netinfo": ["@react-native-community/netinfo@11.4.1", "", { "peerDependencies": { "react-native": ">=0.59" } }, "sha512-B0BYAkghz3Q2V09BF88RA601XursIEA111tnc2JOaN7axJWmNefmfjZqw/KdSxKZp7CZUuPpjBmz/WCR9uaHYg=="],
 
     "@react-native-menu/menu": ["@react-native-menu/menu@1.2.2", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-Uk65PAhwNkCVBAqJu5t2H9biV+m0JLwJc7m3v2X2A/W8SFJmUqYabBsLH4fOWKI3a7kkR9QDT6HruliIKSfM8w=="],
+
+    "@react-native-picker/picker": ["@react-native-picker/picker@2.9.0", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-khEhIW/uhfMqq/+tvg4rEAiPGT8GX+Y6QydlP2TSMSmRHoSJK+ShXvXZXSr4Sii4imkj4BwvLunGywwtQDODqg=="],
 
     "@react-native/assets-registry": ["@react-native/assets-registry@0.76.7", "", {}, "sha512-o79whsqL5fbPTUQO9w1FptRd4cw1TaeOrXtQSLQeDrMVAenw/wmsjyPK10VKtvqxa1KNMtWEyfgxcM8CVZVFmg=="],
 
