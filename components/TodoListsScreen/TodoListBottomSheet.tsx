@@ -60,22 +60,19 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
     }, []);
     const { me } = useAccount();
     const couple = useCouple();
-    const [emoji, setEmoji] = useState(toUpdate?.emoji || '🖊');
-    const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden || false);
-    const [title, setTitle] = useState(toUpdate?.title || '');
-    const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>(
-      toUpdate?.assignedTo || 'us'
-    );
-    const [backgroundColor, setBackgroundColor] = useState(toUpdate?.backgroundColor || '#FFFFFF');
-    const [showHideFromPartner, setShowHideFromPartner] = useState(toUpdate?.assignedTo === 'me');
+    const [emoji, setEmoji] = useState('🖊');
+    const [hideFromPartner, setHideFromPartner] = useState(false);
+    const [title, setTitle] = useState('');
+    const [assignedTo, setAssignedTo] = useState<TodoList['assignedTo']>('us');
+    const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+    const [showHideFromPartner, setShowHideFromPartner] = useState(false);
     const [activeScreen, setActiveScreen] = useState<'todo' | 'color' | 'emoji'>('todo');
 
-    // Update state when toUpdate changes
     useEffect(() => {
       if (toUpdate) {
+        setTitle(toUpdate?.title ?? '');
         setEmoji(toUpdate.emoji || '🖊');
         setHideFromPartner(toUpdate.isHidden || false);
-        setTitle(toUpdate.title || '');
         setAssignedTo(toUpdate.assignedTo || 'us');
         setBackgroundColor(toUpdate.backgroundColor || '#FFFFFF');
         setShowHideFromPartner(toUpdate.assignedTo === 'me');

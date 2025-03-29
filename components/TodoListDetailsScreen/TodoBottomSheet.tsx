@@ -215,6 +215,9 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
   );
 };
 
+const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
+const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
+
 const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
   const { onCreate, defaultAssignedTo, toUpdate, onDismiss } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
@@ -226,13 +229,43 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
     'todo'
   );
-  const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>(
-    toUpdate?.assignedTo ?? 'me'
-  );
-  const [showHideFromPartner, setShowHideFromPartner] = useState(true);
-  const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden ?? false);
 
+  const [title, setTitle] = useState('');
+  const [hasDueDate, setHasDueDate] = useState(toUpdate?.dueDate !== null);
+  const [dueDate, setDueDate] = useState<Date>(toUpdate?.dueDate ?? new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const [alertOption, setAlertOption] = useState<number | null>(null);
+  const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
+  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
+
+  const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
+  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
+  const [showHideFromPartner, setShowHideFromPartner] = useState(true);
+  const [hideFromPartner, setHideFromPartner] = useState(false);
+
+  useEffect(() => {
+    if (photo?.id) setImageDefinition(photo);
+  }, [photo?.id]);
+
+  useEffect(() => {
+    if (toUpdate) {
+      setTitle(toUpdate?.title ?? '');
+      setHideFromPartner(toUpdate?.isHidden ?? false);
+      setAssignedTo(toUpdate?.assignedTo ?? 'me');
+      setRepeatMode(toUpdate?.recurringUnit ?? null);
+      setAlertOption(toUpdate?.alertOptionMinutes ?? null);
+      setSecondAlertOption(toUpdate?.secondAlertOptionMinutes ?? null);
+      if (toUpdate.dueDate) setDueDate(toUpdate.dueDate);
+      setHasDueDate(toUpdate.dueDate !== null);
+    }
+  }, [toUpdate?.id]);
+
+  useEffect(() => {
+    setAssignedTo(defaultAssignedTo ?? 'me');
+    setShowHideFromPartner(defaultAssignedTo === 'me');
+  }, [defaultAssignedTo]);
   const handleImageUpload = async () => {
     try {
       if (!couple) return;
@@ -253,39 +286,6 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       console.error('Failed to upload image:', error);
     }
   };
-
-  useEffect(() => {
-    if (toUpdate) {
-      if (toUpdate.dueDate) setDueDate(toUpdate.dueDate);
-      setHasDueDate(toUpdate.dueDate !== null);
-      setImageDefinition(photo ?? null);
-    }
-  }, [toUpdate, photo?.id]);
-
-  useEffect(() => {
-    setAssignedTo(defaultAssignedTo ?? 'me');
-    setShowHideFromPartner(defaultAssignedTo === 'me');
-  }, [defaultAssignedTo]);
-
-  const [title, setTitle] = useState(toUpdate?.title ?? '');
-
-  const [hasDueDate, setHasDueDate] = useState(toUpdate?.dueDate !== null);
-  const [dueDate, setDueDate] = useState<Date>(toUpdate?.dueDate ?? new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-
-  const [alertOption, setAlertOption] = useState<number | null>(
-    toUpdate?.alertOptionMinutes ?? null
-  );
-  const [secondAlertOption, setSecondAlertOption] = useState<number | null>(
-    toUpdate?.secondAlertOptionMinutes ?? null
-  );
-  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(
-    toUpdate?.recurringUnit ?? null
-  );
-
-  const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
-  const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
 
   const getAlertDisplayText = (minutes: number | null) => {
     if (minutes === null) return 'None';

@@ -12,7 +12,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
-import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import {
   Image,
   Pressable,
@@ -187,18 +187,21 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     const couple = useCouple();
 
     const photo = useCoState(ImageDefinition, toUpdate?.photo?.id as ID<ImageDefinition>);
-    const [title, setTitle] = useState(toUpdate?.name ?? '');
-    const [notes, setNotes] = useState(toUpdate?.notes ?? '');
+    const [title, setTitle] = useState('');
+    const [notes, setNotes] = useState('');
     const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
-    const [hideFromPartner, setHideFromPartner] = useState(toUpdate?.isHidden ?? false);
-
-    const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
-      'todo'
-    );
+    const [hideFromPartner, setHideFromPartner] = useState(false);
+    const [activeScreen, setActiveScreen] = useState<'todo' | 'repeat'>('todo');
 
     useEffect(() => {
       if (photo?.id) setImageDefinition(photo);
     }, [photo?.id]);
+
+    useEffect(() => {
+      setTitle(toUpdate?.name ?? '');
+      setNotes(toUpdate?.notes ?? '');
+      setHideFromPartner(toUpdate?.isHidden ?? false);
+    }, [toUpdate]);
 
     const handleImageUpload = async () => {
       try {
@@ -262,13 +265,11 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
       onDismiss?.();
     }, []);
 
-    const screenHeight = useMemo(() => {
+    const getScreenHeight = () => {
       let height = 450;
-      if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
-        height = 500;
-      }
+      if (activeScreen === 'repeat') height = 500;
       return height;
-    }, [activeScreen]);
+    };
 
     const renderFooter = useCallback(
       (props: BottomSheetFooterProps) => {
@@ -299,7 +300,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         enableDynamicSizing
         onDismiss={handleDismiss}
         footerComponent={renderFooter}>
-        <BottomSheetView style={{ ...styles.sheetContainer, height: screenHeight }}>
+        <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
           {activeScreen === 'todo' && (
             <>
               <InputField onChange={setTitle} initialValue={title} />
