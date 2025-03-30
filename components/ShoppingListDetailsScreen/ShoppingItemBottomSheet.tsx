@@ -14,15 +14,7 @@ import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import CustomSwitch from '../CustomSwitch';
 
@@ -35,6 +27,7 @@ type OptionSectionProps = {
   onQuantityChange: (quantity: number) => void;
   selectedQuantity: number;
   selectedUnit: string;
+  onBack: () => void;
 };
 
 const units = ['kg', 'g', 'l', 'ml', 'pcs'];
@@ -45,25 +38,47 @@ const QuantitySection = ({
   onQuantityChange,
   selectedQuantity,
   selectedUnit,
+  onBack,
 }: OptionSectionProps) => {
   return (
-    <View style={{ width: '100%', height: 50, flexDirection: 'row', alignItems: 'center' }}>
-      <Picker<number>
-        style={{ flex: 1 }}
-        selectedValue={selectedQuantity}
-        onValueChange={(itemValue, itemIndex) => onQuantityChange(itemValue)}>
-        {quantities.map((quantity) => (
-          <Picker.Item label={quantity.toString()} value={quantity.toString()} />
-        ))}
-      </Picker>
-      <Picker<string>
-        style={{ flex: 1 }}
-        selectedValue={selectedUnit}
-        onValueChange={(itemValue, itemIndex) => onUnitChange(itemValue)}>
-        {units.map((unit) => (
-          <Picker.Item label={unit} value={unit} />
-        ))}
-      </Picker>
+    <View
+      style={{
+        width: '100%',
+        height: 50,
+        flexDirection: 'column',
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+        <Pressable onPress={onBack}>
+          <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
+        </Pressable>
+        <Text style={{ fontSize: 18, fontWeight: '600' }}>Quantity</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+        <Picker<number>
+          style={{ flex: 1 }}
+          selectedValue={selectedQuantity}
+          onValueChange={(itemValue, itemIndex) => onQuantityChange(itemValue)}>
+          {quantities.map((quantity) => (
+            <Picker.Item label={quantity.toString()} value={quantity.toString()} />
+          ))}
+        </Picker>
+        <Picker<string>
+          style={{ flex: 1 }}
+          selectedValue={selectedUnit}
+          onValueChange={(itemValue, itemIndex) => onUnitChange(itemValue)}>
+          {units.map((unit) => (
+            <Picker.Item label={unit} value={unit} />
+          ))}
+        </Picker>
+      </View>
     </View>
   );
 };
@@ -89,53 +104,6 @@ const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
         )}
       </Pressable>
     </View>
-  </View>
-);
-
-type OptionListProps = {
-  title: string;
-  options: string[];
-  selectedOption: string;
-  onSelect: (option: string) => void;
-  onBack: () => void;
-};
-
-const OptionList = ({ title, options, selectedOption, onSelect, onBack }: OptionListProps) => (
-  <View style={{ flex: 1 }}>
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 16,
-      }}>
-      <Pressable onPress={onBack}>
-        <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
-      </Pressable>
-      <Text style={{ fontSize: 18, fontWeight: '600' }}>{title}</Text>
-      <View style={{ width: 40 }} />
-    </View>
-    <ScrollView style={{ maxHeight: 600, marginBottom: 0, paddingBottom: 0 }}>
-      {options.map((option) => (
-        <TouchableOpacity
-          key={option}
-          style={[
-            {
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingVertical: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: '#F4F4F5',
-            },
-            selectedOption === option && { backgroundColor: '#F4F4F5' },
-          ]}
-          onPress={() => onSelect(option)}>
-          <Text style={{ fontSize: 16 }}>{option}</Text>
-          {selectedOption === option && <Ionicons name="checkmark" size={20} color="#27272A" />}
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
   </View>
 );
 
@@ -256,6 +224,8 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         toUpdate.notes = notes.trim();
         toUpdate.isHidden = hideFromPartner;
         toUpdate.photo = imageDefinition;
+        toUpdate.unit = selectedUnit as 'kg' | 'g' | 'l' | 'ml' | 'pcs';
+        toUpdate.quantity = selectedQuantity;
       } else {
         const newItem = ShoppingItem.create(
           {
@@ -264,9 +234,9 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
             creatorAccID: me.id,
             isHidden: hideFromPartner,
             photo: imageDefinition,
-            unit: 'kg',
+            unit: selectedUnit as 'kg' | 'g' | 'l' | 'ml' | 'pcs',
             category: 'food',
-            quantity: 1,
+            quantity: selectedQuantity,
             deleted: false,
             completed: false,
           },
@@ -352,7 +322,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                         fontWeight: '600',
                         color: '#8E51FF',
                       }}>
-                      {toUpdate?.quantity} {toUpdate?.unit}
+                      {selectedQuantity} {selectedUnit}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -381,6 +351,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
               onQuantityChange={setSelectedQuantity}
               selectedQuantity={selectedQuantity}
               selectedUnit={selectedUnit}
+              onBack={() => setActiveScreen('todo')}
             />
           )}
         </BottomSheetView>
