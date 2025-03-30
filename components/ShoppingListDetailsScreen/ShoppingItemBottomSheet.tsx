@@ -191,9 +191,13 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     }, [photo?.id]);
 
     useEffect(() => {
-      setTitle(toUpdate?.name ?? '');
-      setNotes(toUpdate?.notes ?? '');
-      setHideFromPartner(toUpdate?.isHidden ?? false);
+      if (toUpdate) {
+        setTitle(toUpdate.name);
+        setNotes(toUpdate.notes ?? '');
+        setHideFromPartner(toUpdate.isHidden);
+        setSelectedQuantity(toUpdate.quantity);
+        setSelectedUnit(toUpdate.unit);
+      }
     }, [toUpdate]);
 
     const handleImageUpload = async () => {
@@ -262,7 +266,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
 
     const getScreenHeight = () => {
       let height = 450;
-      if (activeScreen === 'quantity') height = 500;
+      if (activeScreen === 'quantity') height = 300;
       return height;
     };
 
