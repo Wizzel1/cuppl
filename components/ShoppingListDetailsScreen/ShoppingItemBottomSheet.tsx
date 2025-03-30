@@ -336,35 +336,6 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
               </View>
               <View
                 style={{
-                  marginTop: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Text style={{ fontSize: 16, color: '#27272A' }}>Category</Text>
-                <TouchableOpacity onPress={() => setActiveScreen('quantity')}>
-                  <View
-                    style={{
-                      paddingVertical: 9,
-                      paddingHorizontal: 20,
-                      borderRadius: 20,
-                      width: 120,
-                      backgroundColor: '#F4F4F5',
-                      alignItems: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: '600',
-                        color: '#8E51FF',
-                      }}>
-                      {category}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
