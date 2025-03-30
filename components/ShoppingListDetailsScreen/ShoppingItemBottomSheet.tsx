@@ -185,6 +185,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     const [activeScreen, setActiveScreen] = useState<'todo' | 'quantity'>('todo');
     const [selectedQuantity, setSelectedQuantity] = useState(1);
     const [selectedUnit, setSelectedUnit] = useState('kg');
+    const [category, setCategory] = useState('food');
 
     useEffect(() => {
       if (photo?.id) setImageDefinition(photo);
@@ -197,6 +198,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         setHideFromPartner(toUpdate.isHidden);
         setSelectedQuantity(toUpdate.quantity);
         setSelectedUnit(toUpdate.unit);
+        setCategory(toUpdate.category);
       }
     }, [toUpdate]);
 
@@ -332,8 +334,34 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                   </View>
                 </TouchableOpacity>
               </View>
-              <View style={{ marginTop: 16 }}>
+              <View
+                style={{
+                  marginTop: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Category</Text>
+                <TouchableOpacity onPress={() => setActiveScreen('quantity')}>
+                  <View
+                    style={{
+                      paddingVertical: 9,
+                      paddingHorizontal: 20,
+                      borderRadius: 20,
+                      width: 120,
+                      backgroundColor: '#F4F4F5',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '600',
+                        color: '#8E51FF',
+                      }}>
+                      {category}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </View>
               <View
                 style={{
