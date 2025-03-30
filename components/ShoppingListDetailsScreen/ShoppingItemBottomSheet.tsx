@@ -107,12 +107,6 @@ const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
   </View>
 );
 
-type ShoppingItemBottomSheetProps = {
-  onCreate?: (newItem: ShoppingItem) => void;
-  toUpdate: ShoppingItem | null;
-  onDismiss?: () => void;
-};
-
 interface InputFieldProps {
   onChange: (value: string) => void;
   initialValue?: string;
@@ -167,6 +161,13 @@ const NotesInputField = ({ onChange, initialValue }: InputFieldProps) => {
     />
   );
 };
+
+type ShoppingItemBottomSheetProps = {
+  onCreate?: (newItem: ShoppingItem) => void;
+  toUpdate: ShoppingItem | null;
+  onDismiss?: () => void;
+};
+
 const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetProps>(
   (props, ref) => {
     const { onCreate, toUpdate, onDismiss } = props;
