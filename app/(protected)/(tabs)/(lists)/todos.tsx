@@ -1,6 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
 import { ID } from 'jazz-tools';
+import { group, sift } from 'radashi';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 
@@ -77,40 +78,26 @@ export default function TodoLists() {
   ]);
 
   const { myLists, partnerLists, sharedLists } = useMemo(() => {
-    const empty = { myLists: [], partnerLists: [], sharedLists: [] };
-    if (!couple?.todoLists) return empty;
-    if (!myProfile?.accountId || !partnerProfile?.accountId) return empty;
-    const myAccountId = myProfile.accountId;
-    const partnerAccountId = partnerProfile.accountId;
-
-    const myLists: TodoList[] = [];
-    const partnerLists: TodoList[] = [];
-    const sharedLists: TodoList[] = [];
-
-    for (const list of couple.todoLists) {
-      if (!list) continue;
-      if (list.deleted) continue;
-      switch (list.assignedTo) {
-        case 'me':
-          if (list.creatorAccID === myAccountId) myLists.push(list);
-          if (list.creatorAccID === partnerAccountId) partnerLists.push(list);
-          break;
-        case 'partner':
-          if (list.creatorAccID === myAccountId) partnerLists.push(list);
-          if (list.creatorAccID === partnerAccountId) myLists.push(list);
-          break;
-        case 'us':
-          sharedLists.push(list);
-          break;
+    const myAccountId = myProfile?.accountId;
+    const liveLists = sift(couple?.todoLists ?? []);
+    const { me, partner, us } = group(liveLists, (list) => {
+      if (list.deleted) return 'deleted';
+      if (list.assignedTo === 'me') {
+        if (list.creatorAccID === myAccountId) return 'me';
+        return 'partner';
+      } else if (list.assignedTo === 'partner') {
+        if (list.creatorAccID === myAccountId) return 'partner';
+        return 'me';
       }
-    }
+      return 'us';
+    });
 
     return {
-      myLists,
-      partnerLists,
-      sharedLists,
+      myLists: me ?? [],
+      partnerLists: partner ?? [],
+      sharedLists: us ?? [],
     };
-  }, [couple?.todoLists, myProfile?.accountId, partnerProfile?.accountId]);
+  }, [couple?.todoLists, myProfile?.accountId]);
 
   const onItemPress = useCallback((listId: string) => {
     router.push({

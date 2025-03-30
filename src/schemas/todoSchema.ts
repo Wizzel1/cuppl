@@ -120,9 +120,11 @@ export class TodoList extends CoMap {
 
   get liveItems() {
     const items = [];
+
     for (const item of this.items ?? []) {
-      if (item?.deleted === undefined) continue;
-      if (item?.deleted) continue;
+      if (!item) continue;
+      if (item.deleted === undefined) continue;
+      if (item.deleted) continue;
       items.push(item);
     }
     return items;
@@ -131,9 +133,10 @@ export class TodoList extends CoMap {
   get completedItems() {
     const items = [];
     for (const item of this.items ?? []) {
-      if (item?.deleted) continue;
-      if (item?.completed === undefined) continue;
-      if (item?.completed) {
+      if (!item) continue;
+      if (item.deleted) continue;
+      if (item.completed === undefined) continue;
+      if (item.completed) {
         items.push(item);
       }
     }

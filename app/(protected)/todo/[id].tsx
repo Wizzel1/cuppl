@@ -3,6 +3,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCoState } from 'jazz-react-native';
 import { ID } from 'jazz-tools';
+import { group, sift } from 'radashi';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -26,32 +27,22 @@ export default function TodoListScreen() {
   const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
 
   const { assignedToMe, assignedToPartner, assignedToBoth } = useMemo(() => {
-    const assignedToMe: TodoItem[] = [];
-    const assignedToPartner: TodoItem[] = [];
-    const assignedToBoth: TodoItem[] = [];
-
     const myAccID = myProfile?.accountId;
     const partnerAccID = partnerProfile?.accountId;
-    for (const item of list?.items ?? []) {
-      if (item?.deleted) continue;
 
-      if (item?.assignedTo === 'me') {
-        if (item.creatorAccID === myAccID) {
-          assignedToMe.push(item);
-        } else {
-          assignedToPartner.push(item);
-        }
-      } else if (item?.assignedTo === 'partner') {
-        if (item.creatorAccID === partnerAccID) {
-          assignedToMe.push(item);
-        } else {
-          assignedToPartner.push(item);
-        }
-      } else if (item?.assignedTo === 'us') {
-        assignedToBoth.push(item);
+    const liveItems = sift(list?.liveItems ?? []);
+    const { me, partner, us } = group(liveItems, (item) => {
+      if (item.assignedTo === 'me') {
+        if (item.creatorAccID === myAccID) return 'me';
+        return 'partner';
+      } else if (item.assignedTo === 'partner') {
+        if (item.creatorAccID === partnerAccID) return 'me';
+        return 'partner';
       }
-    }
-    return { assignedToMe, assignedToPartner, assignedToBoth };
+      return 'us';
+    });
+
+    return { assignedToMe: me ?? [], assignedToPartner: partner ?? [], assignedToBoth: us ?? [] };
   }, [list?.items]);
 
   const handleToggle = (title: string) => {
