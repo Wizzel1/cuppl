@@ -2,7 +2,7 @@ import { co, CoList, CoMap, ImageDefinition } from 'jazz-tools';
 
 export class ShoppingItem extends CoMap {
   name = co.string;
-  quantity = co.optional.number;
+  quantity = co.number;
   unit = co.literal('kg', 'g', 'l', 'ml', 'pcs');
   category = co.literal('food', 'household', 'other');
   isHidden = co.boolean;

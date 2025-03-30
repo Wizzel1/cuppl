@@ -8,20 +8,13 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg, useAccount } from 'jazz-react-native';
+import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
-import { ImageDefinition } from 'jazz-tools';
-import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ID, ImageDefinition } from 'jazz-tools';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import CustomSwitch from '../CustomSwitch';
 
@@ -30,21 +23,65 @@ import { ShoppingItem } from '~/src/schemas/shoppingSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
 type OptionSectionProps = {
-  label: string;
-  value: string;
-  onPress: () => void;
+  onUnitChange: (unit: string) => void;
+  onQuantityChange: (quantity: number) => void;
+  selectedQuantity: number;
+  selectedUnit: string;
+  onBack: () => void;
 };
 
-const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>{label}</Text>
-      <Pressable style={styles.optionButton} onPress={onPress}>
-        <Text style={styles.optionText}>{value}</Text>
-      </Pressable>
+const units = ['kg', 'g', 'l', 'ml', 'pcs'];
+const quantities = Array.from({ length: 100 }, (_, i) => i + 1);
+
+const QuantitySection = ({
+  onUnitChange,
+  onQuantityChange,
+  selectedQuantity,
+  selectedUnit,
+  onBack,
+}: OptionSectionProps) => {
+  return (
+    <View
+      style={{
+        width: '100%',
+        height: 50,
+        flexDirection: 'column',
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}>
+        <Pressable onPress={onBack}>
+          <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
+        </Pressable>
+        <Text style={{ fontSize: 18, fontWeight: '600' }}>Quantity</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+        <Picker<number>
+          style={{ flex: 1 }}
+          selectedValue={selectedQuantity}
+          onValueChange={(itemValue, itemIndex) => onQuantityChange(itemValue)}>
+          {quantities.map((quantity) => (
+            <Picker.Item label={quantity.toString()} value={quantity.toString()} />
+          ))}
+        </Picker>
+        <Picker<string>
+          style={{ flex: 1 }}
+          selectedValue={selectedUnit}
+          onValueChange={(itemValue, itemIndex) => onUnitChange(itemValue)}>
+          {units.map((unit) => (
+            <Picker.Item label={unit} value={unit} />
+          ))}
+        </Picker>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 type PhotoSectionProps = {
   image: ImageDefinition | null;
@@ -69,59 +106,6 @@ const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
     </View>
   </View>
 );
-
-type OptionListProps = {
-  title: string;
-  options: string[];
-  selectedOption: string;
-  onSelect: (option: string) => void;
-  onBack: () => void;
-};
-
-const OptionList = ({ title, options, selectedOption, onSelect, onBack }: OptionListProps) => (
-  <View style={{ flex: 1 }}>
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 16,
-      }}>
-      <Pressable onPress={onBack}>
-        <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
-      </Pressable>
-      <Text style={{ fontSize: 18, fontWeight: '600' }}>{title}</Text>
-      <View style={{ width: 40 }} />
-    </View>
-    <ScrollView style={{ maxHeight: 600, marginBottom: 0, paddingBottom: 0 }}>
-      {options.map((option) => (
-        <TouchableOpacity
-          key={option}
-          style={[
-            {
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingVertical: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: '#F4F4F5',
-            },
-            selectedOption === option && { backgroundColor: '#F4F4F5' },
-          ]}
-          onPress={() => onSelect(option)}>
-          <Text style={{ fontSize: 16 }}>{option}</Text>
-          {selectedOption === option && <Ionicons name="checkmark" size={20} color="#27272A" />}
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  </View>
-);
-
-type ShoppingItemBottomSheetProps = {
-  onCreate?: (newItem: ShoppingItem) => void;
-  toUpdate: ShoppingItem | null;
-  onDismiss?: () => void;
-};
 
 interface InputFieldProps {
   onChange: (value: string) => void;
@@ -177,6 +161,13 @@ const NotesInputField = ({ onChange, initialValue }: InputFieldProps) => {
     />
   );
 };
+
+type ShoppingItemBottomSheetProps = {
+  onCreate?: (newItem: ShoppingItem) => void;
+  toUpdate: ShoppingItem | null;
+  onDismiss?: () => void;
+};
+
 const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetProps>(
   (props, ref) => {
     const { onCreate, toUpdate, onDismiss } = props;
@@ -186,11 +177,30 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     const { me } = useAccount();
     const couple = useCouple();
 
-    const [activeScreen, setActiveScreen] = useState<'todo' | 'alert' | 'secondAlert' | 'repeat'>(
-      'todo'
-    );
+    const photo = useCoState(ImageDefinition, toUpdate?.photo?.id as ID<ImageDefinition>);
+    const [title, setTitle] = useState('');
+    const [notes, setNotes] = useState('');
     const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
     const [hideFromPartner, setHideFromPartner] = useState(false);
+    const [activeScreen, setActiveScreen] = useState<'todo' | 'quantity'>('todo');
+    const [selectedQuantity, setSelectedQuantity] = useState(1);
+    const [selectedUnit, setSelectedUnit] = useState('kg');
+    const [category, setCategory] = useState('food');
+
+    useEffect(() => {
+      if (photo?.id) setImageDefinition(photo);
+    }, [photo?.id]);
+
+    useEffect(() => {
+      if (toUpdate) {
+        setTitle(toUpdate.name);
+        setNotes(toUpdate.notes ?? '');
+        setHideFromPartner(toUpdate.isHidden);
+        setSelectedQuantity(toUpdate.quantity);
+        setSelectedUnit(toUpdate.unit);
+        setCategory(toUpdate.category);
+      }
+    }, [toUpdate]);
 
     const handleImageUpload = async () => {
       try {
@@ -213,26 +223,16 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
       }
     };
 
-    useEffect(() => {
-      if (toUpdate) {
-        setTitle(toUpdate.name);
-        setNotes(toUpdate.notes ?? '');
-        setHideFromPartner(toUpdate.isHidden);
-        setImageDefinition(toUpdate.photo ?? null);
-      }
-    }, [toUpdate]);
-
-    const [title, setTitle] = useState('');
-    const [notes, setNotes] = useState('');
-
     const handleSubmit = () => {
       if (!onCreate) return;
 
       if (toUpdate) {
         toUpdate.name = title.trim();
+        toUpdate.notes = notes.trim();
         toUpdate.isHidden = hideFromPartner;
         toUpdate.photo = imageDefinition;
-        toUpdate.notes = notes;
+        toUpdate.unit = selectedUnit as 'kg' | 'g' | 'l' | 'ml' | 'pcs';
+        toUpdate.quantity = selectedQuantity;
       } else {
         const newItem = ShoppingItem.create(
           {
@@ -241,8 +241,9 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
             creatorAccID: me.id,
             isHidden: hideFromPartner,
             photo: imageDefinition,
-            unit: 'kg',
+            unit: selectedUnit as 'kg' | 'g' | 'l' | 'ml' | 'pcs',
             category: 'food',
+            quantity: selectedQuantity,
             deleted: false,
             completed: false,
           },
@@ -258,18 +259,18 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
 
     const handleDismiss = useCallback(() => {
       setTitle('');
+      setNotes('');
       setHideFromPartner(false);
+      setImageDefinition(null);
       setActiveScreen('todo');
       onDismiss?.();
     }, []);
 
-    const screenHeight = useMemo(() => {
+    const getScreenHeight = () => {
       let height = 450;
-      if (activeScreen === 'alert' || activeScreen === 'secondAlert' || activeScreen === 'repeat') {
-        height = 500;
-      }
+      if (activeScreen === 'quantity') height = 300;
       return height;
-    }, [activeScreen]);
+    };
 
     const renderFooter = useCallback(
       (props: BottomSheetFooterProps) => {
@@ -300,15 +301,38 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         enableDynamicSizing
         onDismiss={handleDismiss}
         footerComponent={renderFooter}>
-        <BottomSheetView style={{ ...styles.sheetContainer, height: screenHeight }}>
+        <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
           {activeScreen === 'todo' && (
             <>
               <InputField onChange={setTitle} initialValue={title} />
-              <View style={{ marginTop: 16 }}>
+              <View
+                style={{
+                  marginTop: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Quantity</Text>
-              </View>
-              <View style={{ marginTop: 16 }}>
-                <Text style={{ fontSize: 16, color: '#27272A' }}>Category</Text>
+                <TouchableOpacity onPress={() => setActiveScreen('quantity')}>
+                  <View
+                    style={{
+                      paddingVertical: 9,
+                      paddingHorizontal: 20,
+                      borderRadius: 20,
+                      width: 120,
+                      backgroundColor: '#F4F4F5',
+                      alignItems: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '600',
+                        color: '#8E51FF',
+                      }}>
+                      {selectedQuantity} {selectedUnit}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </View>
               <View
                 style={{
@@ -324,6 +348,15 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
               <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
               <NotesInputField onChange={setNotes} initialValue={notes} />
             </>
+          )}
+          {activeScreen === 'quantity' && (
+            <QuantitySection
+              onUnitChange={setSelectedUnit}
+              onQuantityChange={setSelectedQuantity}
+              selectedQuantity={selectedQuantity}
+              selectedUnit={selectedUnit}
+              onBack={() => setActiveScreen('todo')}
+            />
           )}
         </BottomSheetView>
       </BottomSheetModal>
