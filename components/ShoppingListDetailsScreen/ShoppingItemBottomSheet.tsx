@@ -31,30 +31,38 @@ import { ShoppingItem } from '~/src/schemas/shoppingSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
 type OptionSectionProps = {
-  label: string;
-  value: string;
-  onPress: () => void;
+  onUnitChange: (unit: string) => void;
+  onQuantityChange: (quantity: number) => void;
+  selectedQuantity: number;
+  selectedUnit: string;
 };
 
-const OptionSection = ({ label, value, onPress }: OptionSectionProps) => {
-  const [selectedLanguage, setSelectedLanguage] = useState();
+const units = ['kg', 'g', 'l', 'ml', 'pcs'];
+const quantities = Array.from({ length: 100 }, (_, i) => i + 1);
+
+const QuantitySection = ({
+  onUnitChange,
+  onQuantityChange,
+  selectedQuantity,
+  selectedUnit,
+}: OptionSectionProps) => {
   return (
     <View style={{ width: '100%', height: 50, flexDirection: 'row', alignItems: 'center' }}>
-      <Picker
+      <Picker<number>
         style={{ flex: 1 }}
-        selectedValue={selectedLanguage}
-        onValueChange={(itemValue, itemIndex) => setSelectedLanguage(itemValue)}>
-        <Picker.Item label="Java" value="java" />
-        <Picker.Item label="JavaScript" value="js" />
-        <Picker.Item label="Python" value="py" />
+        selectedValue={selectedQuantity}
+        onValueChange={(itemValue, itemIndex) => onQuantityChange(itemValue)}>
+        {quantities.map((quantity) => (
+          <Picker.Item label={quantity.toString()} value={quantity.toString()} />
+        ))}
       </Picker>
-      <Picker
+      <Picker<string>
         style={{ flex: 1 }}
-        selectedValue={selectedLanguage}
-        onValueChange={(itemValue, itemIndex) => setSelectedLanguage(itemValue)}>
-        <Picker.Item label="Java" value="java" />
-        <Picker.Item label="JavaScript" value="js" />
-        <Picker.Item label="Python" value="py" />
+        selectedValue={selectedUnit}
+        onValueChange={(itemValue, itemIndex) => onUnitChange(itemValue)}>
+        {units.map((unit) => (
+          <Picker.Item label={unit} value={unit} />
+        ))}
       </Picker>
     </View>
   );
@@ -205,7 +213,9 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
     const [notes, setNotes] = useState('');
     const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
     const [hideFromPartner, setHideFromPartner] = useState(false);
-    const [activeScreen, setActiveScreen] = useState<'todo' | 'repeat'>('todo');
+    const [activeScreen, setActiveScreen] = useState<'todo' | 'quantity'>('todo');
+    const [selectedQuantity, setSelectedQuantity] = useState(1);
+    const [selectedUnit, setSelectedUnit] = useState('kg');
 
     useEffect(() => {
       if (photo?.id) setImageDefinition(photo);
@@ -281,7 +291,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
 
     const getScreenHeight = () => {
       let height = 450;
-      if (activeScreen === 'repeat') height = 500;
+      if (activeScreen === 'quantity') height = 500;
       return height;
     };
 
@@ -326,25 +336,26 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                   justifyContent: 'space-between',
                 }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Quantity</Text>
-                <OptionSection label="Quantity" value="" onPress={() => {}} />
-                <View
-                  style={{
-                    paddingVertical: 9,
-                    paddingHorizontal: 20,
-                    borderRadius: 20,
-                    width: 120,
-                    backgroundColor: '#F4F4F5',
-                    alignItems: 'center',
-                  }}>
-                  <Text
+                <TouchableOpacity onPress={() => setActiveScreen('quantity')}>
+                  <View
                     style={{
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: '#8E51FF',
+                      paddingVertical: 9,
+                      paddingHorizontal: 20,
+                      borderRadius: 20,
+                      width: 120,
+                      backgroundColor: '#F4F4F5',
+                      alignItems: 'center',
                     }}>
-                    {toUpdate?.quantity} {toUpdate?.unit}
-                  </Text>
-                </View>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '600',
+                        color: '#8E51FF',
+                      }}>
+                      {toUpdate?.quantity} {toUpdate?.unit}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </View>
               <View style={{ marginTop: 16 }}>
                 <Text style={{ fontSize: 16, color: '#27272A' }}>Category</Text>
@@ -363,6 +374,14 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
               <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
               <NotesInputField onChange={setNotes} initialValue={notes} />
             </>
+          )}
+          {activeScreen === 'quantity' && (
+            <QuantitySection
+              onUnitChange={setSelectedUnit}
+              onQuantityChange={setSelectedQuantity}
+              selectedQuantity={selectedQuantity}
+              selectedUnit={selectedUnit}
+            />
           )}
         </BottomSheetView>
       </BottomSheetModal>
