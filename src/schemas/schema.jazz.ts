@@ -267,6 +267,7 @@ export class CoupleAccount extends Account {
     // Create a private group for couple data
     const privateGroup = Group.create({ owner: this });
 
+    if (1 === 1) return;
     // Create a sample personal todo list
     const myTodoList = createTodoList({
       me: this,
