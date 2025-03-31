@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import { Agenda, AgendaEntry, AgendaSchedule, DateData } from 'react-native-calendars';
+import { Agenda, AgendaProps, AgendaSchedule, DateData } from 'react-native-calendars';
+import { Theme } from 'react-native-calendars/src/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 function getDateFromTimestamp(timestamp: number) {
@@ -8,6 +9,15 @@ function getDateFromTimestamp(timestamp: number) {
   return date.toISOString().split('T')[0];
 }
 
+const theme: Theme = {
+  agendaDayTextColor: 'yellow',
+  agendaDayNumColor: 'green',
+  agendaTodayColor: 'red',
+  agendaKnobColor: 'blue',
+  nowIndicatorKnob: {
+    backgroundColor: 'red',
+  },
+};
 export default function CalendarScreen() {
   const [items, setItems] = useState<AgendaSchedule>({});
   const loadItems = (day: DateData) => {
@@ -38,67 +48,61 @@ export default function CalendarScreen() {
     }, 1000);
   };
 
+  const agendaProps: AgendaProps = useMemo(() => {
+    return {
+      items,
+      showClosingKnob: true,
+      hideKnob: false,
+      selected: getDateFromTimestamp(new Date().getTime()),
+      onCalendarToggled: (calendarOpened) => {
+        console.log(calendarOpened);
+      },
+      onDayChange: (day) => {
+        console.log('day changed', day);
+      },
+      loadItemsForMonth: (month) => {
+        console.log('trigger items loading');
+        loadItems(month);
+      },
+      renderItem: (entry, isFirst) => {
+        return (
+          <View style={{ height: 300, width: '100%' }}>
+            <Text style={{ color: 'black' }}>{entry.name}</Text>
+          </View>
+        );
+      },
+      onDayPress: (day) => {
+        console.log('day pressed', day);
+      },
+      renderKnob: () => {
+        return <View style={{ width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }} />;
+      },
+      rowHasChanged: (r1, r2) => {
+        return r1.name !== r2.name;
+      },
+      renderDay: (day, item) => {
+        return <View />;
+      },
+      renderEmptyDate: () => {
+        return (
+          <View style={{ backgroundColor: 'red', height: 100, width: 100 }}>
+            <Text>This is empty date!</Text>
+          </View>
+        );
+      },
+      theme,
+    } satisfies AgendaProps;
+  }, [items]);
+
   return (
     <SafeAreaView
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
       <Agenda
-        // The list of items that have to be displayed in agenda. If you want to render item as empty date
-        // the value of date key has to be an empty array []. If there exists no value for date key it is
-        // considered that the date in question is not yet loaded
-        items={items}
-        // Callback that gets called when items for a certain month should be loaded (month became visible)
-        loadItemsForMonth={(month: DateData) => {
-          console.log('trigger items loading');
-          loadItems(month);
-        }}
-        // Callback that fires when the calendar is opened or closed
-        onCalendarToggled={(calendarOpened: boolean) => {
-          console.log(calendarOpened);
-        }}
-        // Callback that gets called on day press
-        onDayPress={(day) => {
-          console.log('day pressed');
-        }}
-        // Callback that gets called when day changes while scrolling agenda list
-        onDayChange={(day) => {
-          console.log('day changed');
-        }}
-        // Initially selected day
-        selected={getDateFromTimestamp(new Date().getTime())} //"2025-03-30"
-        // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-        minDate="2012-05-10"
-        // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-        maxDate="2025-05-30"
+        {...agendaProps}
         // Max amount of months allowed to scroll to the past. Default = 50
         pastScrollRange={50}
         // Max amount of months allowed to scroll to the future. Default = 50
         futureScrollRange={50}
-        // Specify how each item should be rendered in agenda
-        renderItem={(item: AgendaEntry, firstItemInDay: boolean) => {
-          return (
-            <View style={{ height: 300, width: '100%' }}>
-              <Text style={{ color: 'black' }}>{item.name}</Text>
-            </View>
-          );
-        }}
-        // Specify how each date should be rendered. day can be undefined if the item is not first in that day
-        renderDay={(day, item) => {
-          return <View />;
-        }}
-        // Specify how empty date content with no items should be rendered
-        renderEmptyDate={() => {
-          return (
-            <View style={{ backgroundColor: 'red', height: 100, width: 100 }}>
-              <Text>This is empty date!</Text>
-            </View>
-          );
-        }}
-        // Specify how agenda knob should look like
-        renderKnob={() => {
-          return (
-            <View style={{ width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }} />
-          );
-        }}
         // Override inner list with a custom implemented component
         // renderList={(listProps) => {
         //   return <MyCustomList {...listProps} />;
@@ -107,14 +111,6 @@ export default function CalendarScreen() {
         renderEmptyData={() => {
           return <View />;
         }}
-        // Specify your item comparison function for increased performance
-        rowHasChanged={(r1, r2) => {
-          return r1.text !== r2.text;
-        }}
-        // Hide knob button. Default = false
-        hideKnob={false}
-        // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
-        showClosingKnob
         // By default, agenda dates are marked if they have at least one item, but you can override this if needed
         markedDates={{
           '2012-05-16': { selected: true, marked: true },
@@ -129,15 +125,6 @@ export default function CalendarScreen() {
         refreshing={false}
         // Add a custom RefreshControl component, used to provide pull-to-refresh functionality for the ScrollView
         refreshControl={null}
-        markToday
-        // Agenda theme
-        theme={{
-          //   ...calendarTheme,
-          agendaDayTextColor: 'yellow',
-          agendaDayNumColor: 'green',
-          agendaTodayColor: 'red',
-          agendaKnobColor: 'blue',
-        }}
         // Agenda container style
         style={{
           height: '100%',
