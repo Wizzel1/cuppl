@@ -52,12 +52,13 @@ export default function CalendarScreen() {
     return {
       items,
       showClosingKnob: true,
-      hideKnob: false,
+      pastScrollRange: 50,
+      futureScrollRange: 50,
       selected: getDateFromTimestamp(new Date().getTime()),
       onCalendarToggled: (calendarOpened) => {
         console.log(calendarOpened);
       },
-      onDayChange: (day) => {
+      onDayChange: (day: DateData) => {
         console.log('day changed', day);
       },
       loadItemsForMonth: (month) => {
@@ -75,7 +76,11 @@ export default function CalendarScreen() {
         console.log('day pressed', day);
       },
       renderKnob: () => {
-        return <View style={{ width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }} />;
+        return (
+          <View
+            style={{ padding: 10, width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }}
+          />
+        );
       },
       rowHasChanged: (r1, r2) => {
         return r1.name !== r2.name;
@@ -90,6 +95,18 @@ export default function CalendarScreen() {
           </View>
         );
       },
+      renderEmptyData: () => {
+        return <View />;
+      },
+      onRefresh: () => {
+        console.log('refreshing...');
+      },
+      markedDates: {
+        '2012-05-16': { selected: true, marked: true },
+        '2012-05-17': { marked: true },
+        '2012-05-18': { disabled: true },
+      },
+      refreshing: false,
       theme,
     } satisfies AgendaProps;
   }, [items]);
@@ -97,40 +114,7 @@ export default function CalendarScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-      <Agenda
-        {...agendaProps}
-        // Max amount of months allowed to scroll to the past. Default = 50
-        pastScrollRange={50}
-        // Max amount of months allowed to scroll to the future. Default = 50
-        futureScrollRange={50}
-        // Override inner list with a custom implemented component
-        // renderList={(listProps) => {
-        //   return <MyCustomList {...listProps} />;
-        // }}
-        // Specify what should be rendered instead of ActivityIndicator
-        renderEmptyData={() => {
-          return <View />;
-        }}
-        // By default, agenda dates are marked if they have at least one item, but you can override this if needed
-        markedDates={{
-          '2012-05-16': { selected: true, marked: true },
-          '2012-05-17': { marked: true },
-          '2012-05-18': { disabled: true },
-        }}
-        // If disabledByDefault={true} dates flagged as not disabled will be enabled. Default = false
-        disabledByDefault
-        // If provided, a standard RefreshControl will be added for "Pull to Refresh" functionality. Make sure to also set the refreshing prop correctly
-        onRefresh={() => console.log('refreshing...')}
-        // Set this true while waiting for new data from a refresh
-        refreshing={false}
-        // Add a custom RefreshControl component, used to provide pull-to-refresh functionality for the ScrollView
-        refreshControl={null}
-        // Agenda container style
-        style={{
-          height: '100%',
-          width: '100%',
-        }}
-      />
+      <Agenda {...agendaProps} style={{ height: '100%', width: '100%' }} />
     </SafeAreaView>
   );
 }
