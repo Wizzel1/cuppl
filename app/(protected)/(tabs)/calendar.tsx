@@ -25,8 +25,14 @@ export default function CalendarScreen() {
 
           const numItems = Math.floor(Math.random() * 3 + 1);
           for (let j = 0; j < numItems; j++) {
-            items[strTime].push({
+            const data = {
               name: 'Item for ' + strTime + ' #' + j,
+              category: 'Category ' + j,
+              text: 'Text ' + j,
+              horizontal: true,
+            };
+            items[strTime].push({
+              name: JSON.stringify(data),
               height: Math.max(50, Math.floor(Math.random() * 150)),
               day: strTime,
             });
@@ -65,16 +71,17 @@ export default function CalendarScreen() {
       // onDayChange: (day: DateData) => {
       //   console.log('day changed', day);
       // },
-      loadItemsForMonth: (month) => {
-        console.log('trigger items loading');
-        loadItems(month);
-      },
+      loadItemsForMonth: loadItems,
       renderItem: (entry, isFirst) => {
         const fontSize = isFirst ? 16 : 14;
         const color = isFirst ? 'black' : '#43515c';
+        const { name, category } = JSON.parse(entry.name);
         return (
-          <Pressable style={[styles.item, { height: 50 }]} onPress={() => Alert.alert(entry.name)}>
-            <Text style={{ fontSize, color }}>{entry.name}</Text>
+          <Pressable
+            style={[styles.item, { height: entry.height }]}
+            onPress={() => Alert.alert(entry.name)}>
+            <Text style={{ fontSize, color }}>{name}</Text>
+            <Text style={{ fontSize, color }}>{category}</Text>
           </Pressable>
         );
       },
@@ -88,19 +95,16 @@ export default function CalendarScreen() {
       //     />
       //   );
       // },
-      // rowHasChanged: (r1, r2) => {
-      //   return r1.name !== r2.name;
-      // },
-      // renderDay: (day, item) => {
-      //   return <View />;
-      // },
-      // renderEmptyDate: () => {
-      //   return (
-      //     <View style={{ backgroundColor: 'red', height: 100, width: 100 }}>
-      //       <Text>This is empty date!</Text>
-      //     </View>
-      //   );
-      // },
+      rowHasChanged: (r1, r2) => {
+        return r1.name !== r2.name;
+      },
+      renderEmptyDate: () => {
+        return (
+          <View style={styles.emptyDate}>
+            <Text>This is empty date!</Text>
+          </View>
+        );
+      },
       // renderEmptyData: () => {
       //   return <View />;
       // },
@@ -121,6 +125,7 @@ export default function CalendarScreen() {
     <View
       style={{
         paddingTop: Constants.statusBarHeight,
+        backgroundColor: 'white',
         flex: 1,
       }}>
       <Agenda {...agendaProps} />
