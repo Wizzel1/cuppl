@@ -4,6 +4,8 @@ import { Agenda, AgendaProps, AgendaSchedule, DateData } from 'react-native-cale
 import { Theme } from 'react-native-calendars/src/types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import FloatingActionButton from '~/components/FloatingActionButton';
+
 function getDateFromTimestamp(timestamp: number) {
   const date = new Date(timestamp);
   return date.toISOString().split('T')[0];
@@ -16,6 +18,17 @@ const theme: Theme = {
   agendaKnobColor: 'blue',
   nowIndicatorKnob: {
     backgroundColor: 'red',
+  },
+  stylesheet: {
+    agenda: {
+      list: {
+        height: 500,
+        backgroundColor: 'red',
+      },
+      main: {
+        backgroundColor: 'blue',
+      },
+    },
   },
 };
 export default function CalendarScreen() {
@@ -67,7 +80,7 @@ export default function CalendarScreen() {
       },
       renderItem: (entry, isFirst) => {
         return (
-          <View style={{ height: 300, width: '100%' }}>
+          <View style={{ height: 300, width: '100%' }} key={entry.name}>
             <Text style={{ color: 'black' }}>{entry.name}</Text>
           </View>
         );
@@ -78,7 +91,7 @@ export default function CalendarScreen() {
       renderKnob: () => {
         return (
           <View
-            style={{ padding: 10, width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }}
+            style={{ padding: 5, width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }}
           />
         );
       },
@@ -115,6 +128,7 @@ export default function CalendarScreen() {
     <SafeAreaView
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
       <Agenda {...agendaProps} style={{ height: '100%', width: '100%' }} />
+      <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
     </SafeAreaView>
   );
 }
