@@ -1,8 +1,8 @@
+import Constants from 'expo-constants';
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Agenda, AgendaProps, AgendaSchedule, DateData } from 'react-native-calendars';
 import { Theme } from 'react-native-calendars/src/types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 
@@ -11,27 +11,8 @@ function getDateFromTimestamp(timestamp: number) {
   return date.toISOString().split('T')[0];
 }
 
-const theme: Theme = {
-  agendaDayTextColor: 'yellow',
-  agendaDayNumColor: 'green',
-  agendaTodayColor: 'red',
-  agendaKnobColor: 'blue',
-  nowIndicatorKnob: {
-    backgroundColor: 'red',
-  },
-  stylesheet: {
-    agenda: {
-      list: {
-        height: 500,
-        backgroundColor: 'red',
-      },
-      main: {
-        backgroundColor: 'blue',
-      },
-    },
-  },
-};
 export default function CalendarScreen() {
+  const [open, setOpen] = useState(false);
   const [items, setItems] = useState<AgendaSchedule>({});
   const loadItems = (day: DateData) => {
     setTimeout(() => {
@@ -61,6 +42,16 @@ export default function CalendarScreen() {
     }, 1000);
   };
 
+  const theme: Theme = {
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    textSectionTitleColor: '#b6c1cd',
+    selectedDayBackgroundColor: '#00adf5',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#00adf5',
+    dayTextColor: '#2d4150',
+    textDisabledColor: '#dd99ee',
+  };
   const agendaProps: AgendaProps = useMemo(() => {
     return {
       items,
@@ -69,66 +60,90 @@ export default function CalendarScreen() {
       futureScrollRange: 50,
       selected: getDateFromTimestamp(new Date().getTime()),
       onCalendarToggled: (calendarOpened) => {
-        console.log(calendarOpened);
+        setOpen(calendarOpened);
       },
-      onDayChange: (day: DateData) => {
-        console.log('day changed', day);
-      },
+      // onDayChange: (day: DateData) => {
+      //   console.log('day changed', day);
+      // },
       loadItemsForMonth: (month) => {
         console.log('trigger items loading');
         loadItems(month);
       },
       renderItem: (entry, isFirst) => {
+        const fontSize = isFirst ? 16 : 14;
+        const color = isFirst ? 'black' : '#43515c';
         return (
-          <View style={{ height: 300, width: '100%' }} key={entry.name}>
-            <Text style={{ color: 'black' }}>{entry.name}</Text>
-          </View>
+          <Pressable style={[styles.item, { height: 50 }]} onPress={() => Alert.alert(entry.name)}>
+            <Text style={{ fontSize, color }}>{entry.name}</Text>
+          </Pressable>
         );
       },
-      onDayPress: (day) => {
-        console.log('day pressed', day);
-      },
-      renderKnob: () => {
-        return (
-          <View
-            style={{ padding: 5, width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }}
-          />
-        );
-      },
-      rowHasChanged: (r1, r2) => {
-        return r1.name !== r2.name;
-      },
-      renderDay: (day, item) => {
-        return <View />;
-      },
-      renderEmptyDate: () => {
-        return (
-          <View style={{ backgroundColor: 'red', height: 100, width: 100 }}>
-            <Text>This is empty date!</Text>
-          </View>
-        );
-      },
-      renderEmptyData: () => {
-        return <View />;
-      },
-      onRefresh: () => {
-        console.log('refreshing...');
-      },
-      markedDates: {
-        '2012-05-16': { selected: true, marked: true },
-        '2012-05-17': { marked: true },
-        '2012-05-18': { disabled: true },
-      },
+      // onDayPress: (day) => {
+      //   console.log('day pressed', day);
+      // },
+      // renderKnob: () => {
+      //   return (
+      //     <View
+      //       style={{ padding: 5, width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }}
+      //     />
+      //   );
+      // },
+      // rowHasChanged: (r1, r2) => {
+      //   return r1.name !== r2.name;
+      // },
+      // renderDay: (day, item) => {
+      //   return <View />;
+      // },
+      // renderEmptyDate: () => {
+      //   return (
+      //     <View style={{ backgroundColor: 'red', height: 100, width: 100 }}>
+      //       <Text>This is empty date!</Text>
+      //     </View>
+      //   );
+      // },
+      // renderEmptyData: () => {
+      //   return <View />;
+      // },
+      // onRefresh: () => {
+      //   console.log('refreshing...');
+      // },
+      // markedDates: {
+      //   '2012-05-16': { selected: true, marked: true },
+      //   '2012-05-17': { marked: true },
+      //   '2012-05-18': { disabled: true },
+      // },
       refreshing: false,
       theme,
     } satisfies AgendaProps;
   }, [items]);
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-      <Agenda {...agendaProps} style={{ height: '100%', width: '100%' }} />
-      <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
-    </SafeAreaView>
+    <View
+      style={{
+        paddingTop: Constants.statusBarHeight,
+        flex: 1,
+      }}>
+      <Agenda {...agendaProps} />
+      {!open && <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  item: {
+    backgroundColor: 'white',
+    flex: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginRight: 10,
+    marginTop: 17,
+  },
+  emptyDate: {
+    height: 15,
+    flex: 1,
+    paddingTop: 30,
+  },
+});
