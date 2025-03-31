@@ -1,5 +1,6 @@
-import { View } from 'react-native';
-import { Agenda } from 'react-native-calendars';
+import { useState } from 'react';
+import { Text, View } from 'react-native';
+import { Agenda, AgendaEntry, AgendaSchedule, DateData } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 function getDateFromTimestamp(timestamp: number) {
@@ -8,6 +9,35 @@ function getDateFromTimestamp(timestamp: number) {
 }
 
 export default function CalendarScreen() {
+  const [items, setItems] = useState<AgendaSchedule>({});
+  const loadItems = (day: DateData) => {
+    setTimeout(() => {
+      for (let i = -15; i < 85; i++) {
+        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+        const strTime = getDateFromTimestamp(time);
+
+        if (!items[strTime]) {
+          items[strTime] = [];
+
+          const numItems = Math.floor(Math.random() * 3 + 1);
+          for (let j = 0; j < numItems; j++) {
+            items[strTime].push({
+              name: 'Item for ' + strTime + ' #' + j,
+              height: Math.max(50, Math.floor(Math.random() * 150)),
+              day: strTime,
+            });
+          }
+        }
+      }
+
+      const newItems: AgendaSchedule = {};
+      Object.keys(items).forEach((key) => {
+        newItems[key] = items[key];
+      });
+      setItems(newItems);
+    }, 1000);
+  };
+
   return (
     <SafeAreaView
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
@@ -15,18 +45,14 @@ export default function CalendarScreen() {
         // The list of items that have to be displayed in agenda. If you want to render item as empty date
         // the value of date key has to be an empty array []. If there exists no value for date key it is
         // considered that the date in question is not yet loaded
-        items={{
-          '2025-03-30': [{ name: 'item 1 - any js object' }],
-          '2025-03-31': [{ name: 'item 2 - any js object', height: 80 }],
-          '2025-04-01': [],
-          '2012-05-25': [{ name: 'item 3 - any js object' }, { name: 'any js object' }],
-        }}
+        items={items}
         // Callback that gets called when items for a certain month should be loaded (month became visible)
-        loadItemsForMonth={(month) => {
+        loadItemsForMonth={(month: DateData) => {
           console.log('trigger items loading');
+          loadItems(month);
         }}
         // Callback that fires when the calendar is opened or closed
-        onCalendarToggled={(calendarOpened) => {
+        onCalendarToggled={(calendarOpened: boolean) => {
           console.log(calendarOpened);
         }}
         // Callback that gets called on day press
@@ -42,14 +68,18 @@ export default function CalendarScreen() {
         // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
         minDate="2012-05-10"
         // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-        maxDate="2012-05-30"
+        maxDate="2025-05-30"
         // Max amount of months allowed to scroll to the past. Default = 50
         pastScrollRange={50}
         // Max amount of months allowed to scroll to the future. Default = 50
         futureScrollRange={50}
         // Specify how each item should be rendered in agenda
-        renderItem={(item, firstItemInDay) => {
-          return <View />;
+        renderItem={(item: AgendaEntry, firstItemInDay: boolean) => {
+          return (
+            <View style={{ height: 300, width: '100%' }}>
+              <Text style={{ color: 'black' }}>{item.name}</Text>
+            </View>
+          );
         }}
         // Specify how each date should be rendered. day can be undefined if the item is not first in that day
         renderDay={(day, item) => {
@@ -57,11 +87,17 @@ export default function CalendarScreen() {
         }}
         // Specify how empty date content with no items should be rendered
         renderEmptyDate={() => {
-          return <View />;
+          return (
+            <View style={{ backgroundColor: 'red', height: 100, width: 100 }}>
+              <Text>This is empty date!</Text>
+            </View>
+          );
         }}
         // Specify how agenda knob should look like
         renderKnob={() => {
-          return <View style={{ width: 10, height: 10, backgroundColor: 'red' }} />;
+          return (
+            <View style={{ width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }} />
+          );
         }}
         // Override inner list with a custom implemented component
         // renderList={(listProps) => {
@@ -93,6 +129,7 @@ export default function CalendarScreen() {
         refreshing={false}
         // Add a custom RefreshControl component, used to provide pull-to-refresh functionality for the ScrollView
         refreshControl={null}
+        markToday
         // Agenda theme
         theme={{
           //   ...calendarTheme,
@@ -103,9 +140,8 @@ export default function CalendarScreen() {
         }}
         // Agenda container style
         style={{
-          width: '100%',
           height: '100%',
-          backgroundColor: 'red',
+          width: '100%',
         }}
       />
     </SafeAreaView>
