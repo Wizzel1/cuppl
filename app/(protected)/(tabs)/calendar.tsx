@@ -6,10 +6,6 @@ import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/com
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 
-interface Props {
-  weekView?: boolean;
-}
-
 // Define the structure for our agenda items
 interface AgendaItem {
   title: string;
@@ -96,7 +92,7 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   );
 });
 
-const ExpandableCalendarScreen = (props: Props) => {
+const ExpandableCalendarScreen = () => {
   const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
     console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
   }, []);
@@ -128,11 +124,42 @@ const ExpandableCalendarScreen = (props: Props) => {
       <ExpandableCalendar
         //   horizontal={false}
         hideArrows
+        theme={{
+          todayBackgroundColor: '#F5F3FF',
+          todayTextColor: '#7F22FE',
+          textDayHeaderFontWeight: 'medium',
+
+          textDayStyle: {
+            color: '#27272A',
+            fontSize: 16,
+            fontWeight: 'medium',
+          },
+          selectedDayBackgroundColor: '#27272A',
+        }}
         // disablePan
         // hideKnob
         //   initialPosition={ExpandableCalendar.positions.OPEN}
         // calendarStyle={styles.calendar}
         style={{ shadowColor: 'transparent' }}
+        renderHeader={(test) => {
+          if (!test) return null;
+          const date = new Date(test);
+          const formattedDate = `${date.toLocaleDateString('en-US', {
+            month: 'long',
+          })} ${date.getFullYear()}`;
+          return (
+            <View style={{ height: 40, width: '100%', justifyContent: 'center' }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: '#27272A',
+                }}>
+                {formattedDate}
+              </Text>
+            </View>
+          );
+        }}
         // headerStyle={styles.header} // for horizontal only
         // disableWeekScroll
         // disableAllTouchEventsForDisabledDays
@@ -164,7 +191,7 @@ const ExpandableCalendarScreen = (props: Props) => {
             </View>
           );
         }}
-        scrollToNextEvent
+        // scrollToNextEvent
         dayFormat="yyyy-MM-d"
       />
       <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
