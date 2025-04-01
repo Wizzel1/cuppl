@@ -152,8 +152,13 @@ const ExpandableCalendarScreen = (props: Props) => {
             year: 'numeric',
           });
           return (
-            <View style={{ backgroundColor: 'red', height: 50 }}>
-              <Text style={{ color: 'white' }}>{localized}</Text>
+            <View>
+              <View style={{ height: 28, backgroundColor: 'white' }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', paddingHorizontal: 24 }}>
+                  {localized}
+                </Text>
+              </View>
+              <View style={{ height: 1, backgroundColor: '#E4E4E7' }} />
             </View>
           );
         }}
