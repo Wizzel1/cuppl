@@ -30,6 +30,15 @@ interface AgendaItemData {
 // Create dummy data for the agenda
 const agendaItems: AgendaItem[] = [
   {
+    title: '2025-04-1',
+    data: [
+      { hour: '09:00', duration: '1h', name: 'Team Meeting' },
+      { hour: '11:30', duration: '30m', name: 'Daily Standup' },
+      { hour: '14:30', duration: '45m', name: 'Dentist Appointment' },
+      { hour: '16:00', duration: '2h', name: 'Product Strategy Workshop' },
+    ],
+  },
+  {
     title: '2025-04-20',
     data: [
       { hour: '09:00', duration: '1h', name: 'Team Meeting' },
@@ -146,16 +155,19 @@ const ExpandableCalendarScreen = (props: Props) => {
         renderSectionHeader={(dateString) => {
           console.log(dateString); //2025-04-25
           //@ts-ignore
-          const localized = new Date(dateString).toLocaleDateString('en-US', {
+          const date = new Date(dateString);
+          const isToday = new Date().toDateString() === date.toDateString();
+          const formattedDate = `${date.getDate()}. ${date.toLocaleDateString('en-US', {
             month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          });
+          })} - ${date.toLocaleDateString('en-US', {
+            weekday: 'long',
+          })}${isToday ? ' - Today' : ''}`;
+
           return (
             <View>
               <View style={{ height: 28, backgroundColor: 'white' }}>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', paddingHorizontal: 24 }}>
-                  {localized}
+                  {formattedDate}
                 </Text>
               </View>
               <View style={{ height: 1, backgroundColor: '#E4E4E7' }} />
