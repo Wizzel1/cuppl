@@ -16,7 +16,6 @@ interface Props {
 
 // Define the structure for our agenda items
 interface AgendaItem {
-  title: string;
   data: {
     hour: string;
     duration: string;
@@ -27,30 +26,33 @@ interface AgendaItem {
 
 // Create dummy data for the agenda
 const agendaItems: { [key: string]: AgendaItem } = {
-  '2024-03-20': {
-    title: '2024-03-20',
+  '2025-03-20': {
     data: [
-      { hour: '09:00', duration: '1h', name: 'Team Meeting', color: '#7B68EE' },
-      { hour: '14:30', duration: '45m', name: 'Dentist Appointment', color: '#20B2AA' },
+      { hour: '09:00', duration: '1h', name: 'Team Meeting' },
+      { hour: '14:30', duration: '45m', name: 'Dentist Appointment' },
     ],
   },
-  '2024-03-21': {
-    title: '2024-03-21',
+  '2025-03-21': {
     data: [
-      { hour: '10:00', duration: '2h', name: 'Project Review', color: '#FFB6C1' },
-      { hour: '15:00', duration: '1h', name: 'Coffee with Client', color: '#DEB887' },
+      { hour: '10:00', duration: '2h', name: 'Project Review' },
+      { hour: '15:00', duration: '1h', name: 'Coffee with Client' },
     ],
   },
-  '2024-03-22': {
-    title: '2024-03-22',
-    data: [{ hour: '11:00', duration: '1h', name: 'Gym Session', color: '#FF7F50' }],
+  '2025-03-22': {
+    data: [{ hour: '11:00', duration: '1h', name: 'Gym Session' }],
   },
-  '2024-03-25': {
-    title: '2024-03-25',
+  '2025-03-25': {
     data: [
-      { hour: '09:30', duration: '1h 30m', name: 'Strategy Planning', color: '#6495ED' },
-      { hour: '13:00', duration: '1h', name: 'Lunch with Team', color: '#98FB98' },
-      { hour: '16:00', duration: '2h', name: 'Code Review', color: '#DDA0DD' },
+      { hour: '09:30', duration: '1h 30m', name: 'Strategy Planning' },
+      { hour: '13:00', duration: '1h', name: 'Lunch with Team' },
+      { hour: '16:00', duration: '2h', name: 'Code Review' },
+    ],
+  },
+  '2025-04-25': {
+    data: [
+      { hour: '09:30', duration: '1h 30m', name: 'Strategy Planning' },
+      { hour: '13:00', duration: '1h', name: 'Lunch with Team' },
+      { hour: '16:00', duration: '2h', name: 'Code Review' },
     ],
   },
 };
@@ -67,7 +69,7 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => 
         justifyContent: 'center',
       }}>
       <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Wedding</Text>
-      <Text style={{ fontSize: 16 }}>Das ist ein sehr langer BeispText</Text>
+      <Text style={{ fontSize: 16 }}>{item.name}</Text>
       <Text style={{ fontSize: 14, color: '#71717B' }}>10:00 - 12:00</Text>
     </View>
   );
@@ -126,11 +128,11 @@ const ExpandableCalendarScreen = (props: Props) => {
       )}
       <AgendaList
         sections={Object.keys(agendaItems).map((date) => ({
-          title: agendaItems[date].title,
+          title: date,
           data: agendaItems[date].data,
         }))}
         renderItem={renderItem}
-        // scrollToNextEvent
+        scrollToNextEvent
         // dayFormat={'yyyy-MM-d'}
       />
     </CalendarProvider>
