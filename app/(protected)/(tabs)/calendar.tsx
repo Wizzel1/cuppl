@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
@@ -19,6 +19,9 @@ interface AgendaItemData {
   color?: string;
 }
 
+const initialDate = new Date().toISOString();
+const nextWeekDate = '2025-04-08';
+const nextMonthDate = '2025-05-08';
 // Create dummy data for the agenda
 const agendaItems: AgendaItem[] = [
   {
@@ -93,6 +96,7 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
 });
 
 const ExpandableCalendarScreen = () => {
+  const [selected, setSelected] = useState(initialDate);
   const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
     console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
   }, []);
@@ -107,6 +111,27 @@ const ExpandableCalendarScreen = () => {
     },
     []
   );
+
+  const marked = useMemo(() => {
+    return {
+      [nextWeekDate]: {
+        selected: selected === nextWeekDate,
+        selectedTextColor: '#5E60CE',
+        marked: true,
+      },
+      [nextMonthDate]: {
+        selected: selected === nextMonthDate,
+        selectedTextColor: '#5E60CE',
+        marked: true,
+      },
+      [selected]: {
+        selected: true,
+        disableTouchEvent: true,
+        selectedColor: '#5E60CE',
+        selectedTextColor: 'white',
+      },
+    };
+  }, [selected]);
 
   return (
     <CalendarProvider
@@ -123,12 +148,13 @@ const ExpandableCalendarScreen = () => {
     >
       <ExpandableCalendar
         //   horizontal={false}
-        hideArrows
+        // staticHeader
+        // hideArrows
+        markedDates={marked}
         theme={{
           todayBackgroundColor: '#F5F3FF',
           todayTextColor: '#7F22FE',
           textDayHeaderFontWeight: 'medium',
-
           textDayStyle: {
             color: '#27272A',
             fontSize: 16,
@@ -170,7 +196,6 @@ const ExpandableCalendarScreen = () => {
         sections={agendaItems}
         renderItem={renderItem}
         renderSectionHeader={(dateString) => {
-          console.log(dateString); //2025-04-25
           //@ts-ignore
           const date = new Date(dateString);
           const isToday = new Date().toDateString() === date.toDateString();
