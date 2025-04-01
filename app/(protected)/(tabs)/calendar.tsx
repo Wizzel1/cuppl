@@ -17,12 +17,14 @@ interface Props {
 // Define the structure for our agenda items
 interface AgendaItem {
   title: string;
-  data: {
-    hour: string;
-    duration: string;
-    name: string;
-    color?: string;
-  }[];
+  data: AgendaItemData[];
+}
+
+interface AgendaItemData {
+  hour: string;
+  duration: string;
+  name: string;
+  color?: string;
 }
 
 // Create dummy data for the agenda
@@ -71,7 +73,7 @@ const agendaItems: AgendaItem[] = [
   },
 ];
 
-const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => {
+const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   return (
     <View
       style={{
