@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { useAccount } from 'jazz-react-native';
 import { memo, useCallback, useState } from 'react';
-import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
+import { SectionListRenderItem, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 
@@ -220,44 +220,3 @@ export default function CalendarScreen() {
     </CalendarProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  calendar: {
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  header: {
-    backgroundColor: 'lightgrey',
-    shadowColor: 'transparent',
-  },
-  section: {
-    color: 'grey',
-    textTransform: 'capitalize',
-  },
-  agendaItem: {
-    padding: 12,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    borderLeftWidth: 4,
-  },
-  agendaItemTime: {
-    flexDirection: 'row',
-    marginBottom: 4,
-  },
-  agendaItemHour: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#666',
-  },
-  agendaItemDuration: {
-    fontSize: 14,
-    color: '#999',
-    marginLeft: 8,
-  },
-  agendaItemName: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-});
