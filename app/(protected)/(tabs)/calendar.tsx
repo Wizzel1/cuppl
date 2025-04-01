@@ -6,6 +6,8 @@ import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'reac
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
+// @ts-ignore fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
+(ExpandableCalendar as any).defaultProps = undefined;
 
 // Define the structure for our agenda items
 interface AgendaItem {
@@ -150,10 +152,7 @@ export default function CalendarScreen() {
       //   todayBottomMargin={16}
     >
       <ExpandableCalendar
-        //   horizontal={false}
-        // staticHeader
-        // hideArrows
-        // markedDates={marked}
+        firstDay={1}
         theme={{
           todayBackgroundColor: '#F5F3FF',
           todayTextColor: '#7F22FE',
@@ -165,10 +164,6 @@ export default function CalendarScreen() {
           },
           selectedDayBackgroundColor: '#27272A',
         }}
-        // disablePan
-        // hideKnob
-        //   initialPosition={ExpandableCalendar.positions.OPEN}
-        // calendarStyle={styles.calendar}
         style={{ shadowColor: 'transparent' }}
         renderHeader={(test) => {
           if (!test) return null;
@@ -192,7 +187,6 @@ export default function CalendarScreen() {
         // headerStyle={styles.header} // for horizontal only
         // disableWeekScroll
         // disableAllTouchEventsForDisabledDays
-        firstDay={1}
         //   animateScroll
       />
       <AgendaList
