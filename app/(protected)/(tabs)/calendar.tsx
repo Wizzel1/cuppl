@@ -1,154 +1,175 @@
 import Constants from 'expo-constants';
-import { useMemo, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Agenda, AgendaProps, AgendaSchedule, DateData } from 'react-native-calendars';
-import { Theme } from 'react-native-calendars/src/types';
+import { memo, useCallback } from 'react';
+import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
+import {
+  AgendaList,
+  CalendarProvider,
+  DateData,
+  ExpandableCalendar,
+  WeekCalendar,
+} from 'react-native-calendars';
+import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 
-import FloatingActionButton from '~/components/FloatingActionButton';
-
-function getDateFromTimestamp(timestamp: number) {
-  const date = new Date(timestamp);
-  return date.toISOString().split('T')[0];
+interface Props {
+  weekView?: boolean;
 }
 
-export default function CalendarScreen() {
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<AgendaSchedule>({});
-  const loadItems = (day: DateData) => {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = getDateFromTimestamp(time);
+// Define the structure for our agenda items
+interface AgendaItem {
+  title: string;
+  data: {
+    hour: string;
+    duration: string;
+    name: string;
+    color?: string;
+  }[];
+}
 
-        if (!items[strTime]) {
-          items[strTime] = [];
+// Create dummy data for the agenda
+const agendaItems: { [key: string]: AgendaItem } = {
+  '2024-03-20': {
+    title: '2024-03-20',
+    data: [
+      { hour: '09:00', duration: '1h', name: 'Team Meeting', color: '#7B68EE' },
+      { hour: '14:30', duration: '45m', name: 'Dentist Appointment', color: '#20B2AA' },
+    ],
+  },
+  '2024-03-21': {
+    title: '2024-03-21',
+    data: [
+      { hour: '10:00', duration: '2h', name: 'Project Review', color: '#FFB6C1' },
+      { hour: '15:00', duration: '1h', name: 'Coffee with Client', color: '#DEB887' },
+    ],
+  },
+  '2024-03-22': {
+    title: '2024-03-22',
+    data: [{ hour: '11:00', duration: '1h', name: 'Gym Session', color: '#FF7F50' }],
+  },
+  '2024-03-25': {
+    title: '2024-03-25',
+    data: [
+      { hour: '09:30', duration: '1h 30m', name: 'Strategy Planning', color: '#6495ED' },
+      { hour: '13:00', duration: '1h', name: 'Lunch with Team', color: '#98FB98' },
+      { hour: '16:00', duration: '2h', name: 'Code Review', color: '#DDA0DD' },
+    ],
+  },
+};
 
-          const numItems = Math.floor(Math.random() * 3 + 1);
-          for (let j = 0; j < numItems; j++) {
-            const data = {
-              name: 'Item for ' + strTime + ' #' + j,
-              category: 'Category ' + j,
-              text: 'Text ' + j,
-              horizontal: true,
-            };
-            items[strTime].push({
-              name: JSON.stringify(data),
-              height: Math.max(50, Math.floor(Math.random() * 150)),
-              day: strTime,
-            });
-          }
-        }
-      }
+const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => {
+  return (
+    <View style={[styles.agendaItem, { borderLeftColor: item.color || '#000' }]}>
+      <View style={styles.agendaItemTime}>
+        <Text style={styles.agendaItemHour}>{item.hour}</Text>
+        <Text style={styles.agendaItemDuration}>{item.duration}</Text>
+      </View>
+      <Text style={styles.agendaItemName}>{item.name}</Text>
+    </View>
+  );
+});
 
-      const newItems: AgendaSchedule = {};
-      Object.keys(items).forEach((key) => {
-        newItems[key] = items[key];
-      });
-      setItems(newItems);
-    }, 1000);
-  };
+AgendaItemComponent.displayName = 'AgendaItemComponent';
 
-  const theme: Theme = {
-    backgroundColor: '#ffffff',
-    calendarBackground: '#ffffff',
-    textSectionTitleColor: '#b6c1cd',
-    selectedDayBackgroundColor: '#00adf5',
-    selectedDayTextColor: '#ffffff',
-    todayTextColor: '#00adf5',
-    dayTextColor: '#2d4150',
-    textDisabledColor: '#dd99ee',
-  };
-  const agendaProps: AgendaProps = useMemo(() => {
-    return {
-      items,
-      showClosingKnob: true,
-      pastScrollRange: 50,
-      futureScrollRange: 50,
-      selected: getDateFromTimestamp(new Date().getTime()),
-      onCalendarToggled: (calendarOpened) => {
-        setOpen(calendarOpened);
-      },
-      // onDayChange: (day: DateData) => {
-      //   console.log('day changed', day);
-      // },
-      loadItemsForMonth: loadItems,
-      renderItem: (entry, isFirst) => {
-        const fontSize = isFirst ? 16 : 14;
-        const color = isFirst ? 'black' : '#43515c';
-        const { name, category } = JSON.parse(entry.name);
-        return (
-          <Pressable
-            style={[styles.item, { height: entry.height }]}
-            onPress={() => Alert.alert(entry.name)}>
-            <Text style={{ fontSize, color }}>{name}</Text>
-            <Text style={{ fontSize, color }}>{category}</Text>
-          </Pressable>
-        );
-      },
-      // onDayPress: (day) => {
-      //   console.log('day pressed', day);
-      // },
-      // renderKnob: () => {
-      //   return (
-      //     <View
-      //       style={{ padding: 5, width: 50, height: 5, backgroundColor: 'grey', borderRadius: 10 }}
-      //     />
-      //   );
-      // },
-      rowHasChanged: (r1, r2) => {
-        return r1.name !== r2.name;
-      },
-      renderEmptyDate: () => {
-        return (
-          <View style={styles.emptyDate}>
-            <Text>This is empty date!</Text>
-          </View>
-        );
-      },
-      // renderEmptyData: () => {
-      //   return <View />;
-      // },
-      // onRefresh: () => {
-      //   console.log('refreshing...');
-      // },
-      // markedDates: {
-      //   '2012-05-16': { selected: true, marked: true },
-      //   '2012-05-17': { marked: true },
-      //   '2012-05-18': { disabled: true },
-      // },
-      refreshing: false,
-      theme,
-    } satisfies AgendaProps;
-  }, [items]);
+const ExpandableCalendarScreen = (props: Props) => {
+  const { weekView } = props;
+
+  const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
+    console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
+  }, []);
+
+  const onMonthChange = useCallback((date: DateData, updateSource: UpdateSources) => {
+    console.log('ExpandableCalendarScreen onMonthChange: ', date, updateSource);
+  }, []);
+
+  const renderItem: SectionListRenderItem<AgendaItem['data'][0]> = useCallback(
+    ({ item, section }) => {
+      return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
+    },
+    []
+  );
 
   return (
-    <View
+    <CalendarProvider
       style={{
         paddingTop: Constants.statusBarHeight,
         backgroundColor: 'white',
-        flex: 1,
-      }}>
-      <Agenda {...agendaProps} />
-      {!open && <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />}
-    </View>
+      }}
+      date={new Date().toISOString()}
+      onDateChanged={onDateChanged}
+      onMonthChange={onMonthChange}
+      showTodayButton
+      // disabledOpacity={0.6}
+      //   todayBottomMargin={16}
+    >
+      {weekView ? (
+        <WeekCalendar firstDay={1} />
+      ) : (
+        <ExpandableCalendar
+          //   horizontal={false}
+          hideArrows
+          // disablePan
+          // hideKnob
+          //   initialPosition={ExpandableCalendar.positions.OPEN}
+          // calendarStyle={styles.calendar}
+          style={{ shadowColor: 'transparent' }}
+          // headerStyle={styles.header} // for horizontal only
+          // disableWeekScroll
+          // disableAllTouchEventsForDisabledDays
+          firstDay={1}
+          //   animateScroll
+        />
+      )}
+      <AgendaList
+        sections={Object.keys(agendaItems).map((date) => ({
+          title: agendaItems[date].title,
+          data: agendaItems[date].data,
+        }))}
+        renderItem={renderItem}
+        // scrollToNextEvent
+        // dayFormat={'yyyy-MM-d'}
+      />
+    </CalendarProvider>
   );
-}
+};
+
+export default ExpandableCalendarScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  calendar: {
+    paddingLeft: 20,
+    paddingRight: 20,
   },
-  item: {
+  header: {
+    backgroundColor: 'lightgrey',
+    shadowColor: 'transparent',
+  },
+  section: {
+    color: 'grey',
+    textTransform: 'capitalize',
+  },
+  agendaItem: {
+    padding: 12,
+    marginVertical: 8,
+    marginHorizontal: 16,
     backgroundColor: 'white',
-    flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17,
+    borderRadius: 8,
+    borderLeftWidth: 4,
   },
-  emptyDate: {
-    height: 15,
-    flex: 1,
-    paddingTop: 30,
+  agendaItemTime: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  agendaItemHour: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#666',
+  },
+  agendaItemDuration: {
+    fontSize: 14,
+    color: '#999',
+    marginLeft: 8,
+  },
+  agendaItemName: {
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
