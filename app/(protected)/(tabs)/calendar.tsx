@@ -16,6 +16,7 @@ interface Props {
 
 // Define the structure for our agenda items
 interface AgendaItem {
+  title: string;
   data: {
     hour: string;
     duration: string;
@@ -25,37 +26,22 @@ interface AgendaItem {
 }
 
 // Create dummy data for the agenda
-const agendaItems: { [key: string]: AgendaItem } = {
-  '2025-03-20': {
+const agendaItems: AgendaItem[] = [
+  {
+    title: '2025-03-20',
     data: [
       { hour: '09:00', duration: '1h', name: 'Team Meeting' },
       { hour: '14:30', duration: '45m', name: 'Dentist Appointment' },
     ],
   },
-  '2025-03-21': {
+  {
+    title: '2025-03-21',
     data: [
       { hour: '10:00', duration: '2h', name: 'Project Review' },
       { hour: '15:00', duration: '1h', name: 'Coffee with Client' },
     ],
   },
-  '2025-03-22': {
-    data: [{ hour: '11:00', duration: '1h', name: 'Gym Session' }],
-  },
-  '2025-03-25': {
-    data: [
-      { hour: '09:30', duration: '1h 30m', name: 'Strategy Planning' },
-      { hour: '13:00', duration: '1h', name: 'Lunch with Team' },
-      { hour: '16:00', duration: '2h', name: 'Code Review' },
-    ],
-  },
-  '2025-04-25': {
-    data: [
-      { hour: '09:30', duration: '1h 30m', name: 'Strategy Planning' },
-      { hour: '13:00', duration: '1h', name: 'Lunch with Team' },
-      { hour: '16:00', duration: '2h', name: 'Code Review' },
-    ],
-  },
-};
+];
 
 const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => {
   return (
@@ -125,14 +111,12 @@ const ExpandableCalendarScreen = (props: Props) => {
         />
       )}
       <AgendaList
-        sections={Object.keys(agendaItems).map((date) => ({
-          title: date,
-          data: agendaItems[date].data,
-        }))}
+        sections={agendaItems}
         renderItem={renderItem}
-        renderSectionHeader={(test) => {
-          console.log(test); //2025-04-25
-          const localized = new Date(test as string).toLocaleDateString('en-US', {
+        renderSectionHeader={(dateString) => {
+          console.log(dateString); //2025-04-25
+          //@ts-ignore
+          const localized = new Date(dateString).toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
             year: 'numeric',
