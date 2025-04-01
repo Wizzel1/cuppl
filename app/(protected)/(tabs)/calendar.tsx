@@ -10,6 +10,8 @@ import {
 } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 
+import FloatingActionButton from '~/components/FloatingActionButton';
+
 interface Props {
   weekView?: boolean;
 }
@@ -177,6 +179,7 @@ const ExpandableCalendarScreen = (props: Props) => {
         scrollToNextEvent
         dayFormat="yyyy-MM-d"
       />
+      <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
     </CalendarProvider>
   );
 };
