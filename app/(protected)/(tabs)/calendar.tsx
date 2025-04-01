@@ -75,8 +75,6 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => 
   );
 });
 
-AgendaItemComponent.displayName = 'AgendaItemComponent';
-
 const ExpandableCalendarScreen = (props: Props) => {
   const { weekView } = props;
 
@@ -132,8 +130,21 @@ const ExpandableCalendarScreen = (props: Props) => {
           data: agendaItems[date].data,
         }))}
         renderItem={renderItem}
+        renderSectionHeader={(test) => {
+          console.log(test); //2025-04-25
+          const localized = new Date(test as string).toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          });
+          return (
+            <View style={{ backgroundColor: 'red', height: 50 }}>
+              <Text style={{ color: 'white' }}>{localized}</Text>
+            </View>
+          );
+        }}
         scrollToNextEvent
-        // dayFormat={'yyyy-MM-d'}
+        dayFormat="yyyy-MM-d"
       />
     </CalendarProvider>
   );
