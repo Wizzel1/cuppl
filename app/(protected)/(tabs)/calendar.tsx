@@ -28,17 +28,45 @@ interface AgendaItem {
 // Create dummy data for the agenda
 const agendaItems: AgendaItem[] = [
   {
-    title: '2025-03-20',
+    title: '2025-04-20',
     data: [
       { hour: '09:00', duration: '1h', name: 'Team Meeting' },
+      { hour: '11:30', duration: '30m', name: 'Daily Standup' },
       { hour: '14:30', duration: '45m', name: 'Dentist Appointment' },
+      { hour: '16:00', duration: '2h', name: 'Product Strategy Workshop' },
     ],
   },
   {
-    title: '2025-03-21',
+    title: '2025-04-21',
     data: [
       { hour: '10:00', duration: '2h', name: 'Project Review' },
+      { hour: '13:00', duration: '1h', name: 'Lunch with Team' },
       { hour: '15:00', duration: '1h', name: 'Coffee with Client' },
+      { hour: '17:00', duration: '30m', name: 'Weekly Planning' },
+    ],
+  },
+  {
+    title: '2025-04-22',
+    data: [
+      { hour: '09:30', duration: '3h', name: 'Design Sprint' },
+      { hour: '14:00', duration: '1h', name: 'Code Review Session' },
+    ],
+  },
+  {
+    title: '2025-04-23',
+    data: [
+      { hour: '10:00', duration: '1h', name: 'Yoga Class' },
+      { hour: '12:00', duration: '2h', name: 'Family Brunch' },
+      { hour: '15:00', duration: '2h', name: 'Movie with Friends' },
+    ],
+  },
+  {
+    title: '2025-04-24',
+    data: [
+      { hour: '08:30', duration: '30m', name: 'Morning Check-in' },
+      { hour: '11:00', duration: '1h', name: 'Client Presentation' },
+      { hour: '14:00', duration: '2h', name: 'Team Building Activity' },
+      { hour: '17:30', duration: '1h', name: 'Gym Session' },
     ],
   },
 ];
