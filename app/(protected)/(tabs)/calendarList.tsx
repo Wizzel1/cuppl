@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
-import { useCallback } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { memo, useCallback } from 'react';
+import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
 import {
   AgendaList,
   CalendarProvider,
@@ -55,7 +55,7 @@ const agendaItems: { [key: string]: AgendaItem } = {
   },
 };
 
-function AgendaItemComponent({ item }: { item: AgendaItem['data'][0] }) {
+const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => {
   return (
     <View style={[styles.agendaItem, { borderLeftColor: item.color || '#000' }]}>
       <View style={styles.agendaItemTime}>
@@ -65,7 +65,9 @@ function AgendaItemComponent({ item }: { item: AgendaItem['data'][0] }) {
       <Text style={styles.agendaItemName}>{item.name}</Text>
     </View>
   );
-}
+});
+
+AgendaItemComponent.displayName = 'AgendaItemComponent';
 
 const ExpandableCalendarScreen = (props: Props) => {
   const { weekView } = props;
@@ -78,9 +80,12 @@ const ExpandableCalendarScreen = (props: Props) => {
     console.log('ExpandableCalendarScreen onMonthChange: ', date, updateSource);
   }, []);
 
-  const renderItem = useCallback(({ item }: any) => {
-    return <AgendaItemComponent item={item} />;
-  }, []);
+  const renderItem: SectionListRenderItem<AgendaItem['data'][0]> = useCallback(
+    ({ item, section }) => {
+      return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
+    },
+    []
+  );
 
   return (
     <CalendarProvider
@@ -96,7 +101,7 @@ const ExpandableCalendarScreen = (props: Props) => {
       //   todayBottomMargin={16}
     >
       {weekView ? (
-        <WeekCalendar firstDay={1} style={{ shadowColor: 'red' }} />
+        <WeekCalendar firstDay={1} />
       ) : (
         <ExpandableCalendar
           //   horizontal={false}
@@ -104,7 +109,8 @@ const ExpandableCalendarScreen = (props: Props) => {
           // disablePan
           // hideKnob
           //   initialPosition={ExpandableCalendar.positions.OPEN}
-          //   calendarStyle={styles.calendar}
+          // calendarStyle={styles.calendar}
+          style={{ shadowColor: 'transparent' }}
           // headerStyle={styles.header} // for horizontal only
           // disableWeekScroll
           // disableAllTouchEventsForDisabledDays
@@ -134,6 +140,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: 'lightgrey',
+    shadowColor: 'transparent',
   },
   section: {
     color: 'grey',
