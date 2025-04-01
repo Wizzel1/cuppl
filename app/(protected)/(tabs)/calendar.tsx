@@ -57,12 +57,18 @@ const agendaItems: { [key: string]: AgendaItem } = {
 
 const AgendaItemComponent = memo(({ item }: { item: AgendaItem['data'][0] }) => {
   return (
-    <View style={[styles.agendaItem, { borderLeftColor: item.color || '#000' }]}>
-      <View style={styles.agendaItemTime}>
-        <Text style={styles.agendaItemHour}>{item.hour}</Text>
-        <Text style={styles.agendaItemDuration}>{item.duration}</Text>
-      </View>
-      <Text style={styles.agendaItemName}>{item.name}</Text>
+    <View
+      style={{
+        height: 100,
+        width: '100%',
+        paddingHorizontal: 24,
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+      }}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Wedding</Text>
+      <Text style={{ fontSize: 16 }}>Das ist ein sehr langer BeispText</Text>
+      <Text style={{ fontSize: 14, color: '#71717B' }}>10:00 - 12:00</Text>
     </View>
   );
 });
