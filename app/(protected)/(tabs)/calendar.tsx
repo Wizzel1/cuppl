@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { useAccount } from 'jazz-react-native';
+import { memo, useCallback, useState } from 'react';
 import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
@@ -19,9 +20,6 @@ interface AgendaItemData {
   color?: string;
 }
 
-const initialDate = new Date().toISOString();
-const nextWeekDate = '2025-04-08';
-const nextMonthDate = '2025-05-08';
 // Create dummy data for the agenda
 const agendaItems: AgendaItem[] = [
   {
@@ -95,8 +93,13 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   );
 });
 
-const ExpandableCalendarScreen = () => {
-  const [selected, setSelected] = useState(initialDate);
+export default function CalendarScreen() {
+  const { me } = useAccount();
+  const [selected, setSelected] = useState(new Date());
+  // const couple = useCoState(Couple, me?.root?.couple?.id, { todoLists: [{}] });
+
+  // const lists = couple?.todoLists;
+  // console.log(lists);
   const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
     console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
   }, []);
@@ -112,26 +115,26 @@ const ExpandableCalendarScreen = () => {
     []
   );
 
-  const marked = useMemo(() => {
-    return {
-      [nextWeekDate]: {
-        selected: selected === nextWeekDate,
-        selectedTextColor: '#5E60CE',
-        marked: true,
-      },
-      [nextMonthDate]: {
-        selected: selected === nextMonthDate,
-        selectedTextColor: '#5E60CE',
-        marked: true,
-      },
-      [selected]: {
-        selected: true,
-        disableTouchEvent: true,
-        selectedColor: '#5E60CE',
-        selectedTextColor: 'white',
-      },
-    };
-  }, [selected]);
+  // const marked = useMemo(() => {
+  //   return {
+  //     [""]: {
+  //       selected: selected === nextWeekDate,
+  //       selectedTextColor: '#5E60CE',
+  //       marked: true,
+  //     },
+  //     [nextMonthDate]: {
+  //       selected: selected === nextMonthDate,
+  //       selectedTextColor: '#5E60CE',
+  //       marked: true,
+  //     },
+  //     [selected]: {
+  //       selected: true,
+  //       disableTouchEvent: true,
+  //       selectedColor: '#5E60CE',
+  //       selectedTextColor: 'white',
+  //     },
+  //   };
+  // }, [selected]);
 
   return (
     <CalendarProvider
@@ -150,7 +153,7 @@ const ExpandableCalendarScreen = () => {
         //   horizontal={false}
         // staticHeader
         // hideArrows
-        markedDates={marked}
+        // markedDates={marked}
         theme={{
           todayBackgroundColor: '#F5F3FF',
           todayTextColor: '#7F22FE',
@@ -222,9 +225,7 @@ const ExpandableCalendarScreen = () => {
       <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
     </CalendarProvider>
   );
-};
-
-export default ExpandableCalendarScreen;
+}
 
 const styles = StyleSheet.create({
   calendar: {
