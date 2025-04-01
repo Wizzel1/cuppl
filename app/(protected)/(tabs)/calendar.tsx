@@ -1,13 +1,7 @@
 import Constants from 'expo-constants';
 import { memo, useCallback } from 'react';
 import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
-import {
-  AgendaList,
-  CalendarProvider,
-  DateData,
-  ExpandableCalendar,
-  WeekCalendar,
-} from 'react-native-calendars';
+import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
@@ -103,8 +97,6 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
 });
 
 const ExpandableCalendarScreen = (props: Props) => {
-  const { weekView } = props;
-
   const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
     console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
   }, []);
@@ -133,24 +125,20 @@ const ExpandableCalendarScreen = (props: Props) => {
       // disabledOpacity={0.6}
       //   todayBottomMargin={16}
     >
-      {weekView ? (
-        <WeekCalendar firstDay={1} />
-      ) : (
-        <ExpandableCalendar
-          //   horizontal={false}
-          hideArrows
-          // disablePan
-          // hideKnob
-          //   initialPosition={ExpandableCalendar.positions.OPEN}
-          // calendarStyle={styles.calendar}
-          style={{ shadowColor: 'transparent' }}
-          // headerStyle={styles.header} // for horizontal only
-          // disableWeekScroll
-          // disableAllTouchEventsForDisabledDays
-          firstDay={1}
-          //   animateScroll
-        />
-      )}
+      <ExpandableCalendar
+        //   horizontal={false}
+        hideArrows
+        // disablePan
+        // hideKnob
+        //   initialPosition={ExpandableCalendar.positions.OPEN}
+        // calendarStyle={styles.calendar}
+        style={{ shadowColor: 'transparent' }}
+        // headerStyle={styles.header} // for horizontal only
+        // disableWeekScroll
+        // disableAllTouchEventsForDisabledDays
+        firstDay={1}
+        //   animateScroll
+      />
       <AgendaList
         sections={agendaItems}
         renderItem={renderItem}
