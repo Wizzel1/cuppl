@@ -1,9 +1,10 @@
 import Constants from 'expo-constants';
 import { useAccount } from 'jazz-react-native';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { SectionListRenderItem, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
+import { Theme } from 'react-native-calendars/src/types';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 // @ts-ignore fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
@@ -95,9 +96,22 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   );
 });
 
+const theme: Theme = {
+  todayBackgroundColor: '#F5F3FF',
+  todayTextColor: '#7F22FE',
+  textDayHeaderFontWeight: 'medium',
+  textDayStyle: {
+    color: '#27272A',
+    fontSize: 16,
+    fontWeight: 'medium',
+  },
+  selectedDayBackgroundColor: '#27272A',
+};
+
 export default function CalendarScreen() {
-  const { me } = useAccount();
-  const [selected, setSelected] = useState(new Date());
+  const { me } = useAccount({});
+  // const pathname = usePathname();
+  // const [selected, setSelected] = useState(new Date());
   // const couple = useCoState(Couple, me?.root?.couple?.id, { todoLists: [{}] });
 
   // const lists = couple?.todoLists;
@@ -137,7 +151,6 @@ export default function CalendarScreen() {
   //     },
   //   };
   // }, [selected]);
-
   return (
     <CalendarProvider
       style={{
@@ -153,17 +166,7 @@ export default function CalendarScreen() {
     >
       <ExpandableCalendar
         firstDay={1}
-        theme={{
-          todayBackgroundColor: '#F5F3FF',
-          todayTextColor: '#7F22FE',
-          textDayHeaderFontWeight: 'medium',
-          textDayStyle: {
-            color: '#27272A',
-            fontSize: 16,
-            fontWeight: 'medium',
-          },
-          selectedDayBackgroundColor: '#27272A',
-        }}
+        theme={theme}
         style={{ shadowColor: 'transparent' }}
         renderHeader={(test) => {
           if (!test) return null;
