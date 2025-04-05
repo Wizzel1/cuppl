@@ -26,61 +26,6 @@ interface AgendaItemData {
   color?: string;
 }
 
-// Create dummy data for the agenda
-const agendaItems: AgendaItem[] = [
-  {
-    title: '2025-04-1',
-    data: [
-      { hour: '09:00', duration: '1h', name: 'Team Meeting' },
-      { hour: '11:30', duration: '30m', name: 'Daily Standup' },
-      { hour: '14:30', duration: '45m', name: 'Dentist Appointment' },
-      { hour: '16:00', duration: '2h', name: 'Product Strategy Workshop' },
-    ],
-  },
-  {
-    title: '2025-04-20',
-    data: [
-      { hour: '09:00', duration: '1h', name: 'Team Meeting' },
-      { hour: '11:30', duration: '30m', name: 'Daily Standup' },
-      { hour: '14:30', duration: '45m', name: 'Dentist Appointment' },
-      { hour: '16:00', duration: '2h', name: 'Product Strategy Workshop' },
-    ],
-  },
-  {
-    title: '2025-04-21',
-    data: [
-      { hour: '10:00', duration: '2h', name: 'Project Review' },
-      { hour: '13:00', duration: '1h', name: 'Lunch with Team' },
-      { hour: '15:00', duration: '1h', name: 'Coffee with Client' },
-      { hour: '17:00', duration: '30m', name: 'Weekly Planning' },
-    ],
-  },
-  {
-    title: '2025-04-22',
-    data: [
-      { hour: '09:30', duration: '3h', name: 'Design Sprint' },
-      { hour: '14:00', duration: '1h', name: 'Code Review Session' },
-    ],
-  },
-  {
-    title: '2025-04-23',
-    data: [
-      { hour: '10:00', duration: '1h', name: 'Yoga Class' },
-      { hour: '12:00', duration: '2h', name: 'Family Brunch' },
-      { hour: '15:00', duration: '2h', name: 'Movie with Friends' },
-    ],
-  },
-  {
-    title: '2025-04-24',
-    data: [
-      { hour: '08:30', duration: '30m', name: 'Morning Check-in' },
-      { hour: '11:00', duration: '1h', name: 'Client Presentation' },
-      { hour: '14:00', duration: '2h', name: 'Team Building Activity' },
-      { hour: '17:30', duration: '1h', name: 'Gym Session' },
-    ],
-  },
-];
-
 const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   return (
     <View
@@ -112,7 +57,6 @@ const theme: Theme = {
 };
 
 export default function CalendarScreen() {
-  // const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
   const shallowCouple = useCouple();
   const couple = useCoState(Couple, shallowCouple?.id, {
     resolve: {
@@ -122,45 +66,6 @@ export default function CalendarScreen() {
       todoLists: { $each: { items: { $each: true } } },
     },
   });
-  // useEffect(() => {
-  //   if (!shallowCouple) return;
-  //   Couple.load(shallowCouple.id, {
-  //     resolve: {
-  //       partnerATodos: { items: { $each: true } },
-  //       partnerBTodos: { items: { $each: true } },
-  //       ourTodos: { items: { $each: true } },
-  //       todoLists: { $each: { items: { $each: true } } },
-  //     },
-  //   }).then((value) => {
-  //     const liveA = sift(value?.partnerATodos?.liveItems ?? []);
-  //     const liveB = sift(value?.partnerBTodos?.liveItems ?? []);
-  //     const liveTodos = sift(value?.todoLists.map((list) => list.liveItems).flat() ?? []);
-  //     const allTodos = [...liveA, ...liveB, ...liveTodos];
-  //     const groupedByDate = group(allTodos, (todo) => {
-  //       if (!todo?.dueDate) return 'NO_DATE';
-  //       // Format date as YYYY-MM-DD
-  //       const date = todo.dueDate;
-  //       const year = date.getFullYear();
-  //       const month = String(date.getMonth() + 1).padStart(2, '0');
-  //       const day = String(date.getDate()).padStart(2, '0');
-  //       return `${year}-${month}-${day}`;
-  //     });
-  //     const items = Object.entries(groupedByDate)
-  //       .map(([date, todos]) => ({
-  //         title: date,
-  //         data:
-  //           todos?.map((todo) => ({
-  //             hour:
-  //               todo.dueDate?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) ??
-  //               '',
-  //             duration: null,
-  //             name: todo.title,
-  //           })) ?? [],
-  //       }))
-  //       .filter((item) => item.title !== 'NO_DATE');
-  //     setAgendaItems(items);
-  //   });
-  // }, [shallowCouple]);
 
   const agendaItems = useMemo(() => {
     const liveA = sift(couple?.partnerATodos?.liveItems ?? []);
