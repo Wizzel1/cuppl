@@ -71,7 +71,12 @@ export default function CalendarScreen() {
     const liveB = sift(couple?.partnerBTodos?.liveItems ?? []);
     const liveTodos = sift(couple?.todoLists.map((list) => list.liveItems).flat() ?? []);
     const allTodos = [...liveA, ...liveB, ...liveTodos];
-    const groupedByDate = group(allTodos, (todo) => {
+    const sortedTodos = allTodos.sort((a, b) => {
+      if (!a?.dueDate) return 1;
+      if (!b?.dueDate) return -1;
+      return a.dueDate.getTime() - b.dueDate.getTime();
+    });
+    const groupedByDate = group(sortedTodos, (todo) => {
       if (!todo?.dueDate) return 'NO_DATE';
       // Format date as YYYY-MM-DD
       const date = todo.dueDate;
@@ -95,7 +100,7 @@ export default function CalendarScreen() {
           })) ?? [],
       }))
       .filter((item) => item.title !== 'NO_DATE');
-  }, [couple?.id]);
+  }, [couple?.todoLists, couple?.partnerATodos, couple?.partnerBTodos, couple?.ourTodos]);
 
   const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
     console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
