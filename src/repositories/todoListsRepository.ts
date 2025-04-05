@@ -25,7 +25,7 @@ function createTodoList(args: {
       assignedTo: args.assignedTo,
       deleted: false,
     },
-    { owner: args.isHidden ? args.me : coupleGroup }
+    { owner: coupleGroup }
   );
 
   if (couple.todoLists) {

@@ -10,7 +10,6 @@ interface AvatarListItemProps {
   backgroundColor?: string;
   emoji?: string;
   isHidden?: boolean;
-  isLoaded?: boolean;
   subtitle?: string;
 }
 
@@ -21,7 +20,6 @@ const AvatarListItem = ({
   backgroundColor,
   emoji,
   isHidden,
-  isLoaded,
   subtitle,
 }: AvatarListItemProps) => {
   return (
@@ -44,11 +42,7 @@ const AvatarListItem = ({
             <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleText}>
               {title}
             </Text>
-            {isLoaded ? (
-              <Text style={styles.subtitleText}>{subtitle}</Text>
-            ) : (
-              <Text style={styles.subtitleText}>Syncing with partner...</Text>
-            )}
+            <Text style={styles.subtitleText}>{subtitle}</Text>
           </View>
           {isHidden && <MaterialCommunityIcons name="eye-off" size={20} color="#A1A1AA" />}
         </View>

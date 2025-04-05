@@ -1,4 +1,11 @@
-import { co, CoList, CoMap, ImageDefinition } from 'jazz-tools';
+import { co, CoList, CoMap, ImageDefinition, Resolved } from 'jazz-tools';
+
+export type ResolvedShoppingList = Resolved<
+  ShoppingList,
+  {
+    items: { $each: true };
+  }
+>;
 
 export class ShoppingItem extends CoMap {
   name = co.string;

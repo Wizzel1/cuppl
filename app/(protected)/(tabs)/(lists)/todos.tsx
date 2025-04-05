@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
-import { ID } from 'jazz-tools';
+import { useCoState } from 'jazz-react-native';
 import { group, sift } from 'radashi';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
@@ -8,8 +8,8 @@ import { SectionList, StyleSheet, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
 import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
-import { useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
-import { DefaultTodoList, TodoList } from '~/src/schemas/todoSchema';
+import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { ResolvedTodoList, TodoList } from '~/src/schemas/todoSchema';
 
 export default function TodoLists() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
@@ -19,7 +19,16 @@ export default function TodoLists() {
   const handlePress = () => {
     bottomSheetModalRef.current?.present();
   };
-  const couple = useCouple();
+  const shallowCouple = useCouple();
+  const couple = useCoState(Couple, shallowCouple?.id, {
+    resolve: {
+      partnerATodos: { items: { $each: true } },
+      partnerBTodos: { items: { $each: true } },
+      ourTodos: { items: { $each: true } },
+      todoLists: { $each: true },
+    },
+  });
+
   const router = useRouter();
 
   // useEffect(() => {
@@ -48,23 +57,23 @@ export default function TodoLists() {
   //     { owner: couple._owner }
   //   );
   // }, []);
-  const { myDefaultListId, partnerDefaultListId, sharedDefaultListId } = useMemo(() => {
-    const empty = { myDefaultListId: null, partnerDefaultListId: null, sharedDefaultListId: null };
+  const { myDefaultList, partnerDefaultList, sharedDefaultList } = useMemo(() => {
+    const empty = { myDefaultList: null, partnerDefaultList: null, sharedDefaultList: null };
     if (!couple) return empty;
     if (!myProfile?.accountId || !partnerProfile?.accountId) return empty;
     const myAccountId = myProfile.accountId;
 
     if (myAccountId === couple.partnerA?.accountId) {
       return {
-        myDefaultListId: couple.partnerATodos?.id ?? null,
-        partnerDefaultListId: couple.partnerBTodos?.id ?? null,
-        sharedDefaultListId: couple.ourTodos?.id ?? null,
+        myDefaultList: couple.partnerATodos,
+        partnerDefaultList: couple.partnerBTodos,
+        sharedDefaultList: couple.ourTodos,
       };
     } else {
       return {
-        myDefaultListId: couple.partnerBTodos?.id ?? null,
-        partnerDefaultListId: couple.partnerATodos?.id ?? null,
-        sharedDefaultListId: couple.ourTodos?.id ?? null,
+        myDefaultList: couple.partnerBTodos,
+        partnerDefaultList: couple.partnerATodos,
+        sharedDefaultList: couple.ourTodos,
       };
     }
   }, [
@@ -93,9 +102,9 @@ export default function TodoLists() {
     });
 
     return {
-      myLists: me ?? [],
-      partnerLists: partner ?? [],
-      sharedLists: us ?? [],
+      myLists: (me ?? []) as ResolvedTodoList[],
+      partnerLists: (partner ?? []) as ResolvedTodoList[],
+      sharedLists: (us ?? []) as ResolvedTodoList[],
     };
   }, [couple?.todoLists, myProfile?.accountId]);
 
@@ -109,30 +118,30 @@ export default function TodoLists() {
   return (
     <View style={styles.container}>
       <View style={styles.listContainer}>
-        {myProfile?.avatar && myDefaultListId && (
+        {myProfile?.avatar && myDefaultList && (
           <TodoListListItem
             avatar={myProfile.avatar}
             title="My To-Dos"
-            listId={myDefaultListId as ID<TodoList | DefaultTodoList>}
-            onPress={() => onItemPress(myDefaultListId as ID<TodoList | DefaultTodoList>)}
+            list={myDefaultList}
+            onPress={() => onItemPress(myDefaultList.id)}
             disableSwipe
           />
         )}
 
-        {partnerProfile?.avatar && partnerDefaultListId && (
+        {partnerProfile?.avatar && partnerDefaultList && (
           <TodoListListItem
             avatar={partnerProfile.avatar}
             title={`${partnerProfile?.nickname ?? 'Partner'}'s To-Dos`}
-            listId={partnerDefaultListId as ID<TodoList | DefaultTodoList>}
-            onPress={() => onItemPress(partnerDefaultListId as ID<TodoList | DefaultTodoList>)}
+            list={partnerDefaultList}
+            onPress={() => onItemPress(partnerDefaultList.id)}
             disableSwipe
           />
         )}
-        {sharedDefaultListId && (
+        {sharedDefaultList && (
           <TodoListListItem
             title="Shared To-Dos"
-            listId={sharedDefaultListId}
-            onPress={() => onItemPress(sharedDefaultListId)}
+            list={sharedDefaultList}
+            onPress={() => onItemPress(sharedDefaultList.id)}
             disableSwipe
           />
         )}
@@ -167,7 +176,7 @@ export default function TodoLists() {
               key={item.id}
               title={item.title}
               onPress={() => onItemPress(item.id)}
-              listId={item.id}
+              list={item}
               onDelete={() => {
                 item.deleted = true;
               }}

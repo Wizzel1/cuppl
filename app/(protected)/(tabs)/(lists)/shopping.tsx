@@ -1,16 +1,22 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
+import { useCoState } from 'jazz-react-native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import { ShoppingListBottomSheet } from '~/components/ShoppingListScreen/ShoppingListBottomSheet';
 import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListListItem';
-import { useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
-import { ShoppingList } from '~/src/schemas/shoppingSchema';
+import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { ResolvedShoppingList, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingLists() {
-  const couple = useCouple();
+  const shallowCouple = useCouple();
+  const couple = useCoState(Couple, shallowCouple?.id, {
+    resolve: {
+      shoppingLists: { $each: true },
+    },
+  });
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -33,17 +39,21 @@ export default function ShoppingLists() {
   }, []);
 
   const { myLists, partnerLists, sharedLists } = useMemo(() => {
-    const empty = { myLists: [], partnerLists: [], sharedLists: [] };
+    const empty = {
+      myLists: [] as ResolvedShoppingList[],
+      partnerLists: [] as ResolvedShoppingList[],
+      sharedLists: [] as ResolvedShoppingList[],
+    };
     if (!couple?.shoppingLists) return empty;
     if (!myProfile?.accountId || !partnerProfile?.accountId) return empty;
     const myAccountId = myProfile.accountId;
     const partnerAccountId = partnerProfile.accountId;
 
-    const myLists: ShoppingList[] = [];
-    const partnerLists: ShoppingList[] = [];
-    const sharedLists: ShoppingList[] = [];
+    const myLists = [];
+    const partnerLists = [];
+    const sharedLists = [];
 
-    for (const list of couple.shoppingLists) {
+    for (const list of couple.shoppingLists as ResolvedShoppingList[]) {
       if (!list) continue;
       if (list.deleted) continue;
       switch (list.assignedTo) {
@@ -98,7 +108,7 @@ export default function ShoppingLists() {
               key={item.id}
               title={item.title}
               onPress={() => onItemPress(item.id)}
-              listId={item.id}
+              list={item}
               onDelete={() => {
                 item.deleted = true;
               }}
