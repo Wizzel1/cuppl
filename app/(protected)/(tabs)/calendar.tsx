@@ -135,6 +135,7 @@ export default function CalendarScreen() {
       <ExpandableCalendar
         firstDay={1}
         theme={theme}
+        hideArrows
         style={{ shadowColor: 'transparent' }}
         renderHeader={(test) => {
           if (!test) return null;
