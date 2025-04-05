@@ -14,7 +14,7 @@ const MaskedBackgroundPhoto = ({ imageUri }: { imageUri: string }) => {
   const height = Dimensions.get('window').height * 0.4;
 
   return (
-    <View style={{ width: windowWidth, height }}>
+    <View style={[styles.backgroundContainer, { width: windowWidth, height }]}>
       <Svg height={height} width={windowWidth}>
         <Defs>
           <Mask id="mask" x="0" y="0" height="100%" width="100%">
@@ -80,14 +80,8 @@ export default function Index() {
             {({ src }) => (src ? <MaskedBackgroundPhoto imageUri={src} /> : null)}
           </ProgressiveImg>
         ) : (
-          <View
-            style={{
-              width: '100%',
-              height: Dimensions.get('window').height * 0.4,
-              backgroundColor: 'gray',
-              justifyContent: 'center',
-            }}>
-            <Text style={{ textAlign: 'center' }}>No background photo</Text>
+          <View style={styles.noPhotoContainer}>
+            <Text style={styles.noPhotoText}>No background photo</Text>
           </View>
         )}
       </Pressable>
@@ -100,16 +94,7 @@ export default function Index() {
         categoryOrder={['recently_used', 'smileys_emotion']}
         disabledCategories={['flags', 'symbols']}
       />
-      {/* <Text>Index{me.profile?.name}</Text>
-      {couple ? <Text> {couple.id}</Text> : <Text>No couple</Text>} */}
-      <View
-        style={{
-          flexDirection: 'row',
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'baseline',
-          marginTop: -44,
-        }}>
+      <View style={styles.avatarContainer}>
         <Pressable
           onPress={() => {
             setPartnerTapped(myProfile ?? null);
@@ -117,9 +102,9 @@ export default function Index() {
           }}>
           <Text style={styles.moodText}>{myProfile?.mood}</Text>
         </Pressable>
-        <View style={{ flexDirection: 'row', marginHorizontal: -10 }}>
+        <View style={styles.avatarRow}>
           <PartnerAvatar partner={myProfile} />
-          <View style={{ marginLeft: -10 }}>
+          <View style={styles.partnerAvatarOffset}>
             <PartnerAvatar partner={partnerProfile} />
           </View>
         </View>
@@ -130,6 +115,32 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  backgroundContainer: {
+    position: 'relative',
+  },
+  noPhotoContainer: {
+    width: '100%',
+    height: Dimensions.get('window').height * 0.4,
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+  },
+  noPhotoText: {
+    textAlign: 'center',
+  },
+  avatarContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'baseline',
+    marginTop: -44,
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    marginHorizontal: -10,
+  },
+  partnerAvatarOffset: {
+    marginLeft: -10,
+  },
   moodText: {
     textAlign: 'center',
     fontSize: 32,

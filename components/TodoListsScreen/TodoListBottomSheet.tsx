@@ -40,12 +40,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
   return (
     <BottomSheetTextInput
       placeholder="New Todo List"
-      style={{
-        fontSize: 24,
-        fontWeight: '600',
-        flex: 1,
-        color: '#27272A',
-      }}
+      style={styles.input}
       onChangeText={setTitle}
       value={title}
     />
@@ -122,14 +117,10 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
 
     const EmojiPickerScreen = () => {
       return (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flexContainer}>
           <EmojiKeyboard
             styles={{
-              container: {
-                shadowColor: 'transparent',
-                paddingVertical: 0,
-                paddingHorizontal: 0,
-              },
+              container: styles.emojiKeyboardContainer,
             }}
             onEmojiSelected={(emoji) => {
               setEmoji(emoji.emoji);
@@ -188,66 +179,29 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
         enableDynamicSizing
         footerComponent={renderFooter}
         keyboardBehavior="interactive">
-        <BottomSheetView
-          style={{
-            ...styles.sheetContainer,
-            height: getScreenHeight(),
-          }}>
+        <BottomSheetView style={[styles.sheetContainer, { height: getScreenHeight() }]}>
           {activeScreen === 'todo' && (
             <>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                  justifyContent: 'space-between',
-                }}>
-                <InputField onChange={setTitle} initialValue={toUpdate?.title} />
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Pressable onPress={() => setActiveScreen('emoji')}>
-                    <View
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        borderWidth: 1,
-                        borderColor: '#E4E4E7',
-                        justifyContent: 'center',
-                      }}>
-                      <Text style={{ fontSize: 20, textAlign: 'center' }}>{emoji}</Text>
-                    </View>
+              <View style={styles.headerRow}>
+                <View style={styles.emojiRow}>
+                  <Pressable style={styles.emojiButton} onPress={() => setActiveScreen('emoji')}>
+                    <Text style={styles.emojiText}>{emoji}</Text>
                   </Pressable>
-                  <Pressable onPress={() => setActiveScreen('color')}>
-                    <View
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        borderWidth: 1,
-                        borderColor: '#E4E4E7',
-                        justifyContent: 'center',
-                        backgroundColor,
-                      }}
-                    />
-                  </Pressable>
+                  <InputField onChange={setTitle} initialValue={toUpdate?.title} />
                 </View>
               </View>
-              <View style={{ marginTop: 16 }}>
+              <View style={styles.marginTop}>
                 <OwnerDropdown
-                  onAssignedToChange={handleAssignedToChange}
                   selectedAssignedTo={assignedTo}
+                  onAssignedToChange={handleAssignedToChange}
                 />
               </View>
               {showHideFromPartner && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginTop: 16,
-                  }}>
-                  <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-                  <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
+                <View style={styles.marginTop}>
+                  <View style={styles.hideFromPartnerRow}>
+                    <Text style={styles.hideFromPartnerText}>Hide from partner</Text>
+                    <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
+                  </View>
                 </View>
               )}
             </>
@@ -286,5 +240,55 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     fontWeight: '800',
+  },
+  input: {
+    fontSize: 24,
+    fontWeight: '600',
+    flex: 1,
+    color: '#27272A',
+  },
+  flexContainer: {
+    flex: 1,
+  },
+  emojiKeyboardContainer: {
+    shadowColor: 'transparent',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  emojiRow: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+    gap: 8,
+  },
+  emojiButton: {
+    backgroundColor: '#F4F4F5',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emojiText: {
+    fontSize: 20,
+    textAlign: 'center',
+  },
+  marginTop: {
+    marginTop: 16,
+  },
+  hideFromPartnerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+  },
+  hideFromPartnerText: {
+    fontSize: 16,
+    color: '#27272A',
   },
 });

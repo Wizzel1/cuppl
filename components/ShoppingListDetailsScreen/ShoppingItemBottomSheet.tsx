@@ -41,41 +41,30 @@ const QuantitySection = ({
   onBack,
 }: OptionSectionProps) => {
   return (
-    <View
-      style={{
-        width: '100%',
-        height: 50,
-        flexDirection: 'column',
-      }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}>
+    <View style={styles.quantityContainer}>
+      <View style={styles.quantityHeader}>
         <Pressable onPress={onBack}>
-          <Text style={{ fontSize: 16, color: '#8E51FF' }}>← Back</Text>
+          <Text style={styles.backButton}>← Back</Text>
         </Pressable>
-        <Text style={{ fontSize: 18, fontWeight: '600' }}>Quantity</Text>
-        <View style={{ width: 40 }} />
+        <Text style={styles.sectionTitle}>Quantity</Text>
+        <View style={styles.spacer} />
       </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+      <View style={styles.pickerContainer}>
         <Picker<number>
-          style={{ flex: 1 }}
+          style={styles.picker}
           selectedValue={selectedQuantity}
-          onValueChange={(itemValue, itemIndex) => onQuantityChange(itemValue)}>
+          onValueChange={(itemValue) => onQuantityChange(itemValue)}>
           {quantities.map((quantity) => (
-            <Picker.Item label={quantity.toString()} value={quantity.toString()} />
+            <Picker.Item key={quantity} label={quantity.toString()} value={quantity.toString()} />
           ))}
         </Picker>
         <Picker<string>
-          style={{ flex: 1 }}
+          style={styles.picker}
           selectedValue={selectedUnit}
-          onValueChange={(itemValue, itemIndex) => onUnitChange(itemValue)}>
+          onValueChange={(itemValue) => onUnitChange(itemValue)}>
           {units.map((unit) => (
-            <Picker.Item label={unit} value={unit} />
+            <Picker.Item key={unit} label={unit} value={unit} />
           ))}
         </Picker>
       </View>
@@ -123,11 +112,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
   return (
     <BottomSheetTextInput
       placeholder="New Item"
-      style={{
-        fontSize: 24,
-        fontWeight: '600',
-        color: '#27272A',
-      }}
+      style={styles.input}
       onChangeText={setTitle}
       value={title}
     />
@@ -146,16 +131,7 @@ const NotesInputField = ({ onChange, initialValue }: InputFieldProps) => {
     <BottomSheetTextInput
       placeholder="Notes"
       multiline
-      style={{
-        fontSize: 16,
-        marginTop: 16,
-        height: 100,
-        color: '#27272A',
-        borderWidth: 1,
-        borderColor: '#E4E4E7',
-        borderRadius: 8,
-        padding: 12,
-      }}
+      style={styles.notesInput}
       value={notes}
       onChangeText={setNotes}
     />
@@ -408,12 +384,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   sectionContainer: {
-    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
   },
   rowBetween: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   sectionLabel: {
     fontSize: 16,
@@ -432,18 +409,62 @@ const styles = StyleSheet.create({
     color: '#71717B',
   },
   photoButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#F4F4F5',
-    width: 70,
-    height: 70,
-    borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
   },
   photoImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  quantityContainer: {
     width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    height: 50,
+    flexDirection: 'column',
+  },
+  quantityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#8E51FF',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  spacer: {
+    width: 40,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  picker: {
+    flex: 1,
+  },
+  input: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#27272A',
+  },
+  notesInput: {
+    fontSize: 16,
+    marginTop: 16,
+    height: 100,
+    color: '#27272A',
+    borderWidth: 1,
+    borderColor: '#E4E4E7',
+    borderRadius: 8,
+    padding: 12,
   },
 });
 

@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { useCoState } from 'jazz-react-native';
 import { group, sift } from 'radashi';
 import { memo, useCallback, useMemo } from 'react';
-import { SectionListRenderItem, Text, View } from 'react-native';
+import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 import { Theme } from 'react-native-calendars/src/types';
@@ -28,17 +28,9 @@ interface AgendaItemData {
 
 const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   return (
-    <View
-      style={{
-        height: 100,
-        width: '100%',
-        paddingHorizontal: 24,
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-      }}>
-      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
-      <Text style={{ fontSize: 14, color: '#71717B' }}>{item.hour}</Text>
+    <View style={styles.agendaItem}>
+      <Text style={styles.agendaItemTitle}>{item.name}</Text>
+      <Text style={styles.agendaItemHour}>{item.hour}</Text>
     </View>
   );
 });
@@ -121,22 +113,16 @@ export default function CalendarScreen() {
 
   return (
     <CalendarProvider
-      style={{
-        paddingTop: Constants.statusBarHeight,
-        backgroundColor: 'white',
-      }}
+      style={styles.calendarProvider}
       date={new Date().toISOString()}
       onDateChanged={onDateChanged}
       onMonthChange={onMonthChange}
-      showTodayButton
-      // disabledOpacity={0.6}
-      //   todayBottomMargin={16}
-    >
+      showTodayButton>
       <ExpandableCalendar
         firstDay={1}
         theme={theme}
         hideArrows
-        style={{ shadowColor: 'transparent' }}
+        style={styles.expandableCalendar}
         renderHeader={(dateString) => {
           if (!dateString) return null;
           const date = new Date(dateString);
@@ -144,22 +130,11 @@ export default function CalendarScreen() {
             month: 'long',
           })} ${date.getFullYear()}`;
           return (
-            <View style={{ height: 40, width: '100%', justifyContent: 'center' }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: '#27272A',
-                }}>
-                {formattedDate}
-              </Text>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarHeaderText}>{formattedDate}</Text>
             </View>
           );
         }}
-        // headerStyle={styles.header} // for horizontal only
-        // disableWeekScroll
-        // disableAllTouchEventsForDisabledDays
-        //   animateScroll
       />
       <AgendaList
         sections={agendaItems}
@@ -176,19 +151,65 @@ export default function CalendarScreen() {
 
           return (
             <View>
-              <View style={{ height: 28, backgroundColor: 'white' }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', paddingHorizontal: 24 }}>
-                  {formattedDate}
-                </Text>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{formattedDate}</Text>
               </View>
-              <View style={{ height: 1, backgroundColor: '#E4E4E7' }} />
+              <View style={styles.sectionDivider} />
             </View>
           );
         }}
-        // scrollToNextEvent
         dayFormat="yyyy-MM-d"
       />
       <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
     </CalendarProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  agendaItem: {
+    height: 100,
+    width: '100%',
+    paddingHorizontal: 24,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  agendaItemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  agendaItemHour: {
+    fontSize: 14,
+    color: '#71717B',
+  },
+  calendarProvider: {
+    paddingTop: Constants.statusBarHeight,
+    backgroundColor: 'white',
+  },
+  expandableCalendar: {
+    shadowColor: 'transparent',
+  },
+  calendarHeader: {
+    height: 40,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  calendarHeaderText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#27272A',
+  },
+  sectionHeader: {
+    height: 28,
+    backgroundColor: 'white',
+  },
+  sectionHeaderText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingHorizontal: 24,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: '#E4E4E7',
+  },
+});
