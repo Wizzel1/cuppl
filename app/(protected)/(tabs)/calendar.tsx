@@ -50,7 +50,7 @@ const OverdueSection = memo(({ todos }: { todos: TodoItem[] }) => {
         <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#71717B" />
       </TouchableOpacity>
       {isExpanded && (
-        <View style={{ height: todos.length * 70 }}>
+        <View style={{ height: todos.length * 50 }}>
           {todos.map((todo, index) => (
             <TodoListItem
               key={todo.id}
