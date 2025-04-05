@@ -2,7 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProgressiveImg } from 'jazz-react-native';
 import { ImageDefinition } from 'jazz-tools';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 interface AvatarListItemProps {
   onPress: () => void;
   title: string;
@@ -11,6 +11,7 @@ interface AvatarListItemProps {
   emoji?: string;
   isHidden?: boolean;
   subtitle?: string;
+  progress: number;
 }
 
 const AvatarListItem = ({
@@ -21,23 +22,36 @@ const AvatarListItem = ({
   emoji,
   isHidden,
   subtitle,
+  progress,
 }: AvatarListItemProps) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
-          {backgroundColor && emoji ? (
-            <View style={[styles.avatarContainer, { backgroundColor }]}>
-              <Text style={styles.emojiText}>{emoji}</Text>
+          <View style={styles.avatarWrapper}>
+            {backgroundColor && emoji ? (
+              <View style={[styles.avatarContainer, { backgroundColor }]}>
+                <Text style={styles.emojiText}>{emoji}</Text>
+              </View>
+            ) : (
+              <ProgressiveImg image={avatar} maxWidth={400}>
+                {({ src, originalSize, res }) => (
+                  <Image source={{ uri: src }} style={styles.avatarImage} />
+                )}
+              </ProgressiveImg>
+            )}
+            <View style={styles.progressContainer}>
+              <AnimatedCircularProgress
+                size={48}
+                width={4}
+                fill={progress * 100}
+                lineCap="round"
+                tintColor="#27272A"
+                onAnimationComplete={() => console.log('onAnimationComplete')}
+                backgroundColor="#E4E4E7"
+              />
             </View>
-          ) : (
-            <ProgressiveImg image={avatar} maxWidth={400}>
-              {({ src, originalSize, res }) => (
-                <Image source={{ uri: src }} style={styles.avatarImage} />
-              )}
-            </ProgressiveImg>
-          )}
-
+          </View>
           <View style={styles.textContainer}>
             <Text numberOfLines={1} ellipsizeMode="tail" style={styles.titleText}>
               {title}
@@ -65,6 +79,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     flex: 1,
+  },
+  avatarWrapper: {
+    width: 48,
+    height: 48,
+    position: 'relative',
   },
   avatarContainer: {
     width: 48,
@@ -117,5 +136,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  progressContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
 });

@@ -87,6 +87,7 @@ function TodoListListItem({
         <AvatarListItem
           onPress={isOpen ? () => setIsOpen(false) : onPress}
           title={title}
+          progress={completedItemsCount / list.liveItems.length}
           avatar={avatar ?? null}
           isHidden={'isHidden' in list && list.isHidden}
           backgroundColor={
