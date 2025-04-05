@@ -137,9 +137,9 @@ export default function CalendarScreen() {
         theme={theme}
         hideArrows
         style={{ shadowColor: 'transparent' }}
-        renderHeader={(test) => {
-          if (!test) return null;
-          const date = new Date(test);
+        renderHeader={(dateString) => {
+          if (!dateString) return null;
+          const date = new Date(dateString);
           const formattedDate = `${date.toLocaleDateString('en-US', {
             month: 'long',
           })} ${date.getFullYear()}`;
