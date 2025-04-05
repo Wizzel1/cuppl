@@ -37,9 +37,8 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
         alignItems: 'flex-start',
         justifyContent: 'center',
       }}>
-      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Wedding</Text>
-      <Text style={{ fontSize: 16 }}>{item.name}</Text>
-      <Text style={{ fontSize: 14, color: '#71717B' }}>10:00 - 12:00</Text>
+      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.name}</Text>
+      <Text style={{ fontSize: 14, color: '#71717B' }}>{item.hour}</Text>
     </View>
   );
 });
@@ -88,8 +87,9 @@ export default function CalendarScreen() {
         data:
           todos?.map((todo) => ({
             hour:
-              todo.dueDate?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) ??
-              '',
+              todo.dueDate?.getHours() +
+              ':' +
+              todo.dueDate?.getMinutes().toString().padStart(2, '0'),
             duration: null,
             name: todo.title,
           })) ?? [],
@@ -97,13 +97,6 @@ export default function CalendarScreen() {
       .filter((item) => item.title !== 'NO_DATE');
   }, [couple?.id]);
 
-  console.log(agendaItems);
-  // const pathname = usePathname();
-  // const [selected, setSelected] = useState(new Date());
-  // const couple = useCoState(Couple, me?.root?.couple?.id, { todoLists: [{}] });
-
-  // const lists = couple?.todoLists;
-  // console.log(lists);
   const onDateChanged = useCallback((date: string, updateSource: UpdateSources) => {
     console.log('ExpandableCalendarScreen onDateChanged: ', date, updateSource);
   }, []);
@@ -119,26 +112,6 @@ export default function CalendarScreen() {
     []
   );
 
-  // const marked = useMemo(() => {
-  //   return {
-  //     [""]: {
-  //       selected: selected === nextWeekDate,
-  //       selectedTextColor: '#5E60CE',
-  //       marked: true,
-  //     },
-  //     [nextMonthDate]: {
-  //       selected: selected === nextMonthDate,
-  //       selectedTextColor: '#5E60CE',
-  //       marked: true,
-  //     },
-  //     [selected]: {
-  //       selected: true,
-  //       disableTouchEvent: true,
-  //       selectedColor: '#5E60CE',
-  //       selectedTextColor: 'white',
-  //     },
-  //   };
-  // }, [selected]);
   return (
     <CalendarProvider
       style={{
