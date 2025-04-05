@@ -34,7 +34,7 @@ const AvatarListItem = ({
                 <Text style={styles.emojiText}>{emoji}</Text>
               </View>
             ) : (
-              <ProgressiveImg image={avatar} maxWidth={400}>
+              <ProgressiveImg image={avatar} targetWidth={48}>
                 {({ src, originalSize, res }) => (
                   <Image source={{ uri: src }} style={styles.avatarImage} />
                 )}

@@ -33,7 +33,7 @@ export default function PartnerAvatar({ partner }: { partner?: PartnerProfile | 
   return (
     <Pressable onPress={handleAvatarPress} style={{ width: 88, height: 88 }}>
       {partner?.avatar ? (
-        <ProgressiveImg image={partner.avatar} maxWidth={400}>
+        <ProgressiveImg image={partner.avatar} targetWidth={88}>
           {({ src, originalSize, res }) => (
             <Image
               source={{ uri: src }}

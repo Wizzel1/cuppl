@@ -121,7 +121,7 @@ const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
       <Text style={styles.sectionLabel}>Photo</Text>
       <Pressable style={styles.photoButton} onPress={onPress}>
         {image ? (
-          <ProgressiveImg image={image} maxWidth={1024}>
+          <ProgressiveImg image={image} targetWidth={70}>
             {({ src, res, originalSize }) => (
               <Image source={{ uri: src }} style={styles.photoImage} />
             )}
