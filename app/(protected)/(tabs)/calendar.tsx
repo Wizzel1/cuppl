@@ -27,15 +27,11 @@ interface AgendaItemData {
   duration: string;
   name: string;
   color?: string;
+  todo?: TodoItem;
 }
 
 const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
-  return (
-    <View style={styles.agendaItem}>
-      <Text style={styles.agendaItemTitle}>{item.name}</Text>
-      <Text style={styles.agendaItemHour}>{item.hour}</Text>
-    </View>
-  );
+  return <TodoListItem item={item.todo!} index={0} />;
 });
 
 const OverdueSection = memo(({ todos }: { todos: TodoItem[] }) => {
@@ -98,7 +94,7 @@ export default function CalendarScreen() {
   }, [couple?.todoLists, couple?.partnerATodos, couple?.partnerBTodos]);
 
   const overdueTodos = useMemo(() => {
-    return allTodos.filter((todo) => todo.dueDate && todo.dueDate < new Date());
+    return allTodos.filter((todo) => todo.isOverDue);
   }, [allTodos]);
 
   const agendaItems = useMemo(() => {
@@ -109,6 +105,7 @@ export default function CalendarScreen() {
     });
     const groupedByDate = group(sortedTodos, (todo) => {
       if (!todo?.dueDate) return 'NO_DATE';
+      if (todo.isOverDue) return 'NO_DATE';
       // Format date as YYYY-MM-DD
       const date = todo.dueDate;
       const year = date.getFullYear();
@@ -127,6 +124,7 @@ export default function CalendarScreen() {
               todo.dueDate?.getMinutes().toString().padStart(2, '0'),
             duration: null,
             name: todo.title,
+            todo,
           })) ?? [],
       }))
       .filter((item) => item.title !== 'NO_DATE');
@@ -140,12 +138,10 @@ export default function CalendarScreen() {
     console.log('ExpandableCalendarScreen onMonthChange: ', date, updateSource);
   }, []);
 
-  const renderItem: SectionListRenderItem<AgendaItem['data'][0]> = useCallback(
-    ({ item, section }) => {
-      return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
-    },
-    []
-  );
+  const renderItem: SectionListRenderItem<AgendaItemData> = useCallback(({ item, section }) => {
+    console.log('item', item);
+    return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
+  }, []);
 
   return (
     <CalendarProvider
@@ -208,14 +204,6 @@ export default function CalendarScreen() {
 const styles = StyleSheet.create({
   agendaList: {
     marginTop: 16,
-  },
-  agendaItem: {
-    height: 100,
-    width: '100%',
-    paddingHorizontal: 24,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
   },
   agendaItemTitle: {
     fontSize: 16,
