@@ -9,7 +9,9 @@ import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/com
 import { Theme } from 'react-native-calendars/src/types';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
+import TodoListItem from '~/components/TodoListDetailsScreen/TodoListItem';
 import { Couple, useCouple } from '~/src/schemas/schema.jazz';
+import { TodoItem } from '~/src/schemas/todoSchema';
 
 // @ts-ignore fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
 (ExpandableCalendar as any).defaultProps = undefined;
@@ -36,7 +38,7 @@ const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
   );
 });
 
-const OverdueSection = memo(({ todos }: { todos: any[] }) => {
+const OverdueSection = memo(({ todos }: { todos: TodoItem[] }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   if (todos.length === 0) return null;
@@ -48,11 +50,16 @@ const OverdueSection = memo(({ todos }: { todos: any[] }) => {
         <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#71717B" />
       </TouchableOpacity>
       {isExpanded && (
-        <View>
-          {todos.map((todo) => (
-            <View key={todo.id} style={styles.overdueItem}>
-              <Text style={styles.overdueItemTitle}>{todo.title}</Text>
-            </View>
+        <View style={{ height: todos.length * 70 }}>
+          {todos.map((todo, index) => (
+            <TodoListItem
+              key={todo.id}
+              item={todo}
+              index={index}
+              onToggle={() => {
+                todo.completed = !todo.completed;
+              }}
+            />
           ))}
         </View>
       )}
@@ -269,6 +276,7 @@ const styles = StyleSheet.create({
   overdueItem: {
     paddingVertical: 12,
     paddingHorizontal: 24,
+    height: 70,
   },
   overdueItemTitle: {
     fontSize: 14,
