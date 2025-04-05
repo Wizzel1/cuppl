@@ -373,7 +373,7 @@ export class CoupleAccount extends Account {
   }
 
   async acceptCoupleInvite(coupleId: string) {
-    const invitedCouple = await Couple.load(coupleId as ID<Couple>, []);
+    const invitedCouple = await Couple.load(coupleId as ID<Couple>);
     if (!invitedCouple) throw new Error('Could not load the couple you were invited to');
     if (invitedCouple.partnerB) throw new Error('This couple already has two partners');
 
@@ -389,7 +389,7 @@ export class CoupleAccount extends Account {
     const originalCoupleId = this.coupleId;
     if (originalCoupleId) {
       try {
-        const originalCouple = await Couple.load(originalCoupleId, { owner: this });
+        const originalCouple = await Couple.load(originalCoupleId);
         if (originalCouple) originalCouple.deleted = true;
       } catch (error) {
         console.error('Could not mark original couple as deleted', error);

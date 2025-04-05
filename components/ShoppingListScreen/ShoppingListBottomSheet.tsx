@@ -108,7 +108,7 @@ export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingList
             creatorAccID: me.id,
             deleted: false,
           },
-          { owner: hideFromPartner ? me : couple._owner }
+          { owner: couple._owner }
         );
         if (couple.shoppingLists) {
           couple.shoppingLists.push(list);

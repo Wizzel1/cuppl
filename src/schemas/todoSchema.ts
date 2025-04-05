@@ -1,6 +1,20 @@
-import { co, CoList, CoMap, ImageDefinition } from 'jazz-tools';
+import { co, CoList, CoMap, ImageDefinition, Resolved } from 'jazz-tools';
 
 import { cancelNotification, scheduleNotification } from './schema.jazz';
+
+export type ResolvedTodoList = Resolved<
+  TodoList,
+  {
+    items: { $each: true };
+  }
+>;
+
+export type ResolvedDefaultTodoList = Resolved<
+  DefaultTodoList,
+  {
+    items: { $each: true };
+  }
+>;
 export class TodoItem extends CoMap {
   title = co.string;
   completed = co.boolean;
@@ -147,4 +161,29 @@ export class TodoList extends CoMap {
 export class TodoLists extends CoList.Of(co.ref(TodoList)) {}
 export class DefaultTodoList extends CoMap {
   items = co.ref(TodoItems);
+
+  get liveItems() {
+    const items = [];
+
+    for (const item of this.items ?? []) {
+      if (!item) continue;
+      if (item.deleted === undefined) continue;
+      if (item.deleted) continue;
+      items.push(item);
+    }
+    return items;
+  }
+
+  get completedItems() {
+    const items = [];
+    for (const item of this.items ?? []) {
+      if (!item) continue;
+      if (item.deleted) continue;
+      if (item.completed === undefined) continue;
+      if (item.completed) {
+        items.push(item);
+      }
+    }
+    return items;
+  }
 }

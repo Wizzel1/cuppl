@@ -247,7 +247,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
             deleted: false,
             completed: false,
           },
-          { owner: hideFromPartner ? me : couple!._owner }
+          { owner: couple!._owner }
         );
         onCreate(newItem);
       }

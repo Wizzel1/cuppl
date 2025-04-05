@@ -15,7 +15,9 @@ import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
 export default function ShoppingListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const list = useCoState(ShoppingList, id as ID<ShoppingList>, {
-    items: [{}],
+    resolve: {
+      items: { $each: true },
+    },
   });
   const completedItemsCount = list?.completedItems.length ?? 0;
   const totalItemsCount = list?.liveItems.length ?? 0;

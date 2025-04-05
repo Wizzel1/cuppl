@@ -17,7 +17,7 @@ import { TodoItem, TodoList } from '~/src/schemas/todoSchema';
 export default function TodoListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [expandedSections, setExpandedSections] = useState(new Set<string>());
-  const list = useCoState(TodoList, id as ID<TodoList>, { items: [{}] });
+  const list = useCoState(TodoList, id as ID<TodoList>, { resolve: { items: { $each: true } } });
   const { partnerProfile, myProfile } = usePartnerProfiles();
   const todoSheetRef = useRef<BottomSheetModal>(null);
   const todoListBottomSheetRef = useRef<BottomSheetModal>(null);

@@ -337,7 +337,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
           secondAlertOptionMinutes: secondAlertOption ?? undefined,
           photo: imageDefinition,
         },
-        { owner: hideFromPartner ? me : couple!._owner }
+        { owner: couple!._owner }
       );
       newTodo.scheduleNotifications().then(() => {
         onCreate(newTodo);

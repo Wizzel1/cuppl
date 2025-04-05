@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useCoState } from 'jazz-react-native';
-import { ID, ImageDefinition } from 'jazz-tools';
-import { memo, useEffect, useState } from 'react';
+import { ImageDefinition } from 'jazz-tools';
+import { memo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -9,7 +8,7 @@ import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimat
 
 import AvatarListItem from '../AvatarListItem';
 
-import { TodoList } from '~/src/schemas/todoSchema';
+import { ResolvedDefaultTodoList, ResolvedTodoList } from '~/src/schemas/todoSchema';
 
 type RightActionProps = {
   onDelete: () => void;
@@ -45,7 +44,7 @@ function RightAction(
 function TodoListListItem({
   avatar,
   title,
-  listId,
+  list,
   onPress,
   onDelete,
   onEdit,
@@ -53,24 +52,12 @@ function TodoListListItem({
 }: {
   avatar?: ImageDefinition | null;
   title: string;
-  listId: string;
+  list: ResolvedTodoList | ResolvedDefaultTodoList;
   onPress: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
   disableSwipe?: boolean;
 }) {
-  const list = useCoState(TodoList, listId as ID<TodoList>);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    if (!list?.id) return;
-    if (isLoaded) return;
-    setIsLoaded(false);
-    list?.ensureLoaded({ items: [{}] }).then(() => {
-      setIsLoaded(true);
-    });
-  }, [list?.id]);
-
   const completedItemsCount = list?.completedItems.length ?? 0;
   const totalItemsCount = list?.liveItems.length ?? 0;
   const [isOpen, setIsOpen] = useState(false);
@@ -101,10 +88,11 @@ function TodoListListItem({
           onPress={isOpen ? () => setIsOpen(false) : onPress}
           title={title}
           avatar={avatar ?? null}
-          isLoaded={isLoaded}
-          isHidden={list?.isHidden}
-          backgroundColor={list?.backgroundColor}
-          emoji={list?.emoji}
+          isHidden={'isHidden' in list && list.isHidden}
+          backgroundColor={
+            'backgroundColor' in list && list.backgroundColor ? list.backgroundColor : undefined
+          }
+          emoji={('emoji' in list && list.emoji) || undefined}
           subtitle={`${completedItemsCount} / ${totalItemsCount}`}
         />
       </Swipeable>
