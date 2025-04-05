@@ -10,11 +10,11 @@ import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListLi
 import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ResolvedShoppingList, ShoppingList } from '~/src/schemas/shoppingSchema';
 
-export default function ShoppingLists() {
+export default function ShoppingListsScreen() {
   const shallowCouple = useCouple();
   const couple = useCoState(Couple, shallowCouple?.id, {
     resolve: {
-      shoppingLists: { $each: true },
+      shoppingLists: { $each: { items: { $each: true } } },
     },
   });
   const { myProfile, partnerProfile } = usePartnerProfiles();

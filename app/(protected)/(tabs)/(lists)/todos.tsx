@@ -11,7 +11,7 @@ import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
 import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ResolvedTodoList, TodoList } from '~/src/schemas/todoSchema';
 
-export default function TodoLists() {
+export default function TodoListsScreen() {
   const { myProfile, partnerProfile } = usePartnerProfiles();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -25,7 +25,7 @@ export default function TodoLists() {
       partnerATodos: { items: { $each: true } },
       partnerBTodos: { items: { $each: true } },
       ourTodos: { items: { $each: true } },
-      todoLists: { $each: true },
+      todoLists: { $each: { items: { $each: true } } },
     },
   });
 

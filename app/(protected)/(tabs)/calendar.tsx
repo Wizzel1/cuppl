@@ -1,12 +1,15 @@
 import Constants from 'expo-constants';
-import { useAccount } from 'jazz-react-native';
-import { memo, useCallback } from 'react';
+import { useCoState } from 'jazz-react-native';
+import { group, sift } from 'radashi';
+import { memo, useCallback, useMemo } from 'react';
 import { SectionListRenderItem, Text, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 import { Theme } from 'react-native-calendars/src/types';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
+import { Couple, useCouple } from '~/src/schemas/schema.jazz';
+
 // @ts-ignore fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
 (ExpandableCalendar as any).defaultProps = undefined;
 
@@ -109,7 +112,87 @@ const theme: Theme = {
 };
 
 export default function CalendarScreen() {
-  const { me } = useAccount({});
+  // const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const shallowCouple = useCouple();
+  const couple = useCoState(Couple, shallowCouple?.id, {
+    resolve: {
+      partnerATodos: { items: { $each: true } },
+      partnerBTodos: { items: { $each: true } },
+      ourTodos: { items: { $each: true } },
+      todoLists: { $each: { items: { $each: true } } },
+    },
+  });
+  // useEffect(() => {
+  //   if (!shallowCouple) return;
+  //   Couple.load(shallowCouple.id, {
+  //     resolve: {
+  //       partnerATodos: { items: { $each: true } },
+  //       partnerBTodos: { items: { $each: true } },
+  //       ourTodos: { items: { $each: true } },
+  //       todoLists: { $each: { items: { $each: true } } },
+  //     },
+  //   }).then((value) => {
+  //     const liveA = sift(value?.partnerATodos?.liveItems ?? []);
+  //     const liveB = sift(value?.partnerBTodos?.liveItems ?? []);
+  //     const liveTodos = sift(value?.todoLists.map((list) => list.liveItems).flat() ?? []);
+  //     const allTodos = [...liveA, ...liveB, ...liveTodos];
+  //     const groupedByDate = group(allTodos, (todo) => {
+  //       if (!todo?.dueDate) return 'NO_DATE';
+  //       // Format date as YYYY-MM-DD
+  //       const date = todo.dueDate;
+  //       const year = date.getFullYear();
+  //       const month = String(date.getMonth() + 1).padStart(2, '0');
+  //       const day = String(date.getDate()).padStart(2, '0');
+  //       return `${year}-${month}-${day}`;
+  //     });
+  //     const items = Object.entries(groupedByDate)
+  //       .map(([date, todos]) => ({
+  //         title: date,
+  //         data:
+  //           todos?.map((todo) => ({
+  //             hour:
+  //               todo.dueDate?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) ??
+  //               '',
+  //             duration: null,
+  //             name: todo.title,
+  //           })) ?? [],
+  //       }))
+  //       .filter((item) => item.title !== 'NO_DATE');
+  //     setAgendaItems(items);
+  //   });
+  // }, [shallowCouple]);
+
+  const agendaItems = useMemo(() => {
+    const liveA = sift(couple?.partnerATodos?.liveItems ?? []);
+    const liveB = sift(couple?.partnerBTodos?.liveItems ?? []);
+    const liveTodos = sift(couple?.todoLists.map((list) => list.liveItems).flat() ?? []);
+    const allTodos = [...liveA, ...liveB, ...liveTodos];
+    const groupedByDate = group(allTodos, (todo) => {
+      if (!todo?.dueDate) return 'NO_DATE';
+      // Format date as YYYY-MM-DD
+      const date = todo.dueDate;
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    });
+    console.log(groupedByDate);
+    return Object.entries(groupedByDate)
+      .map(([date, todos]) => ({
+        title: date,
+        data:
+          todos?.map((todo) => ({
+            hour:
+              todo.dueDate?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) ??
+              '',
+            duration: null,
+            name: todo.title,
+          })) ?? [],
+      }))
+      .filter((item) => item.title !== 'NO_DATE');
+  }, [couple?.id]);
+
+  console.log(agendaItems);
   // const pathname = usePathname();
   // const [selected, setSelected] = useState(new Date());
   // const couple = useCoState(Couple, me?.root?.couple?.id, { todoLists: [{}] });
