@@ -2,11 +2,39 @@ import * as ImagePicker from 'expo-image-picker';
 import { ProgressiveImg } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { useState } from 'react';
-import { Dimensions, Image, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
+import Svg, { Defs, Mask, Path, Image as SvgImage } from 'react-native-svg';
 import EmojiPicker, { type EmojiType } from 'rn-emoji-keyboard';
 
 import PartnerAvatar from '~/components/PartnerAvatar';
 import { PartnerProfile, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+
+const MaskedBackgroundPhoto = ({ imageUri }: { imageUri: string }) => {
+  const windowWidth = Dimensions.get('window').width;
+  const height = Dimensions.get('window').height * 0.4;
+
+  return (
+    <View style={{ width: windowWidth, height }}>
+      <Svg height={height} width={windowWidth}>
+        <Defs>
+          <Mask id="mask" x="0" y="0" height="100%" width="100%">
+            <Path
+              d={`M0 0 L${windowWidth} 0 L${windowWidth} ${height - 40} Q${windowWidth / 2} ${height + 50} 0 ${height - 40} Z`}
+              fill="white"
+            />
+          </Mask>
+        </Defs>
+        <SvgImage
+          width="100%"
+          height="100%"
+          href={{ uri: imageUri }}
+          preserveAspectRatio="xMidYMid slice"
+          mask="url(#mask)"
+        />
+      </Svg>
+    </View>
+  );
+};
 
 export default function Index() {
   const couple = useCouple();
@@ -49,27 +77,18 @@ export default function Index() {
       <Pressable onPress={handleImageUpload}>
         {couple?.backgroundPhoto ? (
           <ProgressiveImg image={couple.backgroundPhoto} maxWidth={1024}>
-            {({ src, res, originalSize }) => (
-              <Image
-                source={{ uri: src }}
-                resizeMode="cover"
-                style={{
-                  width: '100%',
-                  height: Dimensions.get('window').height * 0.4,
-                }}
-              />
-            )}
+            {({ src }) => (src ? <MaskedBackgroundPhoto imageUri={src} /> : null)}
           </ProgressiveImg>
         ) : (
-          <Text
+          <View
             style={{
-              textAlign: 'center',
               width: '100%',
               height: Dimensions.get('window').height * 0.4,
               backgroundColor: 'gray',
+              justifyContent: 'center',
             }}>
-            No background photo
-          </Text>
+            <Text style={{ textAlign: 'center' }}>No background photo</Text>
+          </View>
         )}
       </Pressable>
       <EmojiPicker
