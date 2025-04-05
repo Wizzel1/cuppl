@@ -277,7 +277,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       if (!result.canceled && result.assets[0].base64) {
         const base64Uri = `data:image/jpeg;base64,${result.assets[0].base64}`;
         const image = await createImage(base64Uri, {
-          owner: couple._owner, // Set appropriate owner
+          owner: couple._owner,
           maxSize: 2048, // Optional: limit maximum image size
         });
         setImageDefinition(image);
