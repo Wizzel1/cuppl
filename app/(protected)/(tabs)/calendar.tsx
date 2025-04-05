@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useCoState } from 'jazz-react-native';
 import { group, sift } from 'radashi';
@@ -41,10 +42,10 @@ const OverdueSection = memo(({ todos }: { todos: any[] }) => {
   if (todos.length === 0) return null;
 
   return (
-    <View style={styles.overdueContainer}>
+    <View>
       <TouchableOpacity style={styles.overdueHeader} onPress={() => setIsExpanded(!isExpanded)}>
         <Text style={styles.overdueTitle}>Overdue</Text>
-        <Text style={styles.overdueBadgeText}>{todos.length}x</Text>
+        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#71717B" />
       </TouchableOpacity>
       {isExpanded && (
         <View style={styles.overdueList}>
@@ -246,13 +247,6 @@ const styles = StyleSheet.create({
   sectionDivider: {
     height: 1,
     backgroundColor: '#E4E4E7',
-  },
-  overdueContainer: {
-    backgroundColor: 'white',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E4E4E7',
   },
   overdueHeader: {
     padding: 16,
