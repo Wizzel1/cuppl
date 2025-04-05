@@ -74,7 +74,7 @@ export default function HandleInviteScreen() {
 
   // Go back to home
   const goToHome = () => {
-    router.replace('/(protected)/home');
+    router.replace('/(protected)/(tabs)/home');
   };
 
   return (
