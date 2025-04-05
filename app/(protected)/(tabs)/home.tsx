@@ -32,7 +32,7 @@ export default function Index() {
       if (!result.canceled && result.assets[0].base64) {
         const base64Uri = `data:image/jpeg;base64,${result.assets[0].base64}`;
         const image = await createImage(base64Uri, {
-          owner: couple._owner, // Set appropriate owner
+          owner: couple._owner,
           maxSize: 2048, // Optional: limit maximum image size
         });
         // Store the image in your covalue
@@ -104,13 +104,7 @@ export default function Index() {
             <PartnerAvatar partner={partnerProfile} />
           </View>
         </View>
-        <Pressable
-          onPress={() => {
-            setPartnerTapped(partnerProfile ?? null);
-            setIsOpen(true);
-          }}>
-          <Text style={styles.moodText}>{partnerProfile?.mood}</Text>
-        </Pressable>
+        <Text style={styles.moodText}>{partnerProfile?.mood}</Text>
       </View>
     </View>
   );

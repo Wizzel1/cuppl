@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg } from 'jazz-react-native';
+import { ProgressiveImg, useAccount } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { useCallback } from 'react';
 import { Image, Pressable, View } from 'react-native';
@@ -7,7 +7,9 @@ import { Image, Pressable, View } from 'react-native';
 import { PartnerProfile } from '~/src/schemas/schema.jazz';
 
 export default function PartnerAvatar({ partner }: { partner?: PartnerProfile | null }) {
+  const { me } = useAccount();
   const handleAvatarPress = useCallback(async () => {
+    if (partner?.accountId !== me?.id) return;
     try {
       if (!partner) return;
       const result = await ImagePicker.launchImageLibraryAsync({
