@@ -48,7 +48,7 @@ const OverdueSection = memo(({ todos }: { todos: any[] }) => {
         <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#71717B" />
       </TouchableOpacity>
       {isExpanded && (
-        <View style={styles.overdueList}>
+        <View>
           {todos.map((todo, index) => (
             <View key={index} style={styles.overdueItem}>
               <Text style={styles.overdueItemTitle}>{todo.title}</Text>
@@ -249,10 +249,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#E4E4E7',
   },
   overdueHeader: {
-    padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 24,
   },
   overdueTitle: {
     fontSize: 16,
@@ -263,12 +263,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#EF4444',
   },
-  overdueList: {
-    paddingHorizontal: 16,
-  },
   overdueItem: {
     paddingVertical: 12,
     borderTopWidth: 1,
+    paddingHorizontal: 24,
     borderTopColor: '#E4E4E7',
   },
   overdueItemTitle: {
