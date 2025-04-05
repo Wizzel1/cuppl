@@ -49,8 +49,8 @@ const OverdueSection = memo(({ todos }: { todos: any[] }) => {
       </TouchableOpacity>
       {isExpanded && (
         <View>
-          {todos.map((todo, index) => (
-            <View key={index} style={styles.overdueItem}>
+          {todos.map((todo) => (
+            <View key={todo.id} style={styles.overdueItem}>
               <Text style={styles.overdueItemTitle}>{todo.title}</Text>
             </View>
           ))}
@@ -253,11 +253,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E4E7',
   },
   overdueTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#27272A',
+    paddingVertical: 5.5,
   },
   overdueBadgeText: {
     fontSize: 14,
@@ -265,9 +268,7 @@ const styles = StyleSheet.create({
   },
   overdueItem: {
     paddingVertical: 12,
-    borderTopWidth: 1,
     paddingHorizontal: 24,
-    borderTopColor: '#E4E4E7',
   },
   overdueItemTitle: {
     fontSize: 14,
