@@ -86,6 +86,12 @@ export default function CalendarScreen() {
     },
   });
 
+  // useEffect(() => {
+  //   if (!couple) return;
+  //   couple.events = Events.create([], couple._owner);
+  //   console.log('couple', couple);
+  // }, [couple?.id]);
+
   const allTodos = useMemo(() => {
     const liveA = sift(couple?.partnerATodos?.liveItems ?? []);
     const liveB = sift(couple?.partnerBTodos?.liveItems ?? []);
