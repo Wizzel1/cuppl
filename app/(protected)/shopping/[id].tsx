@@ -7,9 +7,9 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import ShoppingItemBottomSheet from '~/components/ShoppingListDetailsScreen/ShoppingItemBottomSheet';
 import ShoppingListItem from '~/components/ShoppingListDetailsScreen/ShoppingListItem';
-import { ShoppingListBottomSheet } from '~/components/ShoppingListScreen/ShoppingListBottomSheet';
+import ShoppingItemBottomSheet from '~/components/bottomSheets/ShoppingItemBottomSheet';
+import { ShoppingListBottomSheet } from '~/components/bottomSheets/ShoppingListBottomSheet';
 import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListScreen() {

@@ -8,9 +8,9 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import TodoBottomSheet from '~/components/TodoListDetailsScreen/TodoBottomSheet';
 import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
-import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
+import TodoBottomSheet from '~/components/bottomSheets/TodoBottomSheet';
+import { TodoListBottomSheet } from '~/components/bottomSheets/TodoListBottomSheet';
 import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { TodoItem, TodoList } from '~/src/schemas/todoSchema';
 

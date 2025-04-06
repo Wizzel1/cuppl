@@ -16,9 +16,9 @@ import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
-import DueDateSection from '../bottomSheets/components/DueDateSection';
-import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
-import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSection';
+import DueDateSection from './components/DueDateSection';
+import { HideFromPartnerSection } from './components/HideFromPartnerSection';
+import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
