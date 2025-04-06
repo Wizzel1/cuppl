@@ -8,7 +8,6 @@ import {
   BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import * as Notifications from 'expo-notifications';
 import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
@@ -25,8 +24,8 @@ import {
   View,
 } from 'react-native';
 
-import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import DueDateSection from '../bottomSheets/components/DueDateSection';
 import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
@@ -40,59 +39,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-// Due Date Section Component
-type DueDateSectionProps = {
-  hasDueDate: boolean;
-  setHasDueDate: (value: boolean) => void;
-  dueDate: Date;
-  setDueDate: (date: Date) => void;
-  showDatePicker: boolean;
-  setShowDatePicker: (show: boolean) => void;
-  showTimePicker: boolean;
-  setShowTimePicker: (show: boolean) => void;
-};
-
-const DueDateSection = ({
-  hasDueDate,
-  setHasDueDate,
-  dueDate,
-  setDueDate,
-  showDatePicker,
-  setShowDatePicker,
-  showTimePicker,
-  setShowTimePicker,
-}: DueDateSectionProps) => (
-  <View style={{ marginTop: 16 }}>
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-      }}>
-      <Text style={{ fontSize: 16, color: '#27272A' }}>Due Date</Text>
-      <CustomSwitch value={hasDueDate} onValueChange={setHasDueDate} />
-    </View>
-
-    {hasDueDate && (
-      <View style={styles.dateTimeContainer}>
-        <DateTimePicker
-          value={dueDate}
-          style={{ flex: 1 }}
-          mode="datetime"
-          display="compact"
-          accentColor="#8E51FF"
-          minimumDate={new Date(new Date().setHours(new Date().getHours() + 1))}
-          onChange={(event, date) => {
-            setShowTimePicker(false);
-            if (date) setDueDate(date);
-          }}
-        />
-      </View>
-    )}
-  </View>
-);
 
 type OptionSectionProps = {
   label: string;
@@ -512,12 +458,7 @@ const styles = StyleSheet.create({
     padding: 24,
     zIndex: 1000,
   },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 8,
-  },
+
   footerContainer: {
     padding: 12,
     margin: 12,
@@ -544,11 +485,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  dateButtonText: {
-    fontSize: 14,
-    color: '#27272A',
-    textAlign: 'center',
   },
   sectionContainer: {
     marginTop: 16,
