@@ -10,10 +10,10 @@ import {
 import { useAccount } from 'jazz-react-native';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
 import BottomSheetColorPicker from '../BottomSheetColorPicker';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import EmojiPickerScreen from '../bottomSheets/components/EmojiPickerScreen';
 import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
@@ -111,23 +111,6 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       return 200;
     };
 
-    const EmojiPickerScreen = () => {
-      return (
-        <View style={styles.flexContainer}>
-          <EmojiKeyboard
-            styles={{
-              container: styles.emojiKeyboardContainer,
-            }}
-            onEmojiSelected={(emoji) => {
-              setEmoji(emoji.emoji);
-              setActiveScreen('todo');
-            }}
-            defaultHeight={550}
-          />
-        </View>
-      );
-    };
-
     const renderFooter = useCallback(
       (props: BottomSheetFooterProps) => {
         if (activeScreen !== 'todo') return null;
@@ -221,7 +204,12 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
               onBackPress={() => setActiveScreen('todo')}
             />
           )}
-          {activeScreen === 'emoji' && <EmojiPickerScreen />}
+          {activeScreen === 'emoji' && (
+            <EmojiPickerScreen
+              setEmoji={setEmoji}
+              setActiveScreen={(screen) => setActiveScreen(screen as any)}
+            />
+          )}
         </BottomSheetView>
       </BottomSheetModal>
     );
