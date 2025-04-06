@@ -27,6 +27,7 @@ import {
 
 import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
@@ -423,16 +424,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
             </View>
 
             {showHideFromPartner && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginTop: 16,
-                }}>
-                <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-                <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-              </View>
+              <HideFromPartnerSection hideFromPartner setHideFromPartner={setHideFromPartner} />
             )}
             <DueDateSection
               hasDueDate={hasDueDate}

@@ -13,8 +13,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
 import BottomSheetColorPicker from '../BottomSheetColorPicker';
-import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
 import { useCouple } from '~/src/schemas/schema.jazz';
@@ -207,12 +207,10 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
                 />
               </View>
               {showHideFromPartner && (
-                <View style={styles.marginTop}>
-                  <View style={styles.hideFromPartnerRow}>
-                    <Text style={styles.hideFromPartnerText}>Hide from partner</Text>
-                    <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-                  </View>
-                </View>
+                <HideFromPartnerSection
+                  hideFromPartner={hideFromPartner}
+                  setHideFromPartner={setHideFromPartner}
+                />
               )}
             </>
           )}

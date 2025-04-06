@@ -16,7 +16,7 @@ import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import CustomSwitch from '../CustomSwitch';
+import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItem } from '~/src/schemas/shoppingSchema';
@@ -310,16 +310,10 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                   </View>
                 </TouchableOpacity>
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginTop: 16,
-                }}>
-                <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-                <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-              </View>
+              <HideFromPartnerSection
+                hideFromPartner={hideFromPartner}
+                setHideFromPartner={setHideFromPartner}
+              />
 
               <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
               <NotesInputField onChange={setNotes} initialValue={notes} />

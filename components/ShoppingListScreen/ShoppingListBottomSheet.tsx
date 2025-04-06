@@ -13,8 +13,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
 import BottomSheetColorPicker from '../BottomSheetColorPicker';
-import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema';
@@ -248,16 +248,10 @@ export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingList
                 />
               </View>
               {showHideFromPartner && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginTop: 16,
-                  }}>
-                  <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-                  <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-                </View>
+                <HideFromPartnerSection
+                  hideFromPartner={hideFromPartner}
+                  setHideFromPartner={setHideFromPartner}
+                />
               )}
             </>
           )}
