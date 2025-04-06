@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Constants from 'expo-constants';
 import { useCoState } from 'jazz-react-native';
 import { group, sift } from 'radashi';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { SectionListRenderItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
@@ -10,6 +11,7 @@ import { Theme } from 'react-native-calendars/src/types';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListDetailsScreen/TodoListItem';
+import EventBottomSheet from '~/components/bottomSheets/EventBottomSheet';
 import { Couple, useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
 
@@ -85,6 +87,7 @@ export default function CalendarScreen() {
       todoLists: { $each: { items: { $each: true } } },
     },
   });
+  const eventSheetRef = useRef<BottomSheetModal>(null);
 
   // useEffect(() => {
   //   if (!couple) return;
@@ -149,6 +152,10 @@ export default function CalendarScreen() {
     return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
   }, []);
 
+  const handleFABPress = useCallback(() => {
+    eventSheetRef.current?.present();
+  }, []);
+
   return (
     <CalendarProvider
       style={styles.calendarProvider}
@@ -201,7 +208,8 @@ export default function CalendarScreen() {
         }}
         dayFormat="yyyy-MM-d"
       />
-      <FloatingActionButton onPress={() => {}} icon="add" color="#27272A" />
+      <FloatingActionButton onPress={handleFABPress} icon="add" color="#27272A" />
+      <EventBottomSheet ref={eventSheetRef} toUpdate={null} />
     </CalendarProvider>
   );
 }
