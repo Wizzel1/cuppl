@@ -206,8 +206,10 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
           )}
           {activeScreen === 'emoji' && (
             <EmojiPickerScreen
-              setEmoji={setEmoji}
-              setActiveScreen={(screen) => setActiveScreen(screen as any)}
+              setEmoji={(emoji) => {
+                setEmoji(emoji);
+                setActiveScreen('todo');
+              }}
             />
           )}
         </BottomSheetView>

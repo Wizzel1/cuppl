@@ -4,10 +4,9 @@ import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
 interface EmojiPickerScreenProps {
   setEmoji: (emoji: string) => void;
-  setActiveScreen: (screen: string) => void;
 }
 
-const EmojiPickerScreen = ({ setEmoji, setActiveScreen }: EmojiPickerScreenProps) => {
+const EmojiPickerScreen = ({ setEmoji }: EmojiPickerScreenProps) => {
   return (
     <View style={{ flex: 1 }}>
       <EmojiKeyboard
@@ -16,7 +15,6 @@ const EmojiPickerScreen = ({ setEmoji, setActiveScreen }: EmojiPickerScreenProps
         }}
         onEmojiSelected={(emoji) => {
           setEmoji(emoji.emoji);
-          setActiveScreen('todo');
         }}
         defaultHeight={550}
       />
