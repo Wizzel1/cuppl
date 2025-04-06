@@ -79,10 +79,6 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       if (couple.todoLists === null) return;
 
       if (toUpdate) {
-        // Update existing TodoList
-        if (hideFromPartner !== toUpdate.isHidden) {
-          throw new Error('Ownership transfer required');
-        }
         TodoListsRepo.updateTodoList({
           me,
           id: toUpdate.id,
@@ -183,11 +179,25 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
           {activeScreen === 'todo' && (
             <>
               <View style={styles.headerRow}>
-                <View style={styles.emojiRow}>
+                <View style={styles.inputRow}>
+                  <InputField onChange={setTitle} initialValue={toUpdate?.title} />
+
                   <Pressable style={styles.emojiButton} onPress={() => setActiveScreen('emoji')}>
                     <Text style={styles.emojiText}>{emoji}</Text>
                   </Pressable>
-                  <InputField onChange={setTitle} initialValue={toUpdate?.title} />
+                  <Pressable onPress={() => setActiveScreen('color')}>
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        borderWidth: 1,
+                        borderColor: '#E4E4E7',
+                        justifyContent: 'center',
+                        backgroundColor,
+                      }}
+                    />
+                  </Pressable>
                 </View>
               </View>
               <View style={styles.marginTop}>
@@ -260,7 +270,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  emojiRow: {
+  inputRow: {
     flexDirection: 'row',
     flex: 1,
     alignItems: 'center',

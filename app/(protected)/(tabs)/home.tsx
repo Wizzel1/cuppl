@@ -76,7 +76,9 @@ export default function Index() {
       <StatusBar translucent backgroundColor="#FFFFFF4D" />
       <Pressable onPress={handleImageUpload}>
         {couple?.backgroundPhoto ? (
-          <ProgressiveImg image={couple.backgroundPhoto} maxWidth={1024}>
+          <ProgressiveImg
+            image={couple.backgroundPhoto}
+            targetWidth={Dimensions.get('window').width}>
             {({ src }) => (src ? <MaskedBackgroundPhoto imageUri={src} /> : null)}
           </ProgressiveImg>
         ) : (

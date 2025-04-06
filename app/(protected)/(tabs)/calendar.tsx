@@ -1,14 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useCoState } from 'jazz-react-native';
 import { group, sift } from 'radashi';
-import { memo, useCallback, useMemo } from 'react';
-import { SectionListRenderItem, StyleSheet, Text, View } from 'react-native';
+import { memo, useCallback, useMemo, useState } from 'react';
+import { SectionListRenderItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AgendaList, CalendarProvider, DateData, ExpandableCalendar } from 'react-native-calendars';
 import { UpdateSources } from 'react-native-calendars/src/expandableCalendar/commons';
 import { Theme } from 'react-native-calendars/src/types';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
+import TodoListItem from '~/components/TodoListDetailsScreen/TodoListItem';
 import { Couple, useCouple } from '~/src/schemas/schema.jazz';
+import { TodoItem } from '~/src/schemas/todoSchema';
 
 // @ts-ignore fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455
 (ExpandableCalendar as any).defaultProps = undefined;
@@ -24,13 +27,38 @@ interface AgendaItemData {
   duration: string;
   name: string;
   color?: string;
+  todo?: TodoItem;
 }
 
 const AgendaItemComponent = memo(({ item }: { item: AgendaItemData }) => {
+  return <TodoListItem item={item.todo!} index={0} />;
+});
+
+const OverdueSection = memo(({ todos }: { todos: TodoItem[] }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  if (todos.length === 0) return null;
+
   return (
-    <View style={styles.agendaItem}>
-      <Text style={styles.agendaItemTitle}>{item.name}</Text>
-      <Text style={styles.agendaItemHour}>{item.hour}</Text>
+    <View>
+      <TouchableOpacity style={styles.overdueHeader} onPress={() => setIsExpanded(!isExpanded)}>
+        <Text style={styles.overdueTitle}>Overdue</Text>
+        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#71717B" />
+      </TouchableOpacity>
+      {isExpanded && (
+        <View style={{ height: todos.length * 50 }}>
+          {todos.map((todo, index) => (
+            <TodoListItem
+              key={todo.id}
+              item={todo}
+              index={index}
+              onToggle={() => {
+                todo.completed = !todo.completed;
+              }}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 });
@@ -65,6 +93,10 @@ export default function CalendarScreen() {
     return [...liveA, ...liveB, ...liveTodos];
   }, [couple?.todoLists, couple?.partnerATodos, couple?.partnerBTodos]);
 
+  const overdueTodos = useMemo(() => {
+    return allTodos.filter((todo) => todo.isOverDue);
+  }, [allTodos]);
+
   const agendaItems = useMemo(() => {
     const sortedTodos = allTodos.sort((a, b) => {
       if (!a?.dueDate) return 1;
@@ -73,6 +105,7 @@ export default function CalendarScreen() {
     });
     const groupedByDate = group(sortedTodos, (todo) => {
       if (!todo?.dueDate) return 'NO_DATE';
+      if (todo.isOverDue) return 'NO_DATE';
       // Format date as YYYY-MM-DD
       const date = todo.dueDate;
       const year = date.getFullYear();
@@ -91,6 +124,7 @@ export default function CalendarScreen() {
               todo.dueDate?.getMinutes().toString().padStart(2, '0'),
             duration: null,
             name: todo.title,
+            todo,
           })) ?? [],
       }))
       .filter((item) => item.title !== 'NO_DATE');
@@ -104,12 +138,10 @@ export default function CalendarScreen() {
     console.log('ExpandableCalendarScreen onMonthChange: ', date, updateSource);
   }, []);
 
-  const renderItem: SectionListRenderItem<AgendaItem['data'][0]> = useCallback(
-    ({ item, section }) => {
-      return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
-    },
-    []
-  );
+  const renderItem: SectionListRenderItem<AgendaItemData> = useCallback(({ item, section }) => {
+    console.log('item', item);
+    return <AgendaItemComponent key={`${section.title}-${item.hour}-${item.name}`} item={item} />;
+  }, []);
 
   return (
     <CalendarProvider
@@ -136,7 +168,11 @@ export default function CalendarScreen() {
           );
         }}
       />
+
+      <OverdueSection todos={overdueTodos} />
+
       <AgendaList
+        style={styles.agendaList}
         sections={agendaItems}
         renderItem={renderItem}
         renderSectionHeader={(dateString) => {
@@ -166,13 +202,8 @@ export default function CalendarScreen() {
 }
 
 const styles = StyleSheet.create({
-  agendaItem: {
-    height: 100,
-    width: '100%',
-    paddingHorizontal: 24,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+  agendaList: {
+    marginTop: 16,
   },
   agendaItemTitle: {
     fontSize: 16,
@@ -211,5 +242,32 @@ const styles = StyleSheet.create({
   sectionDivider: {
     height: 1,
     backgroundColor: '#E4E4E7',
+  },
+  overdueHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E4E7',
+  },
+  overdueTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#27272A',
+    paddingVertical: 5.5,
+  },
+  overdueBadgeText: {
+    fontSize: 14,
+    color: '#EF4444',
+  },
+  overdueItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    height: 70,
+  },
+  overdueItemTitle: {
+    fontSize: 14,
+    color: '#27272A',
   },
 });

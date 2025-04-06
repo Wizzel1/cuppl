@@ -83,7 +83,7 @@ const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
       <Text style={styles.sectionLabel}>Photo</Text>
       <Pressable style={styles.photoButton} onPress={onPress}>
         {image ? (
-          <ProgressiveImg image={image} maxWidth={1024}>
+          <ProgressiveImg image={image} targetWidth={70}>
             {({ src, res, originalSize }) => (
               <Image source={{ uri: src }} style={styles.photoImage} />
             )}
@@ -384,8 +384,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   sectionContainer: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    marginTop: 16,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -409,17 +408,18 @@ const styles = StyleSheet.create({
     color: '#71717B',
   },
   photoButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     backgroundColor: '#F4F4F5',
+    width: 70,
+    height: 70,
+    borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   photoImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   quantityContainer: {
     width: '100%',
