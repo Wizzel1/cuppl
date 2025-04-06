@@ -9,36 +9,20 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
-import * as Notifications from 'expo-notifications';
-import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 import DueDateSection from '../bottomSheets/components/DueDateSection';
 import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
+import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
 import { useDebounce } from '~/utils/useDebounce';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
 
 type OptionSectionProps = {
   label: string;
@@ -52,30 +36,6 @@ const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
       <Text style={styles.sectionLabel}>{label}</Text>
       <Pressable style={styles.optionButton} onPress={onPress}>
         <Text style={styles.optionText}>{value}</Text>
-      </Pressable>
-    </View>
-  </View>
-);
-
-type PhotoSectionProps = {
-  image: ImageDefinition | null;
-  onPress: () => void;
-};
-
-const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>Photo</Text>
-      <Pressable style={styles.photoButton} onPress={onPress}>
-        {image ? (
-          <ProgressiveImg image={image} targetWidth={70}>
-            {({ src, res, originalSize }) => (
-              <Image source={{ uri: src }} style={styles.photoImage} />
-            )}
-          </ProgressiveImg>
-        ) : (
-          <Ionicons name="image-outline" size={20} color="#71717B" />
-        )}
       </Pressable>
     </View>
   </View>
@@ -404,7 +364,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
               </>
             )}
 
-            <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
+            <PhotoAttachmentSection image={imageDefinition} onPress={handleImageUpload} />
           </>
         )}
 
@@ -509,20 +469,6 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 14,
     color: '#71717B',
-  },
-  photoButton: {
-    backgroundColor: '#F4F4F5',
-    width: 70,
-    height: 70,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  photoImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
   },
 });
 

@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -10,13 +9,14 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
+import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItem } from '~/src/schemas/shoppingSchema';
@@ -71,30 +71,6 @@ const QuantitySection = ({
     </View>
   );
 };
-
-type PhotoSectionProps = {
-  image: ImageDefinition | null;
-  onPress: () => void;
-};
-
-const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>Photo</Text>
-      <Pressable style={styles.photoButton} onPress={onPress}>
-        {image ? (
-          <ProgressiveImg image={image} targetWidth={70}>
-            {({ src, res, originalSize }) => (
-              <Image source={{ uri: src }} style={styles.photoImage} />
-            )}
-          </ProgressiveImg>
-        ) : (
-          <Ionicons name="image-outline" size={20} color="#71717B" />
-        )}
-      </Pressable>
-    </View>
-  </View>
-);
 
 interface InputFieldProps {
   onChange: (value: string) => void;
@@ -315,7 +291,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                 setHideFromPartner={setHideFromPartner}
               />
 
-              <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
+              <PhotoAttachmentSection image={imageDefinition} onPress={handleImageUpload} />
               <NotesInputField onChange={setNotes} initialValue={notes} />
             </>
           )}
