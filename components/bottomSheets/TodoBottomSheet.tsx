@@ -18,28 +18,12 @@ import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 import DueDateSection from './components/DueDateSection';
 import { HideFromPartnerSection } from './components/HideFromPartnerSection';
+import OptionSection from './components/OptionSection';
 import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
 import { useDebounce } from '~/utils/useDebounce';
-
-type OptionSectionProps = {
-  label: string;
-  value: string;
-  onPress: () => void;
-};
-
-const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>{label}</Text>
-      <Pressable style={styles.optionButton} onPress={onPress}>
-        <Text style={styles.optionText}>{value}</Text>
-      </Pressable>
-    </View>
-  </View>
-);
 
 type OptionListProps = {
   title: string;

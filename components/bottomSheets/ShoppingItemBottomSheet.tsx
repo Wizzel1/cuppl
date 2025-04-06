@@ -22,7 +22,7 @@ import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItem } from '~/src/schemas/shoppingSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
-type OptionSectionProps = {
+type QuantitySectionProps = {
   onUnitChange: (unit: string) => void;
   onQuantityChange: (quantity: number) => void;
   selectedQuantity: number;
@@ -39,7 +39,7 @@ const QuantitySection = ({
   selectedQuantity,
   selectedUnit,
   onBack,
-}: OptionSectionProps) => {
+}: QuantitySectionProps) => {
   return (
     <View style={styles.quantityContainer}>
       <View style={styles.quantityHeader}>
