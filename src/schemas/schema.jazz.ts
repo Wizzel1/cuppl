@@ -14,6 +14,7 @@ import {
 import { useMemo } from 'react';
 
 import { createTodoList } from '../repositories/todoListsRepository';
+import { Events } from './eventSchema.jazz';
 import { ShoppingLists } from './shoppingSchema';
 import { DefaultTodoList, TodoItem, TodoItems, TodoList, TodoLists } from './todoSchema';
 export class PartnerProfile extends CoMap {
@@ -69,6 +70,7 @@ export class Couple extends CoMap {
   todoLists = co.ref(TodoLists);
   deleted = co.boolean;
   shoppingLists = co.ref(ShoppingLists);
+  events = co.ref(Events);
 
   getPartners() {
     return this._owner
@@ -346,6 +348,7 @@ export class CoupleAccount extends Account {
         partnerATodos,
         partnerBTodos,
         todoLists: TodoLists.create([], privateGroup),
+        events: Events.create([], privateGroup),
         shoppingLists: ShoppingLists.create([], privateGroup),
         deleted: false,
       },

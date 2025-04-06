@@ -170,7 +170,6 @@ export default function CalendarScreen() {
       />
 
       <OverdueSection todos={overdueTodos} />
-
       <AgendaList
         style={styles.agendaList}
         sections={agendaItems}
