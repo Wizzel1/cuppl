@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg } from 'jazz-react-native';
+import { ProgressiveImg } from 'jazz-expo';
 import { createImage } from 'jazz-react-native-media-images';
 import { useState } from 'react';
 import { Dimensions, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';

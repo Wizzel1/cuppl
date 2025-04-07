@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
-import { useCoState } from 'jazz-react-native';
+import { useCoState } from 'jazz-expo';
 import { group, sift } from 'radashi';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
@@ -32,31 +32,31 @@ export default function TodoListsScreen() {
   const router = useRouter();
 
   // useEffect(() => {
-  //   if (!couple) return;
-  //   if (couple.todoLists?.length === 0) return;
-  //   couple.todoLists = TodoLists.create([], { owner: couple._owner });
-  //   couple.partnerATodos = DefaultTodoList.create(
-  //     { items: TodoItems.create([], { owner: couple._owner }) },
-  //     { owner: couple._owner }
+  //   if (!shallowCouple) return;
+  //   if (shallowCouple.todoLists?.length === 0) return;
+  //   shallowCouple.todoLists = TodoLists.create([], { owner: shallowCouple._owner });
+  //   shallowCouple.partnerATodos = DefaultTodoList.create(
+  //     { items: TodoItems.create([], { owner: shallowCouple._owner }) },
+  //     { owner: shallowCouple._owner }
   //   );
-  //   couple.partnerBTodos = DefaultTodoList.create(
-  //     { items: TodoItems.create([], { owner: couple._owner }) },
-  //     { owner: couple._owner }
+  //   shallowCouple.partnerBTodos = DefaultTodoList.create(
+  //     { items: TodoItems.create([], { owner: shallowCouple._owner }) },
+  //     { owner: shallowCouple._owner }
   //   );
-  //   couple.ourTodos = TodoList.create(
+  //   shallowCouple.ourTodos = TodoList.create(
   //     {
   //       title: 'Our To-Dos',
-  //       items: TodoItems.create([], { owner: couple._owner }),
+  //       items: TodoItems.create([], { owner: shallowCouple._owner }),
   //       isHidden: false,
-  //       creatorAccID: couple.partnerA!.accountId,
+  //       creatorAccID: shallowCouple.partnerA!.accountId,
   //       emoji: '🖊',
   //       backgroundColor: '#FFFFFF',
   //       assignedTo: 'us',
   //       deleted: false,
   //     },
-  //     { owner: couple._owner }
+  //     { owner: shallowCouple._owner }
   //   );
-  // }, []);
+  // }, [shallowCouple?.id]);
   const { myDefaultList, partnerDefaultList, sharedDefaultList } = useMemo(() => {
     const empty = { myDefaultList: null, partnerDefaultList: null, sharedDefaultList: null };
     if (!couple) return empty;

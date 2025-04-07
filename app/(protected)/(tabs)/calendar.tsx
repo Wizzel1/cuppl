@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import Constants from 'expo-constants';
-import { useCoState } from 'jazz-react-native';
+import { useCoState } from 'jazz-expo';
 import { group, sift } from 'radashi';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { SectionListRenderItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';

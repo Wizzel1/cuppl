@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { useCoState } from 'jazz-react-native';
+import { useCoState } from 'jazz-expo';
 import { ID } from 'jazz-tools';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';

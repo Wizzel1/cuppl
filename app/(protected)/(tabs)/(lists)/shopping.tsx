@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
-import { useCoState } from 'jazz-react-native';
+import { useCoState } from 'jazz-expo';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, Text, View } from 'react-native';
 

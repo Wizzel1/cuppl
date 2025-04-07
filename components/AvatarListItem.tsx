@@ -1,5 +1,5 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { ProgressiveImg } from 'jazz-react-native';
+import { ProgressiveImg } from 'jazz-expo';
 import { ImageDefinition } from 'jazz-tools';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';

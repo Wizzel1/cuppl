@@ -6,7 +6,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { useAccount } from 'jazz-react-native';
+import { useAccount } from 'jazz-expo';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 

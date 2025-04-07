@@ -1,4 +1,4 @@
-import { useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-expo';
 import { useEffect, useState } from 'react';
 import { Button, Text, View } from 'react-native';
 
@@ -26,7 +26,9 @@ export default function Profile() {
       {couple ? <Text>Couple owner {couple._owner.id}</Text> : <Text>No couple owner</Text>}
       <Text>My account {me.id}</Text>
 
-      <Text selectable>{inviteLink}</Text>
+      <Text style={{ marginTop: 20 }} selectable>
+        {inviteLink}
+      </Text>
     </View>
   );
 }
