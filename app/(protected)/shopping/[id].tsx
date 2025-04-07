@@ -165,30 +165,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#27272A',
     borderRadius: 4,
   },
-  progressText: {
-    fontSize: 14,
-    color: '#71717B',
-    marginTop: 8,
-    textAlign: 'right',
-  },
   contentContainer: {
     paddingBottom: 80,
-  },
-  sectionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  sectionMetaContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  sectionMetaText: {
-    fontSize: 14,
-    color: '#71717B',
   },
   container: {
     flex: 1,
