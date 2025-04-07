@@ -72,7 +72,7 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
   </View>
 );
 
-type TodoListBottomSheetProps = {
+type EventBottomSheetProps = {
   onCreate?: (newTodo: TodoItem) => void;
   defaultAssignedTo?: OwnerAssignment;
   toUpdate: TodoItem | null;
@@ -94,7 +94,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
 
   return (
     <BottomSheetTextInput
-      placeholder="New Todo"
+      placeholder="New Event"
       style={{
         fontSize: 24,
         fontWeight: '600',
@@ -109,7 +109,7 @@ const InputField = ({ onChange, initialValue }: InputFieldProps) => {
 const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
 const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
 
-const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
+const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((props, ref) => {
   const { onCreate, defaultAssignedTo, toUpdate, onDismiss } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -435,4 +435,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TodoBottomSheet;
+export default EventBottomSheet;
