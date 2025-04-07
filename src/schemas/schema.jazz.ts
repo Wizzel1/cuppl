@@ -2,11 +2,8 @@ import { useAccount, useCoState } from 'jazz-expo';
 import { Account, co, CoMap, Group, ID, Profile } from 'jazz-tools';
 import { useMemo } from 'react';
 
-import { Couple } from './coupleSchema.jazz';
-import { Events } from './eventSchema.jazz';
-import { createPartnerProfile, PartnerProfile } from './partnerProfile.jazz';
-import { ShoppingLists } from './shoppingSchema';
-import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema';
+import { Couple, createCouple } from './coupleSchema.jazz';
+import { createPartnerProfile } from './partnerProfile.jazz';
 
 export class CoupleAccountRoot extends CoMap {
   couple = co.ref(Couple);
@@ -51,58 +48,14 @@ export class CoupleAccount extends Account {
       throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
+    // Create a private group for the profile
     const profileGroup = Group.create({ owner: this });
     this.profile = UserProfile.create({ name, ...other }, { owner: profileGroup });
 
-    const privateGroup = Group.create({ owner: this });
-
-    // Create an initial couple with the temporary partner profile
-    const initialCouple = Couple.create(
-      {
-        anniversary: new Date(),
-        partnerA: PartnerProfile.create(
-          {
-            name: this.profile?.name || 'New Partner',
-            mood: '😊',
-            accountId: this.id,
-          },
-          { owner: privateGroup }
-        ), // Use temporary profile initially
-        ourTodos: TodoList.create(
-          {
-            title: 'Our To-Dos',
-            assignedTo: 'us',
-            isHidden: false,
-            items: TodoItems.create([], privateGroup),
-            creatorAccID: this.id,
-            deleted: false,
-          },
-          privateGroup
-        ),
-        partnerATodos: DefaultTodoList.create(
-          {
-            items: TodoItems.create([], privateGroup),
-          },
-          privateGroup
-        ),
-        partnerBTodos: DefaultTodoList.create(
-          {
-            items: TodoItems.create([], privateGroup),
-          },
-          privateGroup
-        ),
-        todoLists: TodoLists.create([], privateGroup),
-        events: Events.create([], privateGroup),
-        shoppingLists: ShoppingLists.create([], privateGroup),
-        deleted: false,
-      },
-      privateGroup
-    );
-
-    // Initialize the account root with version tracking and the couple
+    const coupleGroup = Group.create({ owner: this });
     this.root = CoupleAccountRoot.create(
       {
-        couple: initialCouple,
+        couple: createCouple(this.profile, coupleGroup),
         version: 0,
       },
       { owner: this }
