@@ -323,7 +323,6 @@ export class CoupleAccount extends Account {
     const invitedCouple = await Couple.load(coupleId as ID<Couple>);
     if (!invitedCouple) throw new Error('Could not load the couple you were invited to');
     if (invitedCouple.partnerB) throw new Error('This couple already has two partners');
-
     const myProfile = createPartnerProfile(
       invitedCouple,
       this.profile?.name || 'New Partner',
@@ -354,16 +353,6 @@ export const shareCouple = (couple: Couple): string | null => {
   return null;
 };
 
-/**
- * Creates a new partner profile for a member of the couple.
- * The profile will be owned by the couple's group, making it editable by both partners.
- *
- * @param couple The couple instance the profile belongs to
- * @param name The name for the profile
- * @param accountId The ID of the account this profile represents
- * @param options Additional optional profile information
- * @returns The created partner profile
- */
 export const createPartnerProfile = (
   couple: Couple,
   name: string,
@@ -384,14 +373,6 @@ export const createPartnerProfile = (
   );
 };
 
-/**
- * Custom hook that returns the couple that the current user is in.
- *
- * This hook simplifies access to the couple data and handles the loading state.
- * It automatically retrieves the couple from the user's account root.
- *
- * @returns The couple instance or undefined if not loaded yet
- */
 export const useCouple = () => {
   const { me } = useAccount();
   const couple = useCoState(Couple, me?.root?.couple?.id);
@@ -419,6 +400,5 @@ export const usePartnerProfiles = () => {
 
     return { myProfile: null, partnerProfile: null };
   }, [couple?.partnerA?.id, couple?.partnerB?.id, me?.id]);
-
   return profiles;
 };
