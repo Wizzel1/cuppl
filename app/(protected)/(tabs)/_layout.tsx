@@ -7,7 +7,7 @@ export default function ProtectedLayout() {
       <Tabs.Screen name="(lists)" options={{ tabBarLabel: 'Lists' }} />
       <Tabs.Screen name="calendar" options={{ tabBarLabel: 'Calendar' }} />
       <Tabs.Screen name="invite" options={{ href: null }} />
-      <Tabs.Screen name="profile" options={{ href: null }} />
+      <Tabs.Screen name="profile" />
     </Tabs>
   );
 }
