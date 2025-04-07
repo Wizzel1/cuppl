@@ -213,8 +213,9 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.photo = imageDefinition;
-      cancelNotifications(toUpdate);
-      scheduleNotifications(toUpdate);
+      cancelNotifications(toUpdate).then(() => {
+        scheduleNotifications(toUpdate);
+      });
     } else {
       const newEvent = Event.create(
         {

@@ -213,8 +213,9 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.photo = imageDefinition;
-      cancelNotifications(toUpdate);
-      scheduleNotifications(toUpdate);
+      cancelNotifications(toUpdate).then(() => {
+        scheduleNotifications(toUpdate);
+      });
     } else {
       const newTodo = TodoItem.create(
         {
