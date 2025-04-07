@@ -5,11 +5,6 @@ import { useMemo } from 'react';
 import { Couple, createCouple } from './coupleSchema.jazz';
 import { createPartnerProfile } from './partnerProfile.jazz';
 
-export class CoupleAccountRoot extends CoMap {
-  couple = co.ref(Couple);
-  version = co.optional.number;
-}
-
 export class UserProfile extends Profile {
   name = co.string;
 
@@ -20,6 +15,10 @@ export class UserProfile extends Profile {
     }
     return { errors };
   }
+}
+export class CoupleAccountRoot extends CoMap {
+  couple = co.ref(Couple);
+  version = co.optional.number;
 }
 export class CoupleAccount extends Account {
   profile = co.ref(UserProfile);
