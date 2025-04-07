@@ -1,4 +1,4 @@
-import { useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-expo';
 import {
   Account,
   co,
@@ -11,10 +11,9 @@ import {
 } from 'jazz-tools';
 import { useMemo } from 'react';
 
-import { createTodoList } from '../repositories/todoListsRepository';
 import { Events } from './eventSchema.jazz';
 import { ShoppingLists } from './shoppingSchema';
-import { DefaultTodoList, TodoItem, TodoItems, TodoList, TodoLists } from './todoSchema';
+import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema';
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;
@@ -244,37 +243,7 @@ export class CoupleAccount extends Account {
     // Create a private group for couple data
     const privateGroup = Group.create({ owner: this });
 
-    if (1 === 1) return;
     // Create a sample personal todo list
-    const myTodoList = createTodoList({
-      me: this,
-      title: 'My To-Dos',
-      isHidden: false,
-      assignedTo: 'me',
-      emoji: '📝',
-      backgroundColor: '#000000',
-    });
-    if (!myTodoList) return;
-    myTodoList!.items!.push(
-      TodoItem.create(
-        {
-          title: 'Welcome to your todo list!',
-          completed: false,
-          dueDate: null,
-          notes: null,
-          deleted: false,
-          isHidden: false,
-          creatorAccID: this.id,
-          assignedTo: 'me',
-          alertNotificationID: null,
-          alertOptionMinutes: null,
-          secondAlertNotificationID: null,
-          secondAlertOptionMinutes: null,
-        },
-        privateGroup
-      )
-    );
-
     const partnerATodos = DefaultTodoList.create(
       {
         items: TodoItems.create([], privateGroup),
