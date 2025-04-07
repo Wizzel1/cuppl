@@ -54,7 +54,7 @@ export class CoupleAccount extends Account {
     const coupleGroup = Group.create({ owner: this });
     this.root = CoupleAccountRoot.create(
       {
-        couple: createCouple(this.profile, coupleGroup),
+        couple: createCouple(this, coupleGroup),
         version: 0,
       },
       { owner: this }

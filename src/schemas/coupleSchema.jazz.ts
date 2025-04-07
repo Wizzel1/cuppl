@@ -3,7 +3,7 @@ import { co, CoMap, Group, ImageDefinition } from 'jazz-tools';
 
 import { Events } from './eventSchema.jazz';
 import { PartnerProfile } from './partnerProfile.jazz';
-import { UserProfile } from './schema.jazz';
+import { CoupleAccount } from './schema.jazz';
 import { ShoppingLists } from './shoppingSchema';
 import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema';
 
@@ -41,14 +41,14 @@ export class Couple extends CoMap {
   }
 }
 
-export function createCouple(profile: UserProfile, owner: Group) {
+export function createCouple(account: CoupleAccount, owner: Group) {
   return Couple.create(
     {
       partnerA: PartnerProfile.create(
         {
-          name: profile?.name || 'New Partner',
+          name: account.profile?.name || 'New Partner',
           mood: '😊',
-          accountId: 'partnerA',
+          accountId: account.id,
         },
         owner
       ),
@@ -56,7 +56,7 @@ export function createCouple(profile: UserProfile, owner: Group) {
         title: 'Our To-Dos',
         assignedTo: 'us',
         isHidden: false,
-        creatorAccID: 'partnerA',
+        creatorAccID: account.id,
         deleted: false,
         emoji: '🖊',
         backgroundColor: '#FFFFFF',
