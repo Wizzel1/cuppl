@@ -5,134 +5,25 @@ import {
   BottomSheetFooter,
   BottomSheetFooterProps,
   BottomSheetModal,
-  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
-import * as Notifications from 'expo-notifications';
-import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import CustomSwitch from '../CustomSwitch';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import BottomSheetInput from './components/BottomSheetInput';
+import DueDateSection from './components/DueDateSection';
+import { HideFromPartnerSection } from './components/HideFromPartnerSection';
+import OptionSection from './components/OptionSection';
+import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
+import { Event } from '~/src/schemas/eventSchema.jazz';
 import { useCouple } from '~/src/schemas/schema.jazz';
-import { TodoItem } from '~/src/schemas/todoSchema';
-import { useDebounce } from '~/utils/useDebounce';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
-// Due Date Section Component
-type DueDateSectionProps = {
-  hasDueDate: boolean;
-  setHasDueDate: (value: boolean) => void;
-  dueDate: Date;
-  setDueDate: (date: Date) => void;
-  showDatePicker: boolean;
-  setShowDatePicker: (show: boolean) => void;
-  showTimePicker: boolean;
-  setShowTimePicker: (show: boolean) => void;
-};
-
-const DueDateSection = ({
-  hasDueDate,
-  setHasDueDate,
-  dueDate,
-  setDueDate,
-  showDatePicker,
-  setShowDatePicker,
-  showTimePicker,
-  setShowTimePicker,
-}: DueDateSectionProps) => (
-  <View style={{ marginTop: 16 }}>
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-      }}>
-      <Text style={{ fontSize: 16, color: '#27272A' }}>Due Date</Text>
-      <CustomSwitch value={hasDueDate} onValueChange={setHasDueDate} />
-    </View>
-
-    {hasDueDate && (
-      <View style={styles.dateTimeContainer}>
-        <DateTimePicker
-          value={dueDate}
-          style={{ flex: 1 }}
-          mode="datetime"
-          display="compact"
-          accentColor="#8E51FF"
-          minimumDate={new Date(new Date().setHours(new Date().getHours() + 1))}
-          onChange={(event, date) => {
-            setShowTimePicker(false);
-            if (date) setDueDate(date);
-          }}
-        />
-      </View>
-    )}
-  </View>
-);
-
-type OptionSectionProps = {
-  label: string;
-  value: string;
-  onPress: () => void;
-};
-
-const OptionSection = ({ label, value, onPress }: OptionSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>{label}</Text>
-      <Pressable style={styles.optionButton} onPress={onPress}>
-        <Text style={styles.optionText}>{value}</Text>
-      </Pressable>
-    </View>
-  </View>
-);
-
-type PhotoSectionProps = {
-  image: ImageDefinition | null;
-  onPress: () => void;
-};
-
-const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>Photo</Text>
-      <Pressable style={styles.photoButton} onPress={onPress}>
-        {image ? (
-          <ProgressiveImg image={image} targetWidth={70}>
-            {({ src, res, originalSize }) => (
-              <Image source={{ uri: src }} style={styles.photoImage} />
-            )}
-          </ProgressiveImg>
-        ) : (
-          <Ionicons name="image-outline" size={20} color="#71717B" />
-        )}
-      </Pressable>
-    </View>
-  </View>
-);
+import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 
 type OptionListProps = {
   title: string;
@@ -181,44 +72,17 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
   </View>
 );
 
-type TodoListBottomSheetProps = {
-  onCreate?: (newTodo: TodoItem) => void;
+type EventBottomSheetProps = {
+  onCreate?: (newEvent: Event) => void;
   defaultAssignedTo?: OwnerAssignment;
-  toUpdate: TodoItem | null;
+  toUpdate: Event | null;
   onDismiss?: () => void;
-};
-
-interface InputFieldProps {
-  onChange: (value: string) => void;
-  initialValue?: string;
-}
-
-const InputField = ({ onChange, initialValue }: InputFieldProps) => {
-  const [title, setTitle] = useState(initialValue ?? '');
-  const debouncedTitle = useDebounce(title, 300);
-
-  useEffect(() => {
-    onChange(debouncedTitle);
-  }, [debouncedTitle, onChange]);
-
-  return (
-    <BottomSheetTextInput
-      placeholder="New Todo"
-      style={{
-        fontSize: 24,
-        fontWeight: '600',
-        color: '#27272A',
-      }}
-      onChangeText={setTitle}
-      value={title}
-    />
-  );
 };
 
 const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
 const repeatOptions = ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
 
-const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((props, ref) => {
+const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((props, ref) => {
   const { onCreate, defaultAssignedTo, toUpdate, onDismiss } = props;
   const backdropComponent = useCallback((props: BottomSheetBackdropProps) => {
     return <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />;
@@ -238,10 +102,10 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
 
   const [alertOption, setAlertOption] = useState<number | null>(null);
   const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
-  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
+  const [repeatMode, setRepeatMode] = useState<Event['recurringUnit'] | null>(null);
 
   const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
+  const [assignedTo, setAssignedTo] = useState<Event['assignedTo']>('me');
   const [showHideFromPartner, setShowHideFromPartner] = useState(true);
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
@@ -321,16 +185,20 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.photo = imageDefinition;
-      toUpdate.scheduleNotifications();
+      cancelNotifications(toUpdate).then(() => {
+        scheduleNotifications(toUpdate);
+      });
     } else {
-      const newTodo = TodoItem.create(
+      const newEvent = Event.create(
         {
           title,
           creatorAccID: me.id,
           dueDate: hasDueDate ? dueDate : null,
-          completed: false,
           deleted: false,
+          isAllDay: false,
+          isRecurring: false,
           isHidden: hideFromPartner,
+          startDate: new Date(),
           assignedTo,
           recurringUnit: repeatMode ?? undefined,
           alertOptionMinutes: alertOption ?? undefined,
@@ -339,8 +207,8 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
         },
         { owner: couple!._owner }
       );
-      newTodo.scheduleNotifications().then(() => {
-        onCreate(newTodo);
+      scheduleNotifications(newEvent).then(() => {
+        onCreate(newEvent);
       });
     }
 
@@ -367,7 +235,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
     setActiveScreen('todo');
   };
 
-  const selectRepeatOption = (option: TodoItem['recurringUnit']) => {
+  const selectRepeatOption = (option: Event['recurringUnit']) => {
     setRepeatMode(option);
     setActiveScreen('todo');
   };
@@ -414,7 +282,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       <BottomSheetView style={{ ...styles.sheetContainer, height: screenHeight }}>
         {activeScreen === 'todo' && (
           <>
-            <InputField onChange={setTitle} initialValue={title} />
+            <BottomSheetInput onChange={setTitle} initialValue={title} placeholder="New Event" />
             <View style={{ marginTop: 16 }}>
               <OwnerDropdown
                 onAssignedToChange={handleAssignedToChange}
@@ -423,16 +291,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
             </View>
 
             {showHideFromPartner && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginTop: 16,
-                }}>
-                <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-                <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-              </View>
+              <HideFromPartnerSection hideFromPartner setHideFromPartner={setHideFromPartner} />
             )}
             <DueDateSection
               hasDueDate={hasDueDate}
@@ -466,7 +325,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
               </>
             )}
 
-            <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
+            <PhotoAttachmentSection image={imageDefinition} onPress={handleImageUpload} />
           </>
         )}
 
@@ -505,7 +364,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
             selectedOption={repeatMode ? repeatMode : 'Never'}
             onSelect={(option) => {
               const selectedOption = repeatOptions[repeatOptions.indexOf(option)];
-              selectRepeatOption(selectedOption as TodoItem['recurringUnit']);
+              selectRepeatOption(selectedOption as Event['recurringUnit']);
             }}
             onBack={() => setActiveScreen('todo')}
           />
@@ -520,12 +379,7 @@ const styles = StyleSheet.create({
     padding: 24,
     zIndex: 1000,
   },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 8,
-  },
+
   footerContainer: {
     padding: 12,
     margin: 12,
@@ -553,49 +407,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  dateButtonText: {
-    fontSize: 14,
-    color: '#27272A',
-    textAlign: 'center',
-  },
   sectionContainer: {
     marginTop: 16,
   },
-  rowBetween: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sectionLabel: {
-    fontSize: 16,
-    color: '#27272A',
-  },
-  optionButton: {
-    backgroundColor: '#F4F4F5',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  optionText: {
-    fontSize: 14,
-    color: '#71717B',
-  },
-  photoButton: {
-    backgroundColor: '#F4F4F5',
-    width: 70,
-    height: 70,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  photoImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
 });
 
-export default TodoBottomSheet;
+export default EventBottomSheet;

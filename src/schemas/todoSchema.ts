@@ -1,6 +1,6 @@
 import { co, CoList, CoMap, ImageDefinition, Resolved } from 'jazz-tools';
 
-import { cancelNotification, scheduleNotification } from './schema.jazz';
+import { cancelNotifications } from '~/utils/notifications';
 
 export type ResolvedTodoList = Resolved<
   TodoList,
@@ -37,41 +37,8 @@ export class TodoItem extends CoMap {
   }
 
   async cancelAndDelete() {
-    await this.cancelNotifications();
+    await cancelNotifications(this);
     this.deleted = true;
-  }
-
-  async cancelNotifications() {
-    if (this.alertNotificationID !== undefined) {
-      await cancelNotification(this.alertNotificationID);
-    }
-    if (this.secondAlertNotificationID !== undefined) {
-      await cancelNotification(this.secondAlertNotificationID);
-    }
-  }
-
-  async scheduleNotifications() {
-    if (!this.dueDate) return;
-    if (this.alertOptionMinutes !== undefined) {
-      const id = await scheduleNotification(
-        this.alertOptionMinutes,
-        this.dueDate,
-        this.title,
-        `${this.title} is due in ${this.alertOptionMinutes} minutes`
-      );
-      this.alertNotificationID = id;
-      console.log('scheduled alert notification', id);
-    }
-    if (this.secondAlertOptionMinutes !== undefined) {
-      const id = await scheduleNotification(
-        this.secondAlertOptionMinutes,
-        this.dueDate,
-        this.title,
-        `${this.title} is due in ${this.secondAlertOptionMinutes} minutes`
-      );
-      this.secondAlertNotificationID = id;
-      console.log('scheduled second alert notification', id);
-    }
   }
 
   tryCreateNextTodo() {
@@ -95,6 +62,7 @@ export class TodoItem extends CoMap {
     return nextTodo;
   }
 }
+
 function getNextDueDate(recurringUnit: TodoItem['recurringUnit'], dueDate: Date | undefined) {
   if (!recurringUnit || !dueDate) return;
   const nextDueDate = new Date(dueDate);

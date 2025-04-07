@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -10,19 +9,21 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import { ProgressiveImg, useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-react-native';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import CustomSwitch from '../CustomSwitch';
+import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
+import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSection';
+import BottomSheetInput from './components/BottomSheetInput';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItem } from '~/src/schemas/shoppingSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
-type OptionSectionProps = {
+type QuantitySectionProps = {
   onUnitChange: (unit: string) => void;
   onQuantityChange: (quantity: number) => void;
   selectedQuantity: number;
@@ -39,7 +40,7 @@ const QuantitySection = ({
   selectedQuantity,
   selectedUnit,
   onBack,
-}: OptionSectionProps) => {
+}: QuantitySectionProps) => {
   return (
     <View style={styles.quantityContainer}>
       <View style={styles.quantityHeader}>
@@ -72,52 +73,10 @@ const QuantitySection = ({
   );
 };
 
-type PhotoSectionProps = {
-  image: ImageDefinition | null;
-  onPress: () => void;
-};
-
-const PhotoSection = ({ image, onPress }: PhotoSectionProps) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.sectionLabel}>Photo</Text>
-      <Pressable style={styles.photoButton} onPress={onPress}>
-        {image ? (
-          <ProgressiveImg image={image} targetWidth={70}>
-            {({ src, res, originalSize }) => (
-              <Image source={{ uri: src }} style={styles.photoImage} />
-            )}
-          </ProgressiveImg>
-        ) : (
-          <Ionicons name="image-outline" size={20} color="#71717B" />
-        )}
-      </Pressable>
-    </View>
-  </View>
-);
-
 interface InputFieldProps {
   onChange: (value: string) => void;
   initialValue?: string;
 }
-
-const InputField = ({ onChange, initialValue }: InputFieldProps) => {
-  const [title, setTitle] = useState(initialValue ?? '');
-  const debouncedTitle = useDebounce(title, 300);
-
-  useEffect(() => {
-    onChange(debouncedTitle);
-  }, [debouncedTitle, onChange]);
-
-  return (
-    <BottomSheetTextInput
-      placeholder="New Item"
-      style={styles.input}
-      onChangeText={setTitle}
-      value={title}
-    />
-  );
-};
 
 const NotesInputField = ({ onChange, initialValue }: InputFieldProps) => {
   const [notes, setNotes] = useState(initialValue ?? '');
@@ -280,7 +239,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
           {activeScreen === 'todo' && (
             <>
-              <InputField onChange={setTitle} initialValue={title} />
+              <BottomSheetInput onChange={setTitle} initialValue={title} placeholder="New Item" />
               <View
                 style={{
                   marginTop: 16,
@@ -310,18 +269,12 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
                   </View>
                 </TouchableOpacity>
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginTop: 16,
-                }}>
-                <Text style={{ fontSize: 16, color: '#27272A' }}>Hide from partner</Text>
-                <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-              </View>
+              <HideFromPartnerSection
+                hideFromPartner={hideFromPartner}
+                setHideFromPartner={setHideFromPartner}
+              />
 
-              <PhotoSection image={imageDefinition} onPress={handleImageUpload} />
+              <PhotoAttachmentSection image={imageDefinition} onPress={handleImageUpload} />
               <NotesInputField onChange={setNotes} initialValue={notes} />
             </>
           )}

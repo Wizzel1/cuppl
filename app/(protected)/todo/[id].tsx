@@ -8,11 +8,12 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import TodoBottomSheet from '~/components/TodoListDetailsScreen/TodoBottomSheet';
 import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
-import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
+import TodoBottomSheet from '~/components/bottomSheets/TodoBottomSheet';
+import { TodoListBottomSheet } from '~/components/bottomSheets/TodoListBottomSheet';
 import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { TodoItem, TodoList } from '~/src/schemas/todoSchema';
+import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 
 export default function TodoListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -88,18 +89,18 @@ export default function TodoListScreen() {
   const handleToggleTodo = async (todo: TodoItem) => {
     todo.completed = !todo.completed;
     if (todo.completed) {
-      await todo.cancelNotifications();
+      await cancelNotifications(todo);
       const nextTodo = todo.tryCreateNextTodo();
       if (nextTodo) {
         list?.items?.push(nextTodo);
         todo.nextTodoID = nextTodo.id;
-        await nextTodo.scheduleNotifications();
+        await scheduleNotifications(nextTodo);
       }
     } else {
       const nextTodo = list?.items?.find((t) => t?.id === todo.nextTodoID);
       if (nextTodo) {
-        await nextTodo.cancelAndDelete();
-        await todo.scheduleNotifications();
+        await cancelNotifications(nextTodo);
+        await scheduleNotifications(nextTodo);
       }
     }
   };
@@ -256,12 +257,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#27272A',
     borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 14,
-    color: '#71717B',
-    marginTop: 8,
-    textAlign: 'right',
   },
   contentContainer: {
     paddingTop: 16,

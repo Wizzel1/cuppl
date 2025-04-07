@@ -5,8 +5,8 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import { ShoppingListBottomSheet } from '~/components/ShoppingListScreen/ShoppingListBottomSheet';
 import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListListItem';
+import { ShoppingListBottomSheet } from '~/components/bottomSheets/ShoppingListBottomSheet';
 import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ResolvedShoppingList, ShoppingList } from '~/src/schemas/shoppingSchema';
 

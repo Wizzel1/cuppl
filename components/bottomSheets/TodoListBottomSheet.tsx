@@ -4,48 +4,26 @@ import {
   BottomSheetFooter,
   BottomSheetFooterProps,
   BottomSheetModal,
-  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useAccount } from 'jazz-react-native';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { EmojiKeyboard } from 'rn-emoji-keyboard';
 
 import BottomSheetColorPicker from '../BottomSheetColorPicker';
-import CustomSwitch from '../CustomSwitch';
+import EmojiPickerScreen from '../bottomSheets/components/EmojiPickerScreen';
+import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import BottomSheetInput from './components/BottomSheetInput';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoList } from '~/src/schemas/todoSchema';
-import { useDebounce } from '~/utils/useDebounce';
 
 interface TodoListBottomSheetProps {
   toUpdate: TodoList | null;
   onDismiss?: () => void;
 }
-interface InputFieldProps {
-  onChange: (value: string) => void;
-  initialValue?: string;
-}
-const InputField = ({ onChange, initialValue }: InputFieldProps) => {
-  const [title, setTitle] = useState(initialValue ?? '');
-  const debouncedTitle = useDebounce(title, 300);
-
-  useEffect(() => {
-    onChange(debouncedTitle);
-  }, [debouncedTitle, onChange]);
-
-  return (
-    <BottomSheetTextInput
-      placeholder="New Todo List"
-      style={styles.input}
-      onChangeText={setTitle}
-      value={title}
-    />
-  );
-};
 
 export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>(
   (props, ref) => {
@@ -111,23 +89,6 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
       return 200;
     };
 
-    const EmojiPickerScreen = () => {
-      return (
-        <View style={styles.flexContainer}>
-          <EmojiKeyboard
-            styles={{
-              container: styles.emojiKeyboardContainer,
-            }}
-            onEmojiSelected={(emoji) => {
-              setEmoji(emoji.emoji);
-              setActiveScreen('todo');
-            }}
-            defaultHeight={550}
-          />
-        </View>
-      );
-    };
-
     const renderFooter = useCallback(
       (props: BottomSheetFooterProps) => {
         if (activeScreen !== 'todo') return null;
@@ -180,7 +141,11 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
             <>
               <View style={styles.headerRow}>
                 <View style={styles.inputRow}>
-                  <InputField onChange={setTitle} initialValue={toUpdate?.title} />
+                  <BottomSheetInput
+                    onChange={setTitle}
+                    initialValue={toUpdate?.title}
+                    placeholder="New Todo List"
+                  />
 
                   <Pressable style={styles.emojiButton} onPress={() => setActiveScreen('emoji')}>
                     <Text style={styles.emojiText}>{emoji}</Text>
@@ -207,12 +172,10 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
                 />
               </View>
               {showHideFromPartner && (
-                <View style={styles.marginTop}>
-                  <View style={styles.hideFromPartnerRow}>
-                    <Text style={styles.hideFromPartnerText}>Hide from partner</Text>
-                    <CustomSwitch value={hideFromPartner} onValueChange={setHideFromPartner} />
-                  </View>
-                </View>
+                <HideFromPartnerSection
+                  hideFromPartner={hideFromPartner}
+                  setHideFromPartner={setHideFromPartner}
+                />
               )}
             </>
           )}
@@ -223,7 +186,14 @@ export const TodoListBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSh
               onBackPress={() => setActiveScreen('todo')}
             />
           )}
-          {activeScreen === 'emoji' && <EmojiPickerScreen />}
+          {activeScreen === 'emoji' && (
+            <EmojiPickerScreen
+              setEmoji={(emoji) => {
+                setEmoji(emoji);
+                setActiveScreen('todo');
+              }}
+            />
+          )}
         </BottomSheetView>
       </BottomSheetModal>
     );
@@ -251,12 +221,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '800',
   },
-  input: {
-    fontSize: 24,
-    fontWeight: '600',
-    flex: 1,
-    color: '#27272A',
-  },
+
   flexContainer: {
     flex: 1,
   },

@@ -6,8 +6,8 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 
 import FloatingActionButton from '~/components/FloatingActionButton';
-import { TodoListBottomSheet } from '~/components/TodoListsScreen/TodoListBottomSheet';
 import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
+import { TodoListBottomSheet } from '~/components/bottomSheets/TodoListBottomSheet';
 import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ResolvedTodoList, TodoList } from '~/src/schemas/todoSchema';
 
