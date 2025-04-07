@@ -17,6 +17,7 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-nativ
 
 import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
 import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSection';
+import BottomSheetInput from './components/BottomSheetInput';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItem } from '~/src/schemas/shoppingSchema';
@@ -76,24 +77,6 @@ interface InputFieldProps {
   onChange: (value: string) => void;
   initialValue?: string;
 }
-
-const InputField = ({ onChange, initialValue }: InputFieldProps) => {
-  const [title, setTitle] = useState(initialValue ?? '');
-  const debouncedTitle = useDebounce(title, 300);
-
-  useEffect(() => {
-    onChange(debouncedTitle);
-  }, [debouncedTitle, onChange]);
-
-  return (
-    <BottomSheetTextInput
-      placeholder="New Item"
-      style={styles.input}
-      onChangeText={setTitle}
-      value={title}
-    />
-  );
-};
 
 const NotesInputField = ({ onChange, initialValue }: InputFieldProps) => {
   const [notes, setNotes] = useState(initialValue ?? '');
@@ -256,7 +239,7 @@ const ShoppingItemSheet = forwardRef<BottomSheetModal, ShoppingItemBottomSheetPr
         <BottomSheetView style={{ ...styles.sheetContainer, height: getScreenHeight() }}>
           {activeScreen === 'todo' && (
             <>
-              <InputField onChange={setTitle} initialValue={title} />
+              <BottomSheetInput onChange={setTitle} initialValue={title} placeholder="New Item" />
               <View
                 style={{
                   marginTop: 16,
