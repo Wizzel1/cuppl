@@ -33,7 +33,8 @@ export default function TodoListsScreen() {
 
   // useEffect(() => {
   //   if (!shallowCouple) return;
-  //   if (shallowCouple.todoLists?.length === 0) return;
+  // if (shallowCouple.todoLists?.length === 0) return;
+  //   console.log('shallowCouple', shallowCouple);
   //   shallowCouple.todoLists = TodoLists.create([], { owner: shallowCouple._owner });
   //   shallowCouple.partnerATodos = DefaultTodoList.create(
   //     { items: TodoItems.create([], { owner: shallowCouple._owner }) },
@@ -107,6 +108,10 @@ export default function TodoListsScreen() {
       sharedLists: (us ?? []) as ResolvedTodoList[],
     };
   }, [couple?.todoLists, myProfile?.accountId]);
+
+  console.log('myLists', myLists);
+  console.log('partnerLists', partnerLists);
+  console.log('sharedLists', sharedLists);
 
   const onItemPress = useCallback((listId: string) => {
     router.push({

@@ -1,57 +1,12 @@
 import { useAccount, useCoState } from 'jazz-expo';
-import {
-  Account,
-  co,
-  CoMap,
-  createInviteLink,
-  Group,
-  ID,
-  ImageDefinition,
-  Profile,
-} from 'jazz-tools';
+import { Account, co, CoMap, Group, ID, Profile } from 'jazz-tools';
 import { useMemo } from 'react';
 
+import { Couple } from './coupleSchema.jazz';
 import { Events } from './eventSchema.jazz';
+import { createPartnerProfile, PartnerProfile } from './partnerProfile.jazz';
 import { ShoppingLists } from './shoppingSchema';
 import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema';
-export class PartnerProfile extends CoMap {
-  name = co.string;
-  nickname = co.optional.string;
-  birthday = co.optional.Date;
-  avatar = co.optional.ref(ImageDefinition);
-  mood = co.string;
-  accountId = co.string;
-
-  static validate(data: { name?: string; nickname?: string }) {
-    const errors: string[] = [];
-    if (!data.name?.trim()) {
-      errors.push('Please enter a name.');
-    }
-    return { errors };
-  }
-}
-
-export class Couple extends CoMap {
-  anniversary = co.optional.Date;
-  backgroundPhoto = co.optional.ref(ImageDefinition);
-  partnerA = co.ref(PartnerProfile);
-  partnerB = co.optional.ref(PartnerProfile);
-  // Default todo lists
-  partnerATodos = co.ref(DefaultTodoList);
-  partnerBTodos = co.ref(DefaultTodoList);
-  ourTodos = co.ref(TodoList);
-  // Additional todo lists
-  todoLists = co.ref(TodoLists);
-  deleted = co.boolean;
-  shoppingLists = co.ref(ShoppingLists);
-  events = co.ref(Events);
-
-  getPartners() {
-    return this._owner
-      .castAs(Group)
-      .members.filter((member) => member.role === 'admin' || member.role === 'writer');
-  }
-}
 
 export class CoupleAccountRoot extends CoMap {
   couple = co.ref(Couple);
@@ -208,33 +163,6 @@ export class CoupleAccount extends Account {
     return invitedCouple;
   }
 }
-
-export const shareCouple = (couple: Couple): string | null => {
-  if (couple._owner) {
-    return createInviteLink(couple, 'admin', 'invite');
-  }
-  return null;
-};
-
-export const createPartnerProfile = (
-  couple: Couple,
-  name: string,
-  accountId: ID<Account>,
-  options?: { nickname?: string; birthday?: Date; avatar?: ImageDefinition }
-): PartnerProfile => {
-  const coupleGroup = couple._owner.castAs(Group);
-  return PartnerProfile.create(
-    {
-      name,
-      nickname: options?.nickname || null,
-      birthday: options?.birthday || null,
-      avatar: options?.avatar || null,
-      mood: '😊',
-      accountId,
-    },
-    { owner: coupleGroup }
-  );
-};
 
 export const useCouple = () => {
   const { me } = useAccount();

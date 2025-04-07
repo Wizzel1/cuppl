@@ -2,7 +2,8 @@ import { useAccount, useCoState } from 'jazz-expo';
 import { useEffect, useState } from 'react';
 import { Button, Text, View } from 'react-native';
 
-import { Couple, shareCouple } from '~/src/schemas/schema.jazz';
+import { Couple } from '~/src/schemas/coupleSchema.jazz';
+
 export default function Profile() {
   const { me, logOut } = useAccount();
   const [inviteLink, setInviteLink] = useState<string | null>(null);
@@ -10,7 +11,7 @@ export default function Profile() {
   const couple = useCoState(Couple, me.coupleId);
 
   useEffect(() => {
-    setInviteLink(couple ? shareCouple(couple) : null);
+    setInviteLink(couple ? (couple.share() ?? null) : null);
   }, [couple?.id]);
 
   return (
