@@ -44,14 +44,6 @@ export class CoupleAccount extends Account {
     }
   }
 
-  /**
-   * Executes the initial migration logic when the account is first created:
-   *  - Validates the user's profile data.
-   *  - Sets up a private group for the user's profile (no longer public).
-   *  - Sets up a private group for the couple data.
-   *  - Creates an initial Couple.
-   *  - Initializes the account root with version 0.
-   */
   private async initialMigration(creationProps: { name: string; other?: Record<string, unknown> }) {
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
@@ -61,54 +53,44 @@ export class CoupleAccount extends Account {
 
     const profileGroup = Group.create({ owner: this });
     this.profile = UserProfile.create({ name, ...other }, { owner: profileGroup });
+
     const privateGroup = Group.create({ owner: this });
-    const partnerATodos = DefaultTodoList.create(
-      {
-        items: TodoItems.create([], privateGroup),
-      },
-      privateGroup
-    );
-
-    const partnerBTodos = DefaultTodoList.create(
-      {
-        items: TodoItems.create([], privateGroup),
-      },
-      privateGroup
-    );
-
-    const ourTodos = TodoList.create(
-      {
-        title: 'Our To-Dos',
-        assignedTo: 'us',
-        isHidden: false,
-        items: TodoItems.create([], privateGroup),
-        creatorAccID: this.id,
-        deleted: false,
-      },
-      privateGroup
-    );
-    // Create a temporary partner profile first - we'll replace it with the proper one after
-    const tempPartnerProfile = PartnerProfile.create(
-      {
-        name: this.profile?.name || 'New Partner',
-        nickname: null,
-        birthday: null,
-        avatar: null,
-        mood: '😊',
-        accountId: this.id,
-      },
-      { owner: privateGroup }
-    );
 
     // Create an initial couple with the temporary partner profile
     const initialCouple = Couple.create(
       {
         anniversary: new Date(),
-        partnerA: tempPartnerProfile, // Use temporary profile initially
-        partnerB: null, // Second partner is null until someone joins
-        ourTodos,
-        partnerATodos,
-        partnerBTodos,
+        partnerA: PartnerProfile.create(
+          {
+            name: this.profile?.name || 'New Partner',
+            mood: '😊',
+            accountId: this.id,
+          },
+          { owner: privateGroup }
+        ), // Use temporary profile initially
+        ourTodos: TodoList.create(
+          {
+            title: 'Our To-Dos',
+            assignedTo: 'us',
+            isHidden: false,
+            items: TodoItems.create([], privateGroup),
+            creatorAccID: this.id,
+            deleted: false,
+          },
+          privateGroup
+        ),
+        partnerATodos: DefaultTodoList.create(
+          {
+            items: TodoItems.create([], privateGroup),
+          },
+          privateGroup
+        ),
+        partnerBTodos: DefaultTodoList.create(
+          {
+            items: TodoItems.create([], privateGroup),
+          },
+          privateGroup
+        ),
         todoLists: TodoLists.create([], privateGroup),
         events: Events.create([], privateGroup),
         shoppingLists: ShoppingLists.create([], privateGroup),
@@ -116,16 +98,6 @@ export class CoupleAccount extends Account {
       },
       privateGroup
     );
-
-    // Now create the proper partner profile using the createPartnerProfile helper
-    const myProfile = createPartnerProfile(
-      initialCouple,
-      this.profile?.name || 'New Partner',
-      this.id
-    );
-
-    // Replace the temporary profile with the proper one
-    initialCouple.partnerA = myProfile;
 
     // Initialize the account root with version tracking and the couple
     this.root = CoupleAccountRoot.create(
