@@ -21,7 +21,7 @@ export class Couple extends CoMap {
   // Default todo lists
   partnerATodos = co.ref(DefaultTodoList);
   partnerBTodos = co.ref(DefaultTodoList);
-  ourTodos = co.ref(TodoList);
+  sharedTodos = co.ref(TodoList);
   // Additional todo lists
   todoLists = co.ref(TodoLists);
   deleted = co.boolean;
@@ -52,7 +52,7 @@ export function createCouple(account: CoupleAccount, owner: Group) {
         },
         owner
       ),
-      ourTodos: TodoList.create({
+      sharedTodos: TodoList.create({
         title: 'Our To-Dos',
         assignedTo: 'us',
         isHidden: false,

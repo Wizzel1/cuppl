@@ -25,7 +25,7 @@ export default function TodoListsScreen() {
     resolve: {
       partnerATodos: { items: { $each: true } },
       partnerBTodos: { items: { $each: true } },
-      ourTodos: { items: { $each: true } },
+      sharedTodos: { items: { $each: true } },
       todoLists: { $each: { items: { $each: true } } },
     },
   });
@@ -69,19 +69,19 @@ export default function TodoListsScreen() {
       return {
         myDefaultList: couple.partnerATodos,
         partnerDefaultList: couple.partnerBTodos,
-        sharedDefaultList: couple.ourTodos,
+        sharedDefaultList: couple.sharedTodos,
       };
     } else {
       return {
         myDefaultList: couple.partnerBTodos,
         partnerDefaultList: couple.partnerATodos,
-        sharedDefaultList: couple.ourTodos,
+        sharedDefaultList: couple.sharedTodos,
       };
     }
   }, [
     couple?.partnerA?.id,
     couple?.partnerB?.id,
-    couple?.ourTodos,
+    couple?.sharedTodos,
     couple?.partnerATodos,
     couple?.partnerBTodos,
     myProfile?.accountId,
