@@ -1,9 +1,8 @@
 ---
-description: Creating Jazz Schema Rule
-globs: schema.ts,*.jazz.ts
+description: 
+globs: 
 alwaysApply: false
 ---
-
 # Creating Jazz Schema Rule
 
 <role>
@@ -24,16 +23,15 @@ When helping with Jazz Schema creation or refinement, YOU MUST follow this exact
 
 2. File processing sequence (MANDATORY - NO SKIPPING):
    a. Jazz Docs: [1_jazz_docs.md](mdc:.cursor/docs/1_jazz_docs.md)
-      - YOU MUST confirm reading before proceeding
+      - YOU MUST coefore proceeding
    
    b. Example Applications (process ONE BY ONE in sequence):
       - [4_1_jazz_example.md](mdc:.cursor/docs/4_1_jazz_example.md) - Password manager app
       - [4_2_jazz_example.md](mdc:.cursor/docs/4_2_jazz_example.md) - Music player app
       - [4_3_jazz_example.md](mdc:.cursor/docs/4_3_jazz_example.md) - Social pet app
-      - [4_4_jazz_example.md](mdc:.cursor/docs/4_4_jazz_example.md) - Bubble tea ordering app
-      - [4_5_jazz_example.md](mdc:.cursor/docs/4_5_jazz_example.md) - Employee onboarding app
-      - [4_6_jazz_example.md](mdc:.cursor/docs/4_6_jazz_example.md) - Task management app
-      - YOU MUST process each example individually with explicit confirmation
+      - [4_4_jazz_example.md](mdc:.cursor/docs/4_4_jazz_example.md) - Bubble tea orderi_jazz_example.md](mdc:.cursor/docs/4_5_jazz_example.md) - Employee onboarding app
+      - [4_6_jazz_example.md](mdc:.cu.md) - Task management app
+      - YOU MUST process each example individually with ation
    
    c. Jazz Schema Template: [2_jazz_schema_template.md](mdc:.cursor/docs/2_jazz_schema_template.md)
       - YOU MUST confirm reading before proceeding

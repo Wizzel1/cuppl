@@ -1,7 +1,7 @@
 # Example app 1: A secure and organized password manager app that allows users to store, manage, and categorize their credentials in folders
 
 ```typescript
-import { Account, CoList, CoMap, Group, Profile, co } from "jazz-tools";
+import { Account, CoList, CoMap, Group, Profile, co } from 'jazz-tools';
 
 /**
  * Represents a password item in the Password Manager.
@@ -87,7 +87,7 @@ export class UserProfile extends Profile {
   static validate(data: { name?: string; email?: string }) {
     const errors: string[] = [];
     if (!data.name?.trim()) {
-      errors.push("Please enter a name.");
+      errors.push('Please enter a name.');
     }
     // Note: In this schema, only 'name' is required.
     return { errors };
@@ -136,12 +136,12 @@ export class PasswordManagerAccount extends Account {
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
     if (profileErrors.errors.length > 0) {
-      throw new Error("Invalid profile data: " + profileErrors.errors.join(", "));
+      throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
     // Create a public group for the user profile.
     const publicGroup = Group.create({ owner: this });
-    publicGroup.addMember("everyone", "reader");
+    publicGroup.addMember('everyone', 'reader');
 
     // Create the user profile with validated data.
     this.profile = UserProfile.create(
@@ -158,15 +158,15 @@ export class PasswordManagerAccount extends Account {
     // Create a default Folder with one default PasswordItem.
     const defaultFolder = Folder.create(
       {
-        name: "Default",
+        name: 'Default',
         items: PasswordList.create(
           [
             PasswordItem.create(
               {
-                name: "Gmail",
-                username: "user@gmail.com",
-                password: "password123",
-                uri: "https://gmail.com",
+                name: 'Gmail',
+                username: 'user@gmail.com',
+                password: 'password123',
+                uri: 'https://gmail.com',
                 // The folder reference will be set after defaultFolder creation.
                 folder: null as any,
                 deleted: false,

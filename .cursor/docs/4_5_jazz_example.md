@@ -1,9 +1,9 @@
 # Example app 5: An employee onboarding app that streamlines the hiring process through structured steps, including initial data collection, document uploads, and final approvals
 
 ```typescript
-import { Account, CoList, CoMap, Group, ImageDefinition, Profile, co } from "jazz-tools";
+import { Account, CoList, CoMap, Group, ImageDefinition, Profile, co } from 'jazz-tools';
 
-type Steps = "initial" | "upload" | "final";
+type Steps = 'initial' | 'upload' | 'final';
 
 interface Step {
   type: Steps;
@@ -23,7 +23,7 @@ interface Step {
  *  - prevStep: Not applicable for the initial step.
  */
 export class CoInitialStep extends CoMap implements Step {
-  type = co.literal("initial");
+  type = co.literal('initial');
   ssn? = co.string;
   address? = co.string;
   done = co.boolean;
@@ -43,7 +43,7 @@ export class CoInitialStep extends CoMap implements Step {
  *  - done: Indicates if this step is completed.
  */
 export class CoDocUploadStep extends CoMap implements Step {
-  type = co.literal("upload");
+  type = co.literal('upload');
   prevStep = co.ref(CoInitialStep);
   photo = co.ref(ImageDefinition, { optional: true });
   done = co.boolean;
@@ -61,7 +61,7 @@ export class CoDocUploadStep extends CoMap implements Step {
  *  - done: Indicates if this step is completed.
  */
 export class CoFinalStep extends CoMap implements Step {
-  type = co.literal("final");
+  type = co.literal('final');
   prevStep = co.ref(CoDocUploadStep);
   done = co.boolean;
   isCurrentStep() {
@@ -119,10 +119,10 @@ export class UserProfile extends Profile {
   static validate(data: { name?: string; email?: string }) {
     const errors: string[] = [];
     if (!data.name?.trim()) {
-      errors.push("Please enter a name.");
+      errors.push('Please enter a name.');
     }
     if (data.email !== undefined && !data.email.trim()) {
-      errors.push("Please enter an email.");
+      errors.push('Please enter an email.');
     }
     return { errors };
   }
@@ -169,12 +169,12 @@ export class HRAccount extends Account {
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
     if (profileErrors.errors.length > 0) {
-      throw new Error("Invalid profile data: " + profileErrors.errors.join(", "));
+      throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
     // Create a public group for the user profile.
     const publicGroup = Group.create({ owner: this });
-    publicGroup.addMember("everyone", "reader");
+    publicGroup.addMember('everyone', 'reader');
 
     // Create the user profile with validated data.
     this.profile = UserProfile.create({ name, ...other }, { owner: publicGroup });
@@ -186,10 +186,7 @@ export class HRAccount extends Account {
     const employees = EmployeeList.create([], privateGroup);
 
     // Initialize the account root with version tracking.
-    this.root = HRAccountRoot.create(
-      { employees, version: 0 },
-      { owner: this }
-    );
+    this.root = HRAccountRoot.create({ employees, version: 0 }, { owner: this });
   }
 
   // KEEP THESE COMMENTS IN THE GENERATED SCHEMA CODE

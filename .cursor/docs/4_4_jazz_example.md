@@ -1,22 +1,17 @@
 # Example app 4: A bubble tea ordering app that lets users customize drinks with different tea bases, add-ons, and delivery preferences
 
 ```typescript
-import { Account, CoList, CoMap, Group, Profile, co } from "jazz-tools";
+import { Account, CoList, CoMap, Group, Profile, co } from 'jazz-tools';
 
 export const BubbleTeaAddOnTypes = [
-  "Pearl",
-  "Lychee jelly",
-  "Red bean",
-  "Brown sugar",
-  "Taro",
+  'Pearl',
+  'Lychee jelly',
+  'Red bean',
+  'Brown sugar',
+  'Taro',
 ] as const;
 
-export const BubbleTeaBaseTeaTypes = [
-  "Black",
-  "Oolong",
-  "Jasmine",
-  "Thai",
-] as const;
+export const BubbleTeaBaseTeaTypes = ['Black', 'Oolong', 'Jasmine', 'Thai'] as const;
 
 /**
  * A list of Bubble Tea add-ons.
@@ -75,10 +70,10 @@ export class DraftBubbleTeaOrder extends CoMap {
   validate() {
     const errors: string[] = [];
     if (!this.baseTea) {
-      errors.push("Please select your preferred base tea.");
+      errors.push('Please select your preferred base tea.');
     }
     if (!this.deliveryDate) {
-      errors.push("Please select a delivery date.");
+      errors.push('Please select a delivery date.');
     }
     return { errors };
   }
@@ -125,10 +120,10 @@ export class UserProfile extends Profile {
   static validate(data: { name?: string; email?: string }) {
     const errors: string[] = [];
     if (!data.name?.trim()) {
-      errors.push("Please enter a name.");
+      errors.push('Please enter a name.');
     }
     if (data.email !== undefined && !data.email.trim()) {
-      errors.push("Please enter an email.");
+      errors.push('Please enter an email.');
     }
     return { errors };
   }
@@ -177,18 +172,15 @@ export class BubbleTeaAccount extends Account {
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
     if (profileErrors.errors.length > 0) {
-      throw new Error("Invalid profile data: " + profileErrors.errors.join(", "));
+      throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
     // Create a public group for the user profile.
     const publicGroup = Group.create({ owner: this });
-    publicGroup.addMember("everyone", "reader");
+    publicGroup.addMember('everyone', 'reader');
 
     // Create the user profile with validated data.
-    this.profile = UserProfile.create(
-      { name, ...other },
-      { owner: publicGroup }
-    );
+    this.profile = UserProfile.create({ name, ...other }, { owner: publicGroup });
 
     // Create a private group for Bubble Tea data.
     const privateGroup = Group.create({ owner: this });
