@@ -18,7 +18,6 @@
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@expo/vector-icons": "^14.0.0",
     "@gorhom/bottom-sheet": "^5.1.2",
-    "@op-engineering/op-sqlite": "^11.4.8",
     "@react-native-community/datetimepicker": "8.3.0",
     "@react-native-community/netinfo": "11.4.1",
     "@react-native-menu/menu": "1.2.2",

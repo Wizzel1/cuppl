@@ -11,7 +11,6 @@
         "@craftzdog/react-native-buffer": "^6.0.5",
         "@expo/vector-icons": "^14.0.0",
         "@gorhom/bottom-sheet": "^5.1.2",
-        "@op-engineering/op-sqlite": "^11.4.8",
         "@react-native-community/datetimepicker": "8.3.0",
         "@react-native-community/netinfo": "11.4.1",
         "@react-native-menu/menu": "1.2.2",
@@ -501,8 +500,6 @@
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
 
     "@npmcli/fs": ["@npmcli/fs@3.1.1", "", { "dependencies": { "semver": "^7.3.5" } }, "sha512-q9CRWjpHCMIh5sVyefoD1cA7PkvILqCZsnSOEUUivORLjxCO/Irmue2DprETiNgEqktDBZaM1Bi+jrarx1XdCg=="],
-
-    "@op-engineering/op-sqlite": ["@op-engineering/op-sqlite@11.4.8", "", { "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-sZajJaKbaeSavdE5DyR+SaUYZOCeBZ0lvRoA9SC8KY8dFseScoGj4fbEBp9E0IjF3pjEaSpEpewUBg1HqFuaPA=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
 
