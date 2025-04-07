@@ -64,7 +64,7 @@ export default function SignUpScreen() {
 
   if (pendingVerification) {
     return (
-      <>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Verify your email</Text>
         <TextInput
           value={code}
@@ -72,28 +72,26 @@ export default function SignUpScreen() {
           onChangeText={(code) => setCode(code)}
         />
         <Button title="Verify" onPress={onVerifyPress} />
-      </>
+      </View>
     );
   }
 
   return (
-    <View>
-      <>
-        <Text>Sign up</Text>
-        <TextInput
-          autoCapitalize="none"
-          value={emailAddress}
-          placeholder="Enter email"
-          onChangeText={(email) => setEmailAddress(email)}
-        />
-        <TextInput
-          value={password}
-          placeholder="Enter password"
-          secureTextEntry
-          onChangeText={(password) => setPassword(password)}
-        />
-        <Button title="Continue" onPress={onSignUpPress} />
-      </>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Sign up</Text>
+      <TextInput
+        autoCapitalize="none"
+        value={emailAddress}
+        placeholder="Enter email"
+        onChangeText={(email) => setEmailAddress(email)}
+      />
+      <TextInput
+        value={password}
+        placeholder="Enter password"
+        secureTextEntry
+        onChangeText={(password) => setPassword(password)}
+      />
+      <Button title="Continue" onPress={onSignUpPress} />
     </View>
   );
 }

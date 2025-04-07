@@ -39,7 +39,7 @@ export default function Page() {
   };
 
   return (
-    <View>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <TextInput
         autoCapitalize="none"
         value={emailAddress}
@@ -60,31 +60,17 @@ export default function Page() {
         </Link>
       </View>
       <Button
-        title="Account1"
+        title="Account6"
         onPress={() => {
-          setEmailAddress('test+clerk_test@test.com');
-          setPassword('test+clerk_test');
+          setEmailAddress('test6+clerk_test@test.com');
+          setPassword('test6+clerk_test');
         }}
       />
       <Button
-        title="Account2"
+        title="Account7"
         onPress={() => {
-          setEmailAddress('test2+clerk_test@test.com');
-          setPassword('test2+clerk_test');
-        }}
-      />
-      <Button
-        title="Account3"
-        onPress={() => {
-          setEmailAddress('test3+clerk_test@test.com');
-          setPassword('test3+clerk_test');
-        }}
-      />
-      <Button
-        title="Account4"
-        onPress={() => {
-          setEmailAddress('test4+clerk_test@test.com');
-          setPassword('test4+clerk_test');
+          setEmailAddress('test7+clerk_test@test.com');
+          setPassword('test7+clerk_test');
         }}
       />
     </View>
