@@ -8,7 +8,8 @@ import { SectionList, StyleSheet, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
 import { TodoListBottomSheet } from '~/components/bottomSheets/TodoListBottomSheet';
-import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { Couple, useCouple } from '~/src/schemas/coupleSchema.jazz';
+import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ResolvedTodoList, TodoList } from '~/src/schemas/todoSchema';
 
 export default function TodoListsScreen() {

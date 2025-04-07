@@ -11,7 +11,7 @@ export default function Profile() {
   const couple = useCoState(Couple, me.coupleId);
 
   useEffect(() => {
-    setInviteLink(couple ? (couple.share() ?? null) : null);
+    setInviteLink(couple ? (couple.getInviteLink() ?? null) : null);
   }, [couple?.id]);
 
   return (

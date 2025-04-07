@@ -7,7 +7,9 @@ import Svg, { Defs, Mask, Path, Image as SvgImage } from 'react-native-svg';
 import EmojiPicker, { type EmojiType } from 'rn-emoji-keyboard';
 
 import PartnerAvatar from '~/components/PartnerAvatar';
-import { PartnerProfile, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { useCouple } from '~/src/schemas/coupleSchema.jazz';
+import { PartnerProfile } from '~/src/schemas/partnerProfile.jazz';
+import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
 
 const MaskedBackgroundPhoto = ({ imageUri }: { imageUri: string }) => {
   const windowWidth = Dimensions.get('window').width;

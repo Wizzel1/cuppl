@@ -19,7 +19,7 @@ import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartn
 import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSection';
 import BottomSheetInput from './components/BottomSheetInput';
 
-import { useCouple } from '~/src/schemas/schema.jazz';
+import { useCouple } from '~/src/schemas/coupleSchema.jazz';
 import { ShoppingItem } from '~/src/schemas/shoppingSchema';
 import { useDebounce } from '~/utils/useDebounce';
 

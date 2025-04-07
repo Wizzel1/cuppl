@@ -12,7 +12,7 @@ import { Theme } from 'react-native-calendars/src/types';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListItem from '~/components/TodoListDetailsScreen/TodoListItem';
 import EventBottomSheet from '~/components/bottomSheets/EventBottomSheet';
-import { Couple, useCouple } from '~/src/schemas/schema.jazz';
+import { Couple, useCouple } from '~/src/schemas/coupleSchema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
 
 // @ts-ignore fix for defaultProps warning: https://github.com/wix/react-native-calendars/issues/2455

@@ -21,8 +21,8 @@ import { HideFromPartnerSection } from './components/HideFromPartnerSection';
 import OptionSection from './components/OptionSection';
 import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
+import { useCouple } from '~/src/schemas/coupleSchema.jazz';
 import { Event } from '~/src/schemas/eventSchema.jazz';
-import { useCouple } from '~/src/schemas/schema.jazz';
 import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 
 type OptionListProps = {

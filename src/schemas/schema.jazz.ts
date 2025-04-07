@@ -136,13 +136,6 @@ export class CoupleAccount extends Account {
   }
 }
 
-export const useCouple = () => {
-  const { me } = useAccount();
-  const couple = useCoState(Couple, me?.root?.couple?.id);
-
-  return couple;
-};
-
 export const usePartnerProfiles = () => {
   const { me } = useAccount();
   const couple = useCoState(Couple, me?.root?.couple?.id);

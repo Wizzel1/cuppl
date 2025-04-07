@@ -17,7 +17,7 @@ import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 import BottomSheetInput from './components/BottomSheetInput';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
-import { useCouple } from '~/src/schemas/schema.jazz';
+import { useCouple } from '~/src/schemas/coupleSchema.jazz';
 import { TodoList } from '~/src/schemas/todoSchema';
 
 interface TodoListBottomSheetProps {

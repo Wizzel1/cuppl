@@ -1,10 +1,17 @@
-import { createInviteLink } from 'jazz-expo';
+import { createInviteLink, useAccount, useCoState } from 'jazz-expo';
 import { co, CoMap, Group, ImageDefinition } from 'jazz-tools';
 
 import { Events } from './eventSchema.jazz';
 import { PartnerProfile } from './partnerProfile.jazz';
 import { ShoppingLists } from './shoppingSchema';
 import { DefaultTodoList, TodoList, TodoLists } from './todoSchema';
+
+export const useCouple = () => {
+  const { me } = useAccount();
+  const couple = useCoState(Couple, me?.root?.couple?.id);
+
+  return couple;
+};
 export class Couple extends CoMap {
   anniversary = co.optional.Date;
   backgroundPhoto = co.optional.ref(ImageDefinition);
@@ -26,7 +33,7 @@ export class Couple extends CoMap {
       .members.filter((member) => member.role === 'admin' || member.role === 'writer');
   }
 
-  share() {
+  getInviteLink() {
     if (this._owner) {
       return createInviteLink(this, 'admin', { baseURL: 'invite' });
     }

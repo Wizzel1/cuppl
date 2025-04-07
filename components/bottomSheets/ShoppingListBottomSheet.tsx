@@ -16,7 +16,7 @@ import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartn
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 import BottomSheetInput from './components/BottomSheetInput';
 
-import { useCouple } from '~/src/schemas/schema.jazz';
+import { useCouple } from '~/src/schemas/coupleSchema.jazz';
 import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema';
 import { TodoList } from '~/src/schemas/todoSchema';
 

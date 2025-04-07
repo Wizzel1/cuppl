@@ -21,7 +21,7 @@ import { HideFromPartnerSection } from './components/HideFromPartnerSection';
 import OptionSection from './components/OptionSection';
 import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
-import { useCouple } from '~/src/schemas/schema.jazz';
+import { useCouple } from '~/src/schemas/coupleSchema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
 import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 

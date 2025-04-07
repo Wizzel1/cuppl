@@ -7,7 +7,8 @@ import { SectionList, Text, View } from 'react-native';
 import FloatingActionButton from '~/components/FloatingActionButton';
 import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListListItem';
 import { ShoppingListBottomSheet } from '~/components/bottomSheets/ShoppingListBottomSheet';
-import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
+import { Couple, useCouple } from '~/src/schemas/coupleSchema.jazz';
+import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
 import { ResolvedShoppingList, ShoppingList } from '~/src/schemas/shoppingSchema';
 
 export default function ShoppingListsScreen() {
