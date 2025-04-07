@@ -1,6 +1,6 @@
 import { co, CoList, CoMap, ImageDefinition, Resolved } from 'jazz-tools';
 
-import { cancelNotification, scheduleNotification } from '~/utils/notifications';
+import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 
 export type ResolvedTodoList = Resolved<
   TodoList,
@@ -42,36 +42,11 @@ export class TodoItem extends CoMap {
   }
 
   async cancelNotifications() {
-    if (this.alertNotificationID !== undefined) {
-      await cancelNotification(this.alertNotificationID);
-    }
-    if (this.secondAlertNotificationID !== undefined) {
-      await cancelNotification(this.secondAlertNotificationID);
-    }
+    await cancelNotifications(this);
   }
 
   async scheduleNotifications() {
-    if (!this.dueDate) return;
-    if (this.alertOptionMinutes !== undefined) {
-      const id = await scheduleNotification(
-        this.alertOptionMinutes,
-        this.dueDate,
-        this.title,
-        `${this.title} is due in ${this.alertOptionMinutes} minutes`
-      );
-      this.alertNotificationID = id;
-      console.log('scheduled alert notification', id);
-    }
-    if (this.secondAlertOptionMinutes !== undefined) {
-      const id = await scheduleNotification(
-        this.secondAlertOptionMinutes,
-        this.dueDate,
-        this.title,
-        `${this.title} is due in ${this.secondAlertOptionMinutes} minutes`
-      );
-      this.secondAlertNotificationID = id;
-      console.log('scheduled second alert notification', id);
-    }
+    await scheduleNotifications(this);
   }
 
   tryCreateNextTodo() {
