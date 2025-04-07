@@ -1,6 +1,6 @@
 import { co, CoList, CoMap, ImageDefinition, Resolved } from 'jazz-tools';
 
-import { cancelNotification, scheduleNotification } from './schema.jazz';
+import { cancelNotification, scheduleNotification } from '~/utils/notifications';
 
 export type ResolvedTodoList = Resolved<
   TodoList,
@@ -95,6 +95,7 @@ export class TodoItem extends CoMap {
     return nextTodo;
   }
 }
+
 function getNextDueDate(recurringUnit: TodoItem['recurringUnit'], dueDate: Date | undefined) {
   if (!recurringUnit || !dueDate) return;
   const nextDueDate = new Date(dueDate);

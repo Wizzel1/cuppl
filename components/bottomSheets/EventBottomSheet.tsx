@@ -21,8 +21,8 @@ import { HideFromPartnerSection } from './components/HideFromPartnerSection';
 import OptionSection from './components/OptionSection';
 import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
+import { Event } from '~/src/schemas/eventSchema.jazz';
 import { useCouple } from '~/src/schemas/schema.jazz';
-import { TodoItem } from '~/src/schemas/todoSchema';
 import { useDebounce } from '~/utils/useDebounce';
 
 type OptionListProps = {
@@ -73,9 +73,9 @@ const OptionList = ({ title, options, selectedOption, onSelect, onBack }: Option
 );
 
 type EventBottomSheetProps = {
-  onCreate?: (newTodo: TodoItem) => void;
+  onCreate?: (newEvent: Event) => void;
   defaultAssignedTo?: OwnerAssignment;
-  toUpdate: TodoItem | null;
+  toUpdate: Event | null;
   onDismiss?: () => void;
 };
 
@@ -129,10 +129,10 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
 
   const [alertOption, setAlertOption] = useState<number | null>(null);
   const [secondAlertOption, setSecondAlertOption] = useState<number | null>(null);
-  const [repeatMode, setRepeatMode] = useState<TodoItem['recurringUnit'] | null>(null);
+  const [repeatMode, setRepeatMode] = useState<Event['recurringUnit'] | null>(null);
 
   const [imageDefinition, setImageDefinition] = useState<ImageDefinition | null>(null);
-  const [assignedTo, setAssignedTo] = useState<TodoItem['assignedTo']>('me');
+  const [assignedTo, setAssignedTo] = useState<Event['assignedTo']>('me');
   const [showHideFromPartner, setShowHideFromPartner] = useState(true);
   const [hideFromPartner, setHideFromPartner] = useState(false);
 
@@ -212,16 +212,18 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.photo = imageDefinition;
-      toUpdate.scheduleNotifications();
+      // toUpdate.scheduleNotifications();
     } else {
-      const newTodo = TodoItem.create(
+      const newEvent = Event.create(
         {
           title,
           creatorAccID: me.id,
           dueDate: hasDueDate ? dueDate : null,
-          completed: false,
           deleted: false,
+          isAllDay: false,
+          isRecurring: false,
           isHidden: hideFromPartner,
+          startDate: new Date(),
           assignedTo,
           recurringUnit: repeatMode ?? undefined,
           alertOptionMinutes: alertOption ?? undefined,
@@ -230,8 +232,8 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
         },
         { owner: couple!._owner }
       );
-      newTodo.scheduleNotifications().then(() => {
-        onCreate(newTodo);
+      newEvent.scheduleNotifications().then(() => {
+        onCreate(newEvent);
       });
     }
 
@@ -258,7 +260,7 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
     setActiveScreen('todo');
   };
 
-  const selectRepeatOption = (option: TodoItem['recurringUnit']) => {
+  const selectRepeatOption = (option: Event['recurringUnit']) => {
     setRepeatMode(option);
     setActiveScreen('todo');
   };
@@ -387,7 +389,7 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
             selectedOption={repeatMode ? repeatMode : 'Never'}
             onSelect={(option) => {
               const selectedOption = repeatOptions[repeatOptions.indexOf(option)];
-              selectRepeatOption(selectedOption as TodoItem['recurringUnit']);
+              selectRepeatOption(selectedOption as Event['recurringUnit']);
             }}
             onBack={() => setActiveScreen('todo')}
           />
