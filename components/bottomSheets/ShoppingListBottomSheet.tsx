@@ -4,7 +4,6 @@ import {
   BottomSheetFooter,
   BottomSheetFooterProps,
   BottomSheetModal,
-  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useAccount } from 'jazz-react-native';
@@ -12,45 +11,19 @@ import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import BottomSheetColorPicker from '../BottomSheetColorPicker';
-import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 import EmojiPickerScreen from '../bottomSheets/components/EmojiPickerScreen';
 import { HideFromPartnerSection } from '../bottomSheets/components/HideFromPartnerSection';
+import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import BottomSheetInput from './components/BottomSheetInput';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema';
 import { TodoList } from '~/src/schemas/todoSchema';
-import { useDebounce } from '~/utils/useDebounce';
 
 interface ShoppingListBottomSheetProps {
   toUpdate: ShoppingList | null;
   onDismiss?: () => void;
 }
-interface InputFieldProps {
-  onChange: (value: string) => void;
-  initialValue?: string;
-}
-const InputField = ({ onChange, initialValue }: InputFieldProps) => {
-  const [title, setTitle] = useState(initialValue ?? '');
-  const debouncedTitle = useDebounce(title, 300);
-
-  useEffect(() => {
-    onChange(debouncedTitle);
-  }, [debouncedTitle, onChange]);
-
-  return (
-    <BottomSheetTextInput
-      placeholder="New Shopping List"
-      style={{
-        fontSize: 24,
-        fontWeight: '600',
-        flex: 1,
-        color: '#27272A',
-      }}
-      onChangeText={setTitle}
-      value={title}
-    />
-  );
-};
 
 export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingListBottomSheetProps>(
   (props, ref) => {
@@ -190,7 +163,11 @@ export const ShoppingListBottomSheet = forwardRef<BottomSheetModal, ShoppingList
                   gap: 8,
                   justifyContent: 'space-between',
                 }}>
-                <InputField onChange={setTitle} initialValue={toUpdate?.title} />
+                <BottomSheetInput
+                  onChange={setTitle}
+                  initialValue={toUpdate?.title}
+                  placeholder="New Shopping List"
+                />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <Pressable onPress={() => setActiveScreen('emoji')}>
                     <View

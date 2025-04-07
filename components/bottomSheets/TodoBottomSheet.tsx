@@ -5,7 +5,6 @@ import {
   BottomSheetFooter,
   BottomSheetFooterProps,
   BottomSheetModal,
-  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
@@ -16,6 +15,7 @@ import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
+import BottomSheetInput from './components/BottomSheetInput';
 import DueDateSection from './components/DueDateSection';
 import { HideFromPartnerSection } from './components/HideFromPartnerSection';
 import OptionSection from './components/OptionSection';
@@ -24,7 +24,6 @@ import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
 import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
-import { useDebounce } from '~/utils/useDebounce';
 
 type OptionListProps = {
   title: string;
@@ -78,33 +77,6 @@ type TodoListBottomSheetProps = {
   defaultAssignedTo?: OwnerAssignment;
   toUpdate: TodoItem | null;
   onDismiss?: () => void;
-};
-
-interface InputFieldProps {
-  onChange: (value: string) => void;
-  initialValue?: string;
-}
-
-const InputField = ({ onChange, initialValue }: InputFieldProps) => {
-  const [title, setTitle] = useState(initialValue ?? '');
-  const debouncedTitle = useDebounce(title, 300);
-
-  useEffect(() => {
-    onChange(debouncedTitle);
-  }, [debouncedTitle, onChange]);
-
-  return (
-    <BottomSheetTextInput
-      placeholder="New Todo"
-      style={{
-        fontSize: 24,
-        fontWeight: '600',
-        color: '#27272A',
-      }}
-      onChangeText={setTitle}
-      value={title}
-    />
-  );
 };
 
 const alertMinutesOptions = [0, 5, 15, 30, 60, 120] as const;
@@ -308,7 +280,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       <BottomSheetView style={{ ...styles.sheetContainer, height: screenHeight }}>
         {activeScreen === 'todo' && (
           <>
-            <InputField onChange={setTitle} initialValue={title} />
+            <BottomSheetInput onChange={setTitle} initialValue={title} placeholder="New Todo" />
             <View style={{ marginTop: 16 }}>
               <OwnerDropdown
                 onAssignedToChange={handleAssignedToChange}
