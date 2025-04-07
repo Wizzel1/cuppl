@@ -23,6 +23,7 @@ import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
 import { TodoItem } from '~/src/schemas/todoSchema';
+import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 import { useDebounce } from '~/utils/useDebounce';
 
 type OptionListProps = {
@@ -212,7 +213,8 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.photo = imageDefinition;
-      toUpdate.scheduleNotifications();
+      cancelNotifications(toUpdate);
+      scheduleNotifications(toUpdate);
     } else {
       const newTodo = TodoItem.create(
         {
@@ -230,7 +232,7 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
         },
         { owner: couple!._owner }
       );
-      newTodo.scheduleNotifications().then(() => {
+      scheduleNotifications(newTodo).then(() => {
         onCreate(newTodo);
       });
     }
@@ -397,12 +399,19 @@ const TodoBottomSheet = forwardRef<BottomSheetModal, TodoListBottomSheetProps>((
   );
 });
 
+export default TodoBottomSheet;
+
 const styles = StyleSheet.create({
   sheetContainer: {
     padding: 24,
     zIndex: 1000,
   },
-
+  dateTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
   footerContainer: {
     padding: 12,
     margin: 12,
@@ -430,13 +439,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  dateButtonText: {
+    fontSize: 14,
+    color: '#27272A',
+    textAlign: 'center',
+  },
   sectionContainer: {
     marginTop: 16,
   },
   rowBetween: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   sectionLabel: {
     fontSize: 16,
@@ -454,6 +468,63 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#71717B',
   },
+  photoButton: {
+    backgroundColor: '#F4F4F5',
+    width: 70,
+    height: 70,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  quantityContainer: {
+    width: '100%',
+    height: 50,
+    flexDirection: 'column',
+  },
+  quantityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#8E51FF',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  spacer: {
+    width: 40,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  picker: {
+    flex: 1,
+  },
+  input: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#27272A',
+  },
+  notesInput: {
+    fontSize: 16,
+    marginTop: 16,
+    height: 100,
+    color: '#27272A',
+    borderWidth: 1,
+    borderColor: '#E4E4E7',
+    borderRadius: 8,
+    padding: 12,
+  },
 });
-
-export default TodoBottomSheet;

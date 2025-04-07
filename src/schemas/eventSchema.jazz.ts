@@ -1,7 +1,5 @@
 import { co, CoList, CoMap, ImageDefinition } from 'jazz-tools';
 
-import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
-
 export class Event extends CoMap {
   title = co.string;
   assignedTo = co.literal('me', 'partner', 'us');
@@ -22,14 +20,6 @@ export class Event extends CoMap {
   secondAlertNotificationID = co.optional.string;
   secondAlertOptionMinutes = co.optional.number;
   travelTime = co.optional.number;
-
-  async cancelNotifications() {
-    await cancelNotifications(this);
-  }
-
-  async scheduleNotifications() {
-    await scheduleNotifications(this);
-  }
 }
 
 export class Events extends CoList.Of(co.ref(Event)) {}

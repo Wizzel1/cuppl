@@ -23,6 +23,7 @@ import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
 import { Event } from '~/src/schemas/eventSchema.jazz';
 import { useCouple } from '~/src/schemas/schema.jazz';
+import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 import { useDebounce } from '~/utils/useDebounce';
 
 type OptionListProps = {
@@ -212,7 +213,8 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
       toUpdate.alertOptionMinutes = alertOption ?? undefined;
       toUpdate.secondAlertOptionMinutes = secondAlertOption ?? undefined;
       toUpdate.photo = imageDefinition;
-      // toUpdate.scheduleNotifications();
+      cancelNotifications(toUpdate);
+      scheduleNotifications(toUpdate);
     } else {
       const newEvent = Event.create(
         {
@@ -232,7 +234,7 @@ const EventBottomSheet = forwardRef<BottomSheetModal, EventBottomSheetProps>((pr
         },
         { owner: couple!._owner }
       );
-      newEvent.scheduleNotifications().then(() => {
+      scheduleNotifications(newEvent).then(() => {
         onCreate(newEvent);
       });
     }

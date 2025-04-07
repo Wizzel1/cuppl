@@ -1,6 +1,6 @@
 import { co, CoList, CoMap, ImageDefinition, Resolved } from 'jazz-tools';
 
-import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
+import { cancelNotifications } from '~/utils/notifications';
 
 export type ResolvedTodoList = Resolved<
   TodoList,
@@ -37,16 +37,8 @@ export class TodoItem extends CoMap {
   }
 
   async cancelAndDelete() {
-    await this.cancelNotifications();
-    this.deleted = true;
-  }
-
-  async cancelNotifications() {
     await cancelNotifications(this);
-  }
-
-  async scheduleNotifications() {
-    await scheduleNotifications(this);
+    this.deleted = true;
   }
 
   tryCreateNextTodo() {
