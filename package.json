@@ -38,7 +38,7 @@
     "expo-status-bar": "~2.0.1",
     "expo-system-ui": "~4.0.9",
     "expo-web-browser": "~14.0.2",
-    "jazz-expo": "^0.13.0",
+    "jazz-expo": "^0.13.1",
     "jazz-react-native-media-images": "^0.13.0",
     "jazz-tools": "^0.13.0",
     "radashi": "^12.4.0",

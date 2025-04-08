@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/clerk-expo';
-import { JazzProviderWithClerk } from 'jazz-expo/dist/auth/clerk';
+import { JazzProviderWithClerk } from 'jazz-expo/auth/clerk';
 import { PropsWithChildren } from 'react';
 
 import { CoupleAccount } from '~/src/schemas/schema.jazz';
