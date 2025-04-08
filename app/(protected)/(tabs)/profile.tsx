@@ -23,6 +23,7 @@ export default function Profile() {
       }}>
       <Text>Profile</Text>
       <Button title="Log Out" onPress={logOut} />
+      {me ? <Text>{me.profile?.name}</Text> : <Text>No profile</Text>}
       {couple ? <Text>Couple {couple.id}</Text> : <Text>No couple</Text>}
       {couple ? <Text>Couple owner {couple._owner.id}</Text> : <Text>No couple owner</Text>}
       <Text>My account {me.id}</Text>
