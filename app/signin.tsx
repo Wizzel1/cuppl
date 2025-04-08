@@ -3,6 +3,8 @@ import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
 
+const latestAccountNumber = 14;
+
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
@@ -60,31 +62,17 @@ export default function Page() {
         </Link>
       </View>
       <Button
-        title="Account1"
+        title={`Account${latestAccountNumber - 1}`}
         onPress={() => {
-          setEmailAddress('test+clerk_test@test.com');
-          setPassword('test+clerk_test');
+          setEmailAddress(`test${latestAccountNumber - 1}+clerk_test@test.com`);
+          setPassword(`test${latestAccountNumber - 1}+clerk_test`);
         }}
       />
       <Button
-        title="Account2"
+        title={`Account${latestAccountNumber}`}
         onPress={() => {
-          setEmailAddress('test2+clerk_test@test.com');
-          setPassword('test2+clerk_test');
-        }}
-      />
-      <Button
-        title="Account3"
-        onPress={() => {
-          setEmailAddress('test3+clerk_test@test.com');
-          setPassword('test3+clerk_test');
-        }}
-      />
-      <Button
-        title="Account4"
-        onPress={() => {
-          setEmailAddress('test4+clerk_test@test.com');
-          setPassword('test4+clerk_test');
+          setEmailAddress(`test${latestAccountNumber}+clerk_test@test.com`);
+          setPassword(`test${latestAccountNumber}+clerk_test`);
         }}
       />
     </View>

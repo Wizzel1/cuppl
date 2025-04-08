@@ -3,11 +3,15 @@ import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
 
+const accountNumber = 14;
+
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
-  const [emailAddress, setEmailAddress] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [emailAddress, setEmailAddress] = React.useState(
+    `test${accountNumber}+clerk_test@test.com`
+  );
+  const [password, setPassword] = React.useState(`test${accountNumber}+clerk_test`);
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState('');
 
