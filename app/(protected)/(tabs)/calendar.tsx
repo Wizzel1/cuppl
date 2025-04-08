@@ -83,7 +83,7 @@ export default function CalendarScreen() {
     resolve: {
       partnerATodos: { items: { $each: true } },
       partnerBTodos: { items: { $each: true } },
-      ourTodos: { items: { $each: true } },
+      sharedTodos: { items: { $each: true } },
       todoLists: { $each: { items: { $each: true } } },
     },
   });
