@@ -1,10 +1,10 @@
 # Example app 6: A task management app that helps users organize their to-dos with categories, tags, due dates, and priority levels
 
 ```typescript
-import { Account, CoList, CoMap, Group, Profile, co } from "jazz-tools";
+import { Account, CoList, CoMap, Group, Profile, co } from 'jazz-tools';
 
 // Task priority levels
-export type PriorityLevel = "Low" | "Medium" | "High";
+export type PriorityLevel = 'Low' | 'Medium' | 'High';
 
 // Represents a tag that can be associated with tasks
 export class Tag extends CoMap {
@@ -28,7 +28,7 @@ export class Task extends CoMap {
   description = co.optional.string;
   dueDate = co.optional.Date;
   isCompleted = co.boolean;
-  priority = co.literal("Low", "Medium", "High");
+  priority = co.literal('Low', 'Medium', 'High');
   tags = co.ref(TagList);
   category = co.optional.ref(Category);
   deleted = co.boolean;
@@ -55,7 +55,7 @@ export class UserProfile extends Profile {
   static validate(data: { name?: string; other?: Record<string, unknown> }) {
     const errors: string[] = [];
     if (!data.name?.trim()) {
-      errors.push("Please enter a name.");
+      errors.push('Please enter a name.');
     }
     return { errors };
   }
@@ -66,10 +66,7 @@ export class JazzAccount extends Account {
   profile = co.ref(UserProfile);
   root = co.ref(AccountRoot);
 
-  async migrate(creationProps?: {
-    name: string;
-    other?: Record<string, unknown>;
-  }) {
+  async migrate(creationProps?: { name: string; other?: Record<string, unknown> }) {
     if (!this._refs.root && creationProps) {
       await this.initialMigration(creationProps);
       return;
@@ -85,29 +82,22 @@ export class JazzAccount extends Account {
     // }
   }
 
-  private async initialMigration(
-    creationProps: {
-      name: string;
-      other?: Record<string, unknown>;
-    }
-  ) {
+  private async initialMigration(creationProps: { name: string; other?: Record<string, unknown> }) {
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
     if (profileErrors.errors.length > 0) {
-      throw new Error(
-        "Invalid profile data: " + profileErrors.errors.join(", "),
-      );
+      throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
     const publicGroup = Group.create({ owner: this });
-    publicGroup.addMember("everyone", "reader");
+    publicGroup.addMember('everyone', 'reader');
 
     this.profile = UserProfile.create(
       {
         name,
         ...other,
       },
-      { owner: publicGroup },
+      { owner: publicGroup }
     );
 
     const privateGroup = Group.create({ owner: this });
@@ -119,15 +109,18 @@ export class JazzAccount extends Account {
         categories: CategoryList.create([], privateGroup),
         tags: TagList.create([], privateGroup),
       },
-      privateGroup,
+      privateGroup
     );
 
     // Initialize root structure with version
-    this.root = AccountRoot.create({
-      container: defaultContainer,
-      version: 0, // Set initial version
-      // here owner is always "this" Account
-    }, { owner: this });
+    this.root = AccountRoot.create(
+      {
+        container: defaultContainer,
+        version: 0, // Set initial version
+        // here owner is always "this" Account
+      },
+      { owner: this }
+    );
   }
 
   // uncomment this to add migrations

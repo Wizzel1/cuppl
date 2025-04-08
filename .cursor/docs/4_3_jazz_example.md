@@ -1,16 +1,9 @@
 # Example app 3: A social pet app where users can share pet photos, react with fun emojis, and organize posts in a collaborative feed
 
 ```typescript
-import { Account, CoFeed, CoList, CoMap, Group, ImageDefinition, Profile, co } from "jazz-tools";
+import { Account, CoFeed, CoList, CoMap, Group, ImageDefinition, Profile, co } from 'jazz-tools';
 
-export const ReactionTypes = [
-  "aww",
-  "love",
-  "haha",
-  "wow",
-  "tiny",
-  "chonkers",
-] as const;
+export const ReactionTypes = ['aww', 'love', 'haha', 'wow', 'tiny', 'chonkers'] as const;
 
 export type ReactionType = (typeof ReactionTypes)[number];
 
@@ -77,10 +70,10 @@ export class UserProfile extends Profile {
   static validate(data: { name?: string; email?: string }) {
     const errors: string[] = [];
     if (!data.name?.trim()) {
-      errors.push("Please enter a name.");
+      errors.push('Please enter a name.');
     }
     if (data.email !== undefined && !data.email?.trim()) {
-      errors.push("Please enter an email.");
+      errors.push('Please enter an email.');
     }
     return { errors };
   }
@@ -130,18 +123,15 @@ export class PetAccount extends Account {
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
     if (profileErrors.errors.length > 0) {
-      throw new Error("Invalid profile data: " + profileErrors.errors.join(", "));
+      throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
     // Create a public group for the user profile.
     const publicGroup = Group.create({ owner: this });
-    publicGroup.addMember("everyone", "reader");
+    publicGroup.addMember('everyone', 'reader');
 
     // Create the user profile with validated data.
-    this.profile = UserProfile.create(
-      { name, ...other },
-      { owner: publicGroup }
-    );
+    this.profile = UserProfile.create({ name, ...other }, { owner: publicGroup });
 
     // Create a private group for pet data.
     const privateGroup = Group.create({ owner: this });
@@ -153,10 +143,7 @@ export class PetAccount extends Account {
     );
 
     // Initialize the account root with version tracking.
-    this.root = PetAccountRoot.create(
-      { container: defaultContainer, version: 0 },
-      { owner: this }
-    );
+    this.root = PetAccountRoot.create({ container: defaultContainer, version: 0 }, { owner: this });
   }
 
   // KEEP THESE COMMENTS IN THE GENERATED SCHEMA CODE

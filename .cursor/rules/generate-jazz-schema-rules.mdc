@@ -1,7 +1,11 @@
 ---
-description: Creating Jazz Schema Rule
-globs: schema.ts,*.jazz.ts
+description: 
+globs: *.jazz.ts
 alwaysApply: false
+---
+---
+description: Creating Jazz Schema Rule
+globs: schema.ts
 ---
 
 # Creating Jazz Schema Rule
