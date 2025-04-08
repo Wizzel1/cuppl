@@ -60,17 +60,17 @@ export default function Page() {
         </Link>
       </View>
       <Button
-        title="Account6"
+        title="Account8"
         onPress={() => {
-          setEmailAddress('test6+clerk_test@test.com');
-          setPassword('test6+clerk_test');
+          setEmailAddress('test8+clerk_test@test.com');
+          setPassword('test8+clerk_test');
         }}
       />
       <Button
-        title="Account7"
+        title="Account9"
         onPress={() => {
-          setEmailAddress('test7+clerk_test@test.com');
-          setPassword('test7+clerk_test');
+          setEmailAddress('test9+clerk_test@test.com');
+          setPassword('test9+clerk_test');
         }}
       />
     </View>
