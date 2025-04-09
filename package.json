@@ -13,8 +13,8 @@
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@bam.tech/react-native-image-resizer": "^3.0.11",
-    "@clerk/clerk-expo": "^2.9.9",
-    "@clerk/types": "^4.51.1",
+    "@clerk/clerk-expo": "^2.9.10",
+    "@clerk/types": "^4.52.0",
     "@craftzdog/react-native-buffer": "^6.0.5",
     "@expo/vector-icons": "^14.0.0",
     "@gorhom/bottom-sheet": "^5.1.2",
