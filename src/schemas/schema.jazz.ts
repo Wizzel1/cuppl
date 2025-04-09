@@ -286,16 +286,13 @@ export const createPartnerProfile = (
  * @returns The couple instance or undefined if not loaded yet
  */
 export const useCouple = () => {
-  const { me } = useAccount();
-  const couple = useCoState(Couple, me?.root?.couple?.id);
-
-  return couple;
+  const { me } = useAccount({ resolve: { root: { couple: true } } });
+  return me?.root.couple;
 };
 
 export const usePartnerProfiles = () => {
-  const { me } = useAccount();
-  const couple = useCoState(Couple, me?.root?.couple?.id);
-
+  const { me } = useAccount({ resolve: { root: { couple: true } } });
+  const couple = me?.root.couple;
   const profiles = useMemo(() => {
     if (!couple || !me?.id) {
       return { myProfile: null, partnerProfile: null };
