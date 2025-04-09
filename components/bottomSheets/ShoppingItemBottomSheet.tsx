@@ -9,7 +9,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-import { useAccount, useCoState } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-expo';
 import { createImage } from 'jazz-react-native-media-images';
 import { ID, ImageDefinition } from 'jazz-tools';
 import { forwardRef, useCallback, useEffect, useState } from 'react';

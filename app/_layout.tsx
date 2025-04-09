@@ -1,8 +1,9 @@
 import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { resourceCache } from '@clerk/clerk-expo/resource-cache';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack, usePathname, useRouter, useSegments } from 'expo-router';
-import { useAccount } from 'jazz-react-native';
+import { useAccount, useIsAuthenticated } from 'jazz-expo';
 import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -20,6 +21,9 @@ function InitialLayout() {
   const { me } = useAccount();
   const segments = useSegments();
   const pathname = usePathname();
+  const isAuthenticated = useIsAuthenticated();
+  console.log('isAuthenticated', isAuthenticated);
+  console.log('isSignedIn', isSignedIn);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -56,7 +60,10 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <BottomSheetModalProvider>
-        <ClerkProvider publishableKey={publishableKey!} tokenCache={tokenCache}>
+        <ClerkProvider
+          publishableKey={publishableKey!}
+          tokenCache={tokenCache}
+          __experimental_resourceCache={resourceCache}>
           <ClerkLoaded>
             <JazzAndAuth>
               <InitialLayout />

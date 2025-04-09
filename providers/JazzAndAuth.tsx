@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/clerk-expo';
-import { JazzProviderWithClerk } from 'jazz-react-native-auth-clerk';
+import { JazzProviderWithClerk } from 'jazz-expo/auth/clerk';
 import { PropsWithChildren } from 'react';
 
 import { CoupleAccount } from '~/src/schemas/schema.jazz';
@@ -10,18 +10,16 @@ export function JazzAndAuth({ children }: PropsWithChildren) {
   return (
     <JazzProviderWithClerk
       clerk={clerk}
-      storage="sqlite"
       AccountSchema={CoupleAccount}
-      guestMode={false}
       sync={{
-        peer: `wss://cloud.jazz.tools/?key=r_christian@gmx.de`,
+        peer: `wss://cloud.jazz.tools/?key=${process.env.EXPO_PUBLIC_JAZZ_KEY}`,
       }}>
       {children}
     </JazzProviderWithClerk>
   );
 }
 
-declare module 'jazz-react-native' {
+declare module 'jazz-expo' {
   interface Register {
     Account: CoupleAccount;
   }

@@ -1,4 +1,4 @@
-import { useAccount } from 'jazz-react-native';
+import { useAccount, useCoState } from 'jazz-expo';
 import {
   Account,
   co,
@@ -218,21 +218,13 @@ export const createPartnerProfile = (
   );
 };
 
-/**
- * Custom hook that returns the couple that the current user is in.
- *
- * This hook simplifies access to the couple data and handles the loading state.
- * It automatically retrieves the couple from the user's account root.
- *
- * @returns The couple instance or undefined if not loaded yet
- */
 export const useCouple = () => {
-  const { me } = useAccount({ resolve: { root: { couple: true } } });
-  return me?.root.couple;
+  const { me } = useAccount();
+  return useCoState(Couple, me?.root?.couple?.id);
 };
 
 export const usePartnerProfiles = () => {
-  const { me } = useAccount({ resolve: { root: { couple: true } } });
+  const { me } = useAccount({ resolve: { root: { couple: { partnerA: true, partnerB: true } } } });
   const couple = me?.root.couple;
   const profiles = useMemo(() => {
     if (!couple || !me?.id) {
@@ -249,7 +241,7 @@ export const usePartnerProfiles = () => {
     }
 
     return { myProfile: null, partnerProfile: null };
-  }, [couple?.partnerA?.id, couple?.partnerB?.id, me?.id]);
+  }, [me?.root?.couple?.partnerA?.id, me?.root?.couple?.partnerB?.id, me?.id]);
 
   return profiles;
 };

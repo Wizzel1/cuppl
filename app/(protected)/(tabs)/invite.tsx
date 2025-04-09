@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useAcceptInvite, useAccount } from 'jazz-react-native';
+import { useAcceptInvite, useAccount } from 'jazz-expo';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Button, Linking, StyleSheet, Text, View } from 'react-native';
 

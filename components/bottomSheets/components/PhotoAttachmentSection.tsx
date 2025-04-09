@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ProgressiveImg } from 'jazz-react-native';
+import { ProgressiveImg } from 'jazz-expo';
 import { ImageDefinition } from 'jazz-tools';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 

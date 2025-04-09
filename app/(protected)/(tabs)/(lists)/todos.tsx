@@ -1,6 +1,6 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRouter } from 'expo-router';
-import { useCoState } from 'jazz-react-native';
+import { useCoState } from 'jazz-expo';
 import { group, sift } from 'radashi';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { SectionList, StyleSheet, Text, View } from 'react-native';
@@ -24,7 +24,7 @@ export default function TodoListsScreen() {
     resolve: {
       partnerATodos: { items: { $each: true } },
       partnerBTodos: { items: { $each: true } },
-      ourTodos: { items: { $each: true } },
+      sharedTodos: { items: { $each: true } },
       todoLists: { $each: { items: { $each: true } } },
     },
   });
@@ -67,19 +67,19 @@ export default function TodoListsScreen() {
       return {
         myDefaultList: couple.partnerATodos,
         partnerDefaultList: couple.partnerBTodos,
-        sharedDefaultList: couple.ourTodos,
+        sharedDefaultList: couple.sharedTodos,
       };
     } else {
       return {
         myDefaultList: couple.partnerBTodos,
         partnerDefaultList: couple.partnerATodos,
-        sharedDefaultList: couple.ourTodos,
+        sharedDefaultList: couple.sharedTodos,
       };
     }
   }, [
     couple?.partnerA?.id,
     couple?.partnerB?.id,
-    couple?.ourTodos,
+    couple?.sharedTodos,
     couple?.partnerATodos,
     couple?.partnerBTodos,
     myProfile?.accountId,
