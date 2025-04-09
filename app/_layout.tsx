@@ -1,4 +1,5 @@
 import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack, usePathname, useRouter, useSegments } from 'expo-router';
 import { useAccount } from 'jazz-react-native';
@@ -7,7 +8,6 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { JazzAndAuth } from '~/providers/JazzAndAuth';
-import { tokenCache } from '~/utils/tokenCache';
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 if (!publishableKey) {
