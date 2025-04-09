@@ -1,4 +1,4 @@
-import { useAccount, useCoState } from 'jazz-react-native';
+import { useAccount } from 'jazz-react-native';
 import {
   Account,
   co,
@@ -11,10 +11,9 @@ import {
 } from 'jazz-tools';
 import { useMemo } from 'react';
 
-import { createTodoList } from '../repositories/todoListsRepository';
 import { Events } from './eventSchema.jazz';
 import { ShoppingLists } from './shoppingSchema';
-import { DefaultTodoList, TodoItem, TodoItems, TodoList, TodoLists } from './todoSchema';
+import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema';
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;
@@ -40,7 +39,7 @@ export class Couple extends CoMap {
   // Default todo lists
   partnerATodos = co.ref(DefaultTodoList);
   partnerBTodos = co.ref(DefaultTodoList);
-  ourTodos = co.ref(TodoList);
+  sharedTodos = co.ref(TodoList);
   // Additional todo lists
   todoLists = co.ref(TodoLists);
   deleted = co.boolean;
@@ -91,124 +90,76 @@ export class CoupleAccount extends Account {
   }
 
   private async initialMigration(creationProps: { name: string; other?: Record<string, unknown> }) {
+    console.log('initialMigration', creationProps);
     const { name, other } = creationProps;
     const profileErrors = UserProfile.validate({ name, ...other });
     if (profileErrors.errors.length > 0) {
       throw new Error('Invalid profile data: ' + profileErrors.errors.join(', '));
     }
 
-    // Create a private group for the user profile (no longer public)
-    const profileGroup = Group.create({ owner: this });
-
-    // Create the user profile with validated data - now private
-    this.profile = UserProfile.create({ name, ...other }, { owner: profileGroup });
-
-    // Create a private group for couple data
-    const privateGroup = Group.create({ owner: this });
-
-    if (1 === 1) return;
-    // Create a sample personal todo list
-    const myTodoList = createTodoList({
-      me: this,
-      title: 'My To-Dos',
-      isHidden: false,
-      assignedTo: 'me',
-      emoji: '📝',
-      backgroundColor: '#000000',
-    });
-    if (!myTodoList) return;
-    myTodoList!.items!.push(
-      TodoItem.create(
-        {
-          title: 'Welcome to your todo list!',
-          completed: false,
-          dueDate: null,
-          notes: null,
-          deleted: false,
-          isHidden: false,
-          creatorAccID: this.id,
-          assignedTo: 'me',
-          alertNotificationID: null,
-          alertOptionMinutes: null,
-          secondAlertNotificationID: null,
-          secondAlertOptionMinutes: null,
-        },
-        privateGroup
-      )
+    const privateProfileGroup = Group.create({ owner: this });
+    this.profile = UserProfile.create(
+      {
+        name,
+        ...other,
+      },
+      { owner: privateProfileGroup }
     );
-
+    console.log('profile', this.profile);
+    const coupleGroup = Group.create({ owner: this });
     const partnerATodos = DefaultTodoList.create(
-      {
-        items: TodoItems.create([], privateGroup),
-      },
-      privateGroup
+      { items: TodoItems.create([], { owner: coupleGroup }) },
+      { owner: coupleGroup }
     );
-
     const partnerBTodos = DefaultTodoList.create(
-      {
-        items: TodoItems.create([], privateGroup),
-      },
-      privateGroup
+      { items: TodoItems.create([], { owner: coupleGroup }) },
+      { owner: coupleGroup }
     );
-
-    const ourTodos = TodoList.create(
+    const sharedTodos = TodoList.create(
       {
-        title: 'Our To-Dos',
-        assignedTo: 'us',
-        isHidden: false,
-        items: TodoItems.create([], privateGroup),
-        creatorAccID: this.id,
         deleted: false,
+        creatorAccID: this.id,
+        assignedTo: 'us',
+        items: TodoItems.create([], { owner: coupleGroup }),
+        title: 'Shared Todos',
+        isHidden: false,
       },
-      privateGroup
+      { owner: coupleGroup }
     );
-    // Create a temporary partner profile first - we'll replace it with the proper one after
-    const tempPartnerProfile = PartnerProfile.create(
+    const todoLists = TodoLists.create([], { owner: coupleGroup });
+    const events = Events.create([], { owner: coupleGroup });
+    const shoppingLists = ShoppingLists.create([], { owner: coupleGroup });
+
+    const partnerA = PartnerProfile.create(
       {
-        name: this.profile?.name || 'New Partner',
-        nickname: null,
-        birthday: null,
-        avatar: null,
-        mood: '😊',
         accountId: this.id,
+        name,
+        mood: '😊',
+        nickname: 'Partner A',
       },
-      { owner: privateGroup }
+      { owner: coupleGroup }
     );
 
-    // Create an initial couple with the temporary partner profile
-    const initialCouple = Couple.create(
+    const couple = Couple.create(
       {
-        anniversary: new Date(),
-        partnerA: tempPartnerProfile, // Use temporary profile initially
-        partnerB: null, // Second partner is null until someone joins
-        ourTodos,
+        todoLists,
+        shoppingLists,
+        events,
         partnerATodos,
         partnerBTodos,
-        todoLists: TodoLists.create([], privateGroup),
-        events: Events.create([], privateGroup),
-        shoppingLists: ShoppingLists.create([], privateGroup),
+        sharedTodos,
         deleted: false,
+        partnerA,
       },
-      privateGroup
+      { owner: coupleGroup }
     );
-
-    // Now create the proper partner profile using the createPartnerProfile helper
-    const myProfile = createPartnerProfile(
-      initialCouple,
-      this.profile?.name || 'New Partner',
-      this.id
-    );
-
-    // Replace the temporary profile with the proper one
-    initialCouple.partnerA = myProfile;
-
-    // Initialize the account root with version tracking and the couple
+    console.log('couple', couple);
     this.root = CoupleAccountRoot.create(
       {
-        couple: initialCouple,
+        couple,
         version: 0,
       },
-      { owner: this }
+      { owner: coupleGroup }
     );
   }
 
@@ -247,16 +198,6 @@ export const shareCouple = (couple: Couple): string | null => {
   return null;
 };
 
-/**
- * Creates a new partner profile for a member of the couple.
- * The profile will be owned by the couple's group, making it editable by both partners.
- *
- * @param couple The couple instance the profile belongs to
- * @param name The name for the profile
- * @param accountId The ID of the account this profile represents
- * @param options Additional optional profile information
- * @returns The created partner profile
- */
 export const createPartnerProfile = (
   couple: Couple,
   name: string,

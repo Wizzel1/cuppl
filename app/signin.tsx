@@ -3,8 +3,7 @@ import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
 
-const latestAccountNumber = 14;
-
+const latestAccountNumber = 21;
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
@@ -26,6 +25,7 @@ export default function Page() {
       // If sign-in process is complete, set the created session as active
       // and redirect the user
       if (signInAttempt.status === 'complete') {
+        console.log('signInAttempt', signInAttempt);
         await setActive({ session: signInAttempt.createdSessionId });
         router.replace('/(protected)/(tabs)/home');
       } else {

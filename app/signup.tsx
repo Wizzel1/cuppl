@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
 
-const accountNumber = 14;
+const accountNumber = 21;
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();

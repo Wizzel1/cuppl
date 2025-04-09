@@ -12,6 +12,7 @@ export function JazzAndAuth({ children }: PropsWithChildren) {
       clerk={clerk}
       storage="sqlite"
       AccountSchema={CoupleAccount}
+      guestMode={false}
       sync={{
         peer: `wss://cloud.jazz.tools/?key=r_christian@gmx.de`,
       }}>
