@@ -8,7 +8,7 @@ import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimat
 
 import AvatarListItem from '../AvatarListItem';
 
-import { ResolvedDefaultTodoList, ResolvedTodoList } from '~/src/schemas/todoSchema';
+import { ResolvedDefaultTodoList, ResolvedTodoList } from '~/src/schemas/todoSchema.jazz';
 
 type RightActionProps = {
   onDelete: () => void;

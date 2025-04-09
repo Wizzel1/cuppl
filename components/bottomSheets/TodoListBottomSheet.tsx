@@ -18,7 +18,7 @@ import BottomSheetInput from './components/BottomSheetInput';
 
 import * as TodoListsRepo from '~/src/repositories/todoListsRepository';
 import { useCouple } from '~/src/schemas/schema.jazz';
-import { TodoList } from '~/src/schemas/todoSchema';
+import { TodoList } from '~/src/schemas/todoSchema.jazz';
 
 interface TodoListBottomSheetProps {
   toUpdate: TodoList | null;

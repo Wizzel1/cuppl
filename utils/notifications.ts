@@ -2,7 +2,7 @@ import * as Notifications from 'expo-notifications';
 import { SchedulableTriggerInputTypes } from 'expo-notifications';
 
 import { Event } from '~/src/schemas/eventSchema.jazz';
-import { TodoItem } from '~/src/schemas/todoSchema';
+import { TodoItem } from '~/src/schemas/todoSchema.jazz';
 
 export async function scheduleNotifications(item: Event | TodoItem) {
   const { alertOptionMinutes, secondAlertOptionMinutes, dueDate, title } = item;

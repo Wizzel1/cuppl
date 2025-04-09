@@ -9,7 +9,7 @@ import FloatingActionButton from '~/components/FloatingActionButton';
 import TodoListListItem from '~/components/TodoListsScreen/TodoListListItem';
 import { TodoListBottomSheet } from '~/components/bottomSheets/TodoListBottomSheet';
 import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
-import { ResolvedTodoList, TodoList } from '~/src/schemas/todoSchema';
+import { ResolvedTodoList, TodoList } from '~/src/schemas/todoSchema.jazz';
 
 export default function TodoListsScreen() {
   const { myProfile, partnerProfile } = usePartnerProfiles();

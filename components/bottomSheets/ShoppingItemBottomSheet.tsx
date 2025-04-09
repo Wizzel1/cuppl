@@ -20,7 +20,7 @@ import PhotoAttachmentSection from '../bottomSheets/components/PhotoAttachmentSe
 import BottomSheetInput from './components/BottomSheetInput';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
-import { ShoppingItem } from '~/src/schemas/shoppingSchema';
+import { ShoppingItem } from '~/src/schemas/shoppingSchema.jazz';
 import { useDebounce } from '~/utils/useDebounce';
 
 type QuantitySectionProps = {

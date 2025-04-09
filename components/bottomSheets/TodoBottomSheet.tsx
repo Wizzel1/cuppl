@@ -22,7 +22,7 @@ import OptionSection from './components/OptionSection';
 import PhotoAttachmentSection from './components/PhotoAttachmentSection';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
-import { TodoItem } from '~/src/schemas/todoSchema';
+import { TodoItem } from '~/src/schemas/todoSchema.jazz';
 import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 
 type OptionListProps = {

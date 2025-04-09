@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
-import { ShoppingItem } from '~/src/schemas/shoppingSchema';
+import { ShoppingItem } from '~/src/schemas/shoppingSchema.jazz';
 
 type RightActionProps = {
   onDelete: () => void;

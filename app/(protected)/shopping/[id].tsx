@@ -10,7 +10,7 @@ import FloatingActionButton from '~/components/FloatingActionButton';
 import ShoppingListItem from '~/components/ShoppingListDetailsScreen/ShoppingListItem';
 import ShoppingItemBottomSheet from '~/components/bottomSheets/ShoppingItemBottomSheet';
 import { ShoppingListBottomSheet } from '~/components/bottomSheets/ShoppingListBottomSheet';
-import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema';
+import { ShoppingItem, ShoppingList } from '~/src/schemas/shoppingSchema.jazz';
 
 export default function ShoppingListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

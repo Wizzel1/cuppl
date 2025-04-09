@@ -12,8 +12,8 @@ import {
 import { useMemo } from 'react';
 
 import { Events } from './eventSchema.jazz';
-import { ShoppingLists } from './shoppingSchema';
-import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema';
+import { ShoppingLists } from './shoppingSchema.jazz';
+import { DefaultTodoList, TodoItems, TodoList, TodoLists } from './todoSchema.jazz';
 export class PartnerProfile extends CoMap {
   name = co.string;
   nickname = co.optional.string;

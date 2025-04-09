@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
-import { TodoItem } from '~/src/schemas/todoSchema';
+import { TodoItem } from '~/src/schemas/todoSchema.jazz';
 
 type RightActionProps = {
   onDelete: () => void;

@@ -12,7 +12,7 @@ import TodoSectionList from '~/components/TodoListDetailsScreen/TodoDueSection';
 import TodoBottomSheet from '~/components/bottomSheets/TodoBottomSheet';
 import { TodoListBottomSheet } from '~/components/bottomSheets/TodoListBottomSheet';
 import { usePartnerProfiles } from '~/src/schemas/schema.jazz';
-import { TodoItem, TodoList } from '~/src/schemas/todoSchema';
+import { TodoItem, TodoList } from '~/src/schemas/todoSchema.jazz';
 import { cancelNotifications, scheduleNotifications } from '~/utils/notifications';
 
 export default function TodoListScreen() {

@@ -8,7 +8,7 @@ import FloatingActionButton from '~/components/FloatingActionButton';
 import ShoppingListListItem from '~/components/ShoppingListScreen/ShoppingListListItem';
 import { ShoppingListBottomSheet } from '~/components/bottomSheets/ShoppingListBottomSheet';
 import { Couple, useCouple, usePartnerProfiles } from '~/src/schemas/schema.jazz';
-import { ResolvedShoppingList, ShoppingList } from '~/src/schemas/shoppingSchema';
+import { ResolvedShoppingList, ShoppingList } from '~/src/schemas/shoppingSchema.jazz';
 
 export default function ShoppingListsScreen() {
   const shallowCouple = useCouple();

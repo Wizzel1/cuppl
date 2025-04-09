@@ -8,7 +8,7 @@ import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimat
 
 import AvatarListItem from '../AvatarListItem';
 
-import { ResolvedShoppingList } from '~/src/schemas/shoppingSchema';
+import { ResolvedShoppingList } from '~/src/schemas/shoppingSchema.jazz';
 
 type RightActionProps = {
   onDelete: () => void;

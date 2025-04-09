@@ -17,8 +17,8 @@ import OwnerDropdown, { OwnerAssignment } from '../OwnerDropdown';
 import BottomSheetInput from './components/BottomSheetInput';
 
 import { useCouple } from '~/src/schemas/schema.jazz';
-import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema';
-import { TodoList } from '~/src/schemas/todoSchema';
+import { ShoppingItems, ShoppingList } from '~/src/schemas/shoppingSchema.jazz';
+import { TodoList } from '~/src/schemas/todoSchema.jazz';
 
 interface ShoppingListBottomSheetProps {
   toUpdate: ShoppingList | null;
