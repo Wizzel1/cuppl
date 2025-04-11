@@ -1,11 +1,11 @@
-import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
 import { resourceCache } from '@clerk/clerk-expo/resource-cache';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Stack, usePathname, useRouter, useSegments } from 'expo-router';
-import { useAccount, useIsAuthenticated } from 'jazz-expo';
+import { useIsAuthenticated } from 'jazz-expo';
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { JazzAndAuth } from '~/providers/JazzAndAuth';
@@ -16,32 +16,21 @@ if (!publishableKey) {
 }
 
 function InitialLayout() {
-  const router = useRouter();
-  const { isLoaded, isSignedIn } = useAuth();
-  const { me } = useAccount();
-  const segments = useSegments();
-  const pathname = usePathname();
   const isAuthenticated = useIsAuthenticated();
-  console.log('isAuthenticated', isAuthenticated);
-  console.log('isSignedIn', isSignedIn);
+  const segments = useSegments();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoaded) return;
+    console.log('isAuthenticated', isAuthenticated);
     const inAuthGroup = segments[0] === '(protected)';
-    if (isSignedIn && !inAuthGroup) {
+    if (isAuthenticated && inAuthGroup) {
       router.replace('/(protected)');
-    } else if (!isSignedIn && pathname !== '/signin') {
-      router.replace('/signin');
+    } else if (!isAuthenticated && pathname !== '/signin') {
+      router.replace('/(auth)/signin');
     }
-  }, [isSignedIn, me.id]);
+  }, [isAuthenticated]);
 
-  if (!isLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
   return (
     <Stack
       screenOptions={{
@@ -50,8 +39,7 @@ function InitialLayout() {
         headerTitle: '',
       }}>
       <Stack.Screen name="(protected)" options={{ headerShown: false }} />
-      <Stack.Screen name="signin" options={{ headerShown: false }} />
-      <Stack.Screen name="signup" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
     </Stack>
   );
 }

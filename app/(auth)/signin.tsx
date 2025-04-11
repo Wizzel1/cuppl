@@ -57,7 +57,7 @@ export default function Page() {
       <Button title="Sign in" onPress={onSignInPress} />
       <View>
         <Text>Don't have an account?</Text>
-        <Link href="/signup">
+        <Link href="/(auth)/signup">
           <Text>Sign up</Text>
         </Link>
       </View>
