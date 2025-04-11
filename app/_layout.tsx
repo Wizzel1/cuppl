@@ -22,7 +22,6 @@ function InitialLayout() {
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log('isAuthenticated', isAuthenticated);
     const inAuthGroup = segments[0] === '(protected)';
     if (isAuthenticated && inAuthGroup) {
       router.replace('/(protected)');
